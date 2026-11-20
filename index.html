@@ -7,50 +7,59 @@
 <link rel="apple-touch-icon" href="icon.png">
 <style>
   :root {
-    --bg-body: #131314;
-    --bg-card: #1e1f20;
-    --bg-box: #131314;
-    --bg-btn: #2c2d2f;
-    --bg-btn-hover: #3c4043;
-    --border-main: #333537;
-    --border-sub: #2c2d2f;
-    --border-input: #3c4043;
-    --text-main: #e3e3e3;
-    --text-title: #ffffff;
-    --text-label: #c4c7c5;
-    --text-muted: #9aa0a6;
-    --c-fixo: #8ab4f8;
-    --c-lazer: #fdd663;
-    --c-reserva: #c58af9;
-    --c-guardado: #81c995;
-    --c-sobra: #78d9ec;
-    --c-neg: #f28b82;
+    --bg-body: #000000;
+    --bg-card: #121214;
+    --bg-box: #0a0a0c;
+    --bg-btn: #1c1c1f;
+    --bg-btn-hover: #2a2a2e;
+    --border-main: rgba(255, 255, 255, 0.08);
+    --border-sub: rgba(255, 255, 255, 0.06);
+    --border-input: rgba(255, 255, 255, 0.14);
+    --shadow-card: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 12px 32px rgba(0, 0, 0, 0.55);
+    --text-main: #F5F5F7;
+    --text-title: #F5F5F7;
+    --text-label: #D1D1D6;
+    --text-muted: #86868B;
+
+    --c-cartao: #FF9F0A;
+    --c-fixo: #0A84FF;
+    --c-cabelo: #FF375F;
+    --c-lazer: #FFD60A;
+    --c-reserva: #BF5AF2;
+    --c-guardado: #30D158;
+    --c-sobra: #64D2FF;
+    --c-neg: #FF453A;
   }
 
   body.light-mode {
-    --bg-body: #f0f4f9;
-    --bg-card: #ffffff;
-    --bg-box: #f8fafd;
-    --bg-btn: #e8eaed;
-    --bg-btn-hover: #dadce0;
-    --border-main: #dadce0;
-    --border-sub: #e0e3e7;
-    --border-input: #bdc1c6;
-    --text-main: #1f1f1f;
-    --text-title: #1f1f1f;
-    --text-label: #3c4043;
-    --text-muted: #5f6368;
-    --c-fixo: #1a73e8;
-    --c-lazer: #d97706;
-    --c-reserva: #8430ce;
-    --c-guardado: #188038;
-    --c-sobra: #007b83;
-    --c-neg: #d93025;
+    --bg-body: #F5F5F7;
+    --bg-card: #FFFFFF;
+    --bg-box: #F5F5F7;
+    --bg-btn: #ECECEF;
+    --bg-btn-hover: #E1E1E6;
+    --border-main: rgba(0, 0, 0, 0.06);
+    --border-sub: rgba(0, 0, 0, 0.05);
+    --border-input: rgba(0, 0, 0, 0.14);
+    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.04);
+    --text-main: #1D1D1F;
+    --text-title: #1D1D1F;
+    --text-label: #3A3A3C;
+    --text-muted: #6E6E73;
+
+    --c-cartao: #E67E00;
+    --c-fixo: #0066CC;
+    --c-cabelo: #D91B42;
+    --c-lazer: #B28700;
+    --c-reserva: #892CDC;
+    --c-guardado: #1A8F3E;
+    --c-sobra: #0077A8;
+    --c-neg: #D70015;
   }
 
   * {
     box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
@@ -58,6 +67,11 @@
     color: var(--text-main);
     margin: 0;
     padding: 0;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  .num-tabular {
+    font-variant-numeric: tabular-nums;
   }
 
   /* ==================== TELA DE LOGIN LIQUID GLASS ==================== */
@@ -69,18 +83,18 @@
     flex-direction: column;
     justify-content: space-between;
     overflow-x: hidden;
-    background: radial-gradient(circle at 25% 35%, #2e5388 0%, #1b3864 45%, #0f1f3d 100%);
-    color: #ffffff;
+    background: #05070c;
+    color: #F5F5F7;
   }
 
   .sb-bg-image {
     position: fixed;
-    inset: -16px;
+    inset: -28px;
     background-image: url('icon.png');
     background-size: cover;
     background-position: center;
-    filter: blur(5px) brightness(0.95) saturate(1.1);
-    transform: scale(1.03);
+    filter: blur(22px) brightness(0.72) saturate(1.25);
+    transform: scale(1.06);
     z-index: 0;
     pointer-events: none;
   }
@@ -88,7 +102,7 @@
   .sb-bg-overlay {
     position: fixed;
     inset: 0;
-    background: linear-gradient(180deg, rgba(12, 32, 66, 0.28) 0%, rgba(10, 24, 50, 0.25) 50%, rgba(10, 24, 50, 0.42) 100%);
+    background: radial-gradient(circle at 50% 40%, rgba(10, 14, 24, 0.25) 0%, rgba(0, 0, 0, 0.65) 100%);
     z-index: 1;
     pointer-events: none;
   }
@@ -99,7 +113,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 32px;
+    padding: 18px 28px;
     gap: 12px;
   }
 
@@ -107,52 +121,55 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 20px;
+    font-size: 19px;
     font-weight: 700;
-    color: #ffffff;
-    letter-spacing: -0.3px;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.35);
+    color: #F5F5F7;
+    letter-spacing: -0.02em;
   }
 
   .sb-chart-icon {
-    width: 26px;
-    height: 26px;
-    background: rgba(255, 255, 255, 0.88);
-    border-radius: 6px;
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 9px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #1b3864;
+    color: #30D158;
   }
 
   .sb-nav-links {
     display: flex;
     align-items: center;
-    gap: 22px;
+    gap: 20px;
     font-size: 13px;
     font-weight: 500;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.4);
   }
 
   .sb-nav-links a {
-    color: rgba(255, 255, 255, 0.95);
+    color: rgba(245, 245, 247, 0.85);
     text-decoration: none;
     cursor: pointer;
+    transition: opacity 0.2s;
   }
 
   .sb-nav-links a:hover {
-    text-decoration: underline;
+    opacity: 1;
+    color: #FFFFFF;
   }
 
   .sb-btn-open-top {
-    background: #ffffff;
-    color: #111827 !important;
-    padding: 7px 14px;
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.14) !important;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    color: #FFFFFF !important;
+    padding: 8px 14px;
+    border-radius: 999px;
     font-weight: 600;
-    text-decoration: none !important;
-    text-shadow: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   .sb-center-wrap {
@@ -168,49 +185,47 @@
 
   .sb-glass-card {
     width: 100%;
-    max-width: 315px;
-    background: rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.42);
+    max-width: 350px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: 24px;
-    padding: 26px 22px 22px;
+    padding: 28px 24px 24px;
     text-align: center;
-    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.22);
   }
 
   .sb-card-logo {
-    width: 34px;
-    height: 34px;
-    margin: 0 auto 10px;
-    background: rgba(255, 255, 255, 0.85);
-    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    margin: 0 auto 12px;
+    background: rgba(48, 209, 88, 0.16);
+    border: 1px solid rgba(48, 209, 88, 0.35);
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #1b3864;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+    color: #30D158;
   }
 
   .sb-card-title {
     margin: 0;
-    font-size: 21px;
+    font-size: 22px;
     font-weight: 700;
-    color: #ffffff;
-    letter-spacing: -0.3px;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.35);
+    color: #F5F5F7;
+    letter-spacing: -0.02em;
   }
 
   .sb-card-sub {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.92);
-    margin: 4px 0 18px;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.35);
+    font-size: 12.5px;
+    color: rgba(245, 245, 247, 0.72);
+    margin: 5px 0 20px;
   }
 
   .sb-field-group {
     position: relative;
-    margin-bottom: 11px;
+    margin-bottom: 12px;
     display: flex;
     align-items: center;
   }
@@ -218,7 +233,7 @@
   .sb-field-icon {
     position: absolute;
     left: 14px;
-    color: rgba(255, 255, 255, 0.78);
+    color: rgba(245, 245, 247, 0.6);
     display: flex;
     align-items: center;
     pointer-events: none;
@@ -226,88 +241,96 @@
 
   .sb-input {
     width: 100%;
-    background: rgba(22, 24, 28, 0.88);
+    min-height: 46px;
+    background: rgba(0, 0, 0, 0.42);
     border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 12px;
-    padding: 12px 38px 12px 40px;
-    color: #ffffff;
-    font-size: 13.5px;
+    border-radius: 14px;
+    padding: 12px 42px 12px 42px;
+    color: #F5F5F7;
+    font-size: 14px;
     outline: none;
+    transition: border-color 0.2s, background-color 0.2s;
   }
 
   .sb-input::placeholder {
-    color: rgba(255, 255, 255, 0.75);
+    color: rgba(245, 245, 247, 0.5);
   }
 
   .sb-input:focus {
-    border-color: #82c896;
-    background: rgba(18, 20, 24, 0.95);
+    border-color: #30D158;
+    background: rgba(0, 0, 0, 0.62);
   }
 
   .sb-eye-btn {
     position: absolute;
-    right: 12px;
+    right: 10px;
+    min-width: 34px;
+    min-height: 34px;
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.75);
+    color: rgba(245, 245, 247, 0.65);
     cursor: pointer;
-    padding: 4px;
     display: flex;
     align-items: center;
+    justify-content: center;
   }
 
   .sb-help-links {
     display: flex;
-    flex-direction: column;
-    gap: 5px;
-    margin: 12px 0 16px;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.45);
+    justify-content: space-between;
+    gap: 8px;
+    margin: 10px 2px 18px;
   }
 
   .sb-help-links a {
     font-size: 12px;
-    color: #ffffff;
+    color: rgba(245, 245, 247, 0.78);
     text-decoration: none;
     cursor: pointer;
   }
 
   .sb-help-links a:hover {
+    color: #FFFFFF;
     text-decoration: underline;
   }
 
   .sb-btn-enter {
     width: 100%;
-    background: #84c997;
-    color: #0e1a12;
+    min-height: 46px;
+    background: #30D158;
+    color: #041408;
     border: none;
-    border-radius: 999px;
-    padding: 11px;
-    font-size: 14.5px;
+    border-radius: 14px;
+    padding: 12px;
+    font-size: 15px;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-    transition: transform 0.15s, background-color 0.15s;
+    transition: transform 0.15s ease, filter 0.15s ease;
   }
 
   .sb-btn-enter:hover {
-    background: #96d8a8;
-    transform: translateY(-1px);
+    filter: brightness(1.06);
+  }
+
+  .sb-btn-enter:active {
+    transform: scale(0.985);
   }
 
   .sb-btn-secondary {
     width: 100%;
+    min-height: 44px;
     margin-top: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.45);
-    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 14px;
     padding: 8px 14px;
-    color: #ffffff;
+    color: #F5F5F7;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
-    line-height: 1.2;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.35);
+    justify-content: center;
+    line-height: 1.25;
   }
 
   .sb-btn-secondary:hover {
@@ -321,32 +344,32 @@
 
   .sb-btn-secondary span {
     font-size: 10.5px;
-    color: rgba(255, 255, 255, 0.88);
+    color: rgba(245, 245, 247, 0.68);
   }
 
   .sb-qr-link {
-    margin-top: 14px;
+    margin-top: 16px;
+    min-height: 40px;
     display: inline-flex;
     align-items: center;
     gap: 6px;
     font-size: 12.5px;
-    color: #ffffff;
+    color: rgba(245, 245, 247, 0.85);
     cursor: pointer;
     background: none;
     border: none;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
   }
 
   .sb-qr-link:hover {
+    color: #FFFFFF;
     text-decoration: underline;
   }
 
   .sb-login-msg {
-    margin-top: 8px;
-    font-size: 11.5px;
-    min-height: 14px;
-    color: #ffd663;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    margin-top: 10px;
+    font-size: 12px;
+    min-height: 16px;
+    color: #FFD60A;
   }
 
   .sb-footer {
@@ -355,12 +378,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 32px;
+    padding: 16px 28px;
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.92);
+    color: rgba(245, 245, 247, 0.72);
     flex-wrap: wrap;
     gap: 12px;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.55);
   }
 
   .sb-footer-links {
@@ -369,7 +391,7 @@
   }
 
   .sb-footer-links a {
-    color: rgba(255, 255, 255, 0.92);
+    color: rgba(245, 245, 247, 0.72);
     text-decoration: none;
     cursor: pointer;
   }
@@ -382,8 +404,13 @@
   }
 
   @media (max-width: 720px) {
-    .sb-topbar { padding: 14px 18px; }
+    .sb-topbar { padding: 14px 16px; }
     .sb-nav-links a:not(.sb-btn-open-top) { display: none; }
+    .sb-glass-card {
+      max-width: 100%;
+      border-radius: 22px;
+      padding: 24px 18px 20px;
+    }
     .sb-footer {
       flex-direction: column;
       text-align: center;
@@ -392,26 +419,27 @@
     }
   }
 
-  /* ==================== PAINEL FINANCEIRO ==================== */
+  /* ==================== PAINEL APPLE GOURMET ==================== */
   .app-wrapper {
-    padding: 14px;
+    padding: 18px;
   }
 
   .card {
     background: var(--bg-card);
-    border-radius: 16px;
-    padding: 18px;
-    max-width: 900px;
+    border-radius: 20px;
+    padding: 22px;
+    max-width: 1060px;
     margin: 0 auto;
     border: 1px solid var(--border-main);
+    box-shadow: var(--shadow-card);
   }
 
   .header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
-    gap: 10px;
+    margin-bottom: 18px;
+    gap: 12px;
     flex-wrap: wrap;
   }
 
@@ -423,20 +451,20 @@
   }
 
   .brand-tag {
-    font-weight: 800;
-    font-size: 16px;
-    color: var(--c-guardado);
-    letter-spacing: -0.3px;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--text-title);
+    letter-spacing: -0.02em;
   }
 
   .user-pill {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
-    padding: 3px 8px;
+    padding: 5px 11px;
     border-radius: 999px;
-    background: rgba(138, 180, 248, 0.15);
+    background: rgba(10, 132, 255, 0.14);
     color: var(--c-fixo);
-    border: 1px solid rgba(138, 180, 248, 0.35);
+    border: 1px solid rgba(10, 132, 255, 0.25);
   }
 
   .date-selectors {
@@ -446,105 +474,123 @@
   }
 
   .month-select {
+    min-height: 36px;
     background: var(--bg-btn);
     color: var(--text-title);
     border: 1px solid var(--border-input);
-    border-radius: 8px;
-    padding: 6px 10px;
-    font-size: 13.5px;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     outline: none;
   }
 
   .sync-badge {
-    font-size: 11px;
-    padding: 4px 8px;
-    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 999px;
     background: var(--bg-box);
     border: 1px solid var(--border-sub);
     color: var(--text-muted);
+    white-space: nowrap;
   }
 
   .actions {
     display: flex;
-    gap: 6px;
+    gap: 7px;
     align-items: center;
     flex-wrap: wrap;
   }
 
   .btn {
+    min-height: 36px;
     background: var(--bg-btn);
     color: var(--text-main);
     border: 1px solid var(--border-input);
-    border-radius: 8px;
-    padding: 6px 10px;
-    font-size: 12px;
+    border-radius: 12px;
+    padding: 7px 12px;
+    font-size: 12.5px;
     cursor: pointer;
-    font-weight: 500;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: background-color 0.15s ease, transform 0.12s ease;
   }
 
   .btn:hover {
     background: var(--bg-btn-hover);
   }
 
+  .btn:active {
+    transform: scale(0.97);
+  }
+
   .btn-accent {
-    background: rgba(129, 201, 149, 0.15);
-    border-color: var(--c-guardado);
+    background: rgba(48, 209, 88, 0.14);
+    border-color: rgba(48, 209, 88, 0.35);
     color: var(--c-guardado);
-    font-weight: 600;
   }
 
   .btn-installment {
-    background: rgba(120, 217, 236, 0.14);
-    border-color: var(--c-sobra);
+    background: rgba(100, 210, 255, 0.14);
+    border-color: rgba(100, 210, 255, 0.35);
     color: var(--c-sobra);
-    font-weight: 600;
   }
 
   .btn-add-bottom {
     width: 100%;
-    padding: 11px;
-    font-size: 13px;
+    min-height: 46px;
+    padding: 12px;
+    font-size: 13.5px;
     border-style: dashed;
-    border-width: 1.5px;
+    border-radius: 14px;
+    margin-top: 6px;
     margin-bottom: 14px;
   }
 
   .btn-danger {
+    min-width: 34px;
+    min-height: 34px;
     color: var(--c-neg);
     border-color: transparent;
     background: transparent;
     padding: 4px 8px;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 700;
+    border-radius: 10px;
   }
 
   .btn-danger:hover {
-    background: rgba(242, 139, 130, 0.15);
+    background: rgba(255, 69, 58, 0.14);
   }
 
+  /* ==================== FAIXA DE KPIs ==================== */
   .top-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+    gap: 10px;
     margin-bottom: 16px;
   }
 
   .kpi {
     background: var(--bg-box);
-    border-radius: 12px;
-    padding: 12px 8px;
+    border-radius: 16px;
+    padding: 13px 10px;
     text-align: center;
     border: 1px solid var(--border-sub);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
   }
 
   .kpi-label {
-    font-size: 10px;
+    font-size: 10.5px;
     color: var(--text-muted);
     margin-bottom: 5px;
     text-transform: uppercase;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.04em;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -552,65 +598,86 @@
   }
 
   .kpi-val {
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 700;
+    letter-spacing: -0.02em;
   }
 
   .kpi-pct {
-    font-size: 11px;
+    font-size: 11.5px;
     margin-top: 3px;
-    opacity: 0.9;
-    font-weight: 500;
-  }
-
-  .income-box {
-    background: var(--bg-box);
-    padding: 12px 14px;
-    border-radius: 10px;
-    margin-bottom: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid var(--border-sub);
-  }
-
-  .income-box label {
-    font-size: 13px;
-    color: var(--text-label);
-    font-weight: 500;
-  }
-
-  .income-input {
-    background: transparent;
-    border: none;
-    color: var(--text-title);
-    font-size: 18px;
-    font-weight: 700;
-    text-align: right;
-    width: 115px;
-    outline: none;
+    font-weight: 600;
   }
 
   .bar {
-    height: 10px;
-    border-radius: 6px;
+    height: 8px;
+    border-radius: 999px;
     overflow: hidden;
     display: flex;
-    background: var(--border-sub);
+    background: var(--bg-btn);
     margin-bottom: 18px;
   }
 
   .seg {
     height: 100%;
-    transition: width 0.2s;
+    transition: width 0.25s ease;
+  }
+
+  /* ==================== CARD CENTRAL DE RENDA ==================== */
+  .income-box {
+    background: var(--bg-box);
+    padding: 14px 18px;
+    border-radius: 16px;
+    margin-bottom: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--border-sub);
+  }
+
+  .income-box label {
+    font-size: 14px;
+    color: var(--text-label);
+    font-weight: 600;
+  }
+
+  .income-input {
+    min-height: 44px;
+    background: var(--bg-btn);
+    border: 1px solid var(--border-input);
+    border-radius: 12px;
+    color: var(--text-title);
+    font-size: 19px;
+    font-weight: 700;
+    text-align: right;
+    width: 145px;
+    padding: 6px 12px;
+    outline: none;
+  }
+
+  .income-input:focus {
+    border-color: var(--c-guardado);
+  }
+
+  /* ==================== GRID DE CATEGORIAS (2 COLUNAS NO PC) ==================== */
+  .topics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 12px;
   }
 
   .section {
-    margin-bottom: 14px;
     background: var(--bg-box);
-    padding: 14px;
-    border-radius: 12px;
+    padding: 16px;
+    border-radius: 16px;
     border: 1px solid var(--border-sub);
+    border-left: 4px solid var(--topic-color, var(--c-fixo));
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
 
   .sec-header {
@@ -618,10 +685,11 @@
     justify-content: space-between;
     align-items: center;
     font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 12px;
+    font-weight: 700;
     gap: 8px;
     flex-wrap: wrap;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border-sub);
   }
 
   .sec-title-area {
@@ -629,6 +697,7 @@
     align-items: center;
     gap: 6px;
     cursor: pointer;
+    min-height: 32px;
   }
 
   .sec-title-area:hover {
@@ -638,19 +707,18 @@
   .sec-controls {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+    flex-wrap: wrap;
   }
 
   .row {
     display: grid;
-    grid-template-columns: 1fr 110px 75px 28px;
+    grid-template-columns: minmax(0, 1fr) 96px 80px 34px;
     gap: 8px;
     align-items: center;
-    margin-bottom: 10px;
-  }
-
-  .row:last-child {
-    margin-bottom: 0;
+    padding: 6px 8px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.015);
   }
 
   .item-label {
@@ -658,6 +726,7 @@
     color: var(--text-label);
     cursor: pointer;
     word-break: break-word;
+    line-height: 1.3;
   }
 
   .item-label:hover {
@@ -667,70 +736,147 @@
 
   .parcel-tag {
     display: inline-block;
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 700;
-    padding: 1px 6px;
+    padding: 2px 6px;
     border-radius: 999px;
-    background: rgba(120, 217, 236, 0.16);
+    background: rgba(100, 210, 255, 0.14);
     color: var(--c-sobra);
-    border: 1px solid rgba(120, 217, 236, 0.35);
-    margin-left: 6px;
+    border: 1px solid rgba(100, 210, 255, 0.3);
+    margin-left: 5px;
     vertical-align: middle;
   }
 
-  input[type=range] {
+  /* Slider Apple com preenchimento dinâmico via --pct */
+  input[type=range].sb-slider {
+    -webkit-appearance: none;
+    appearance: none;
     width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(
+      to right,
+      var(--topic-color, var(--c-fixo)) 0%,
+      var(--topic-color, var(--c-fixo)) var(--pct, 0%),
+      var(--bg-btn-hover) var(--pct, 0%),
+      var(--bg-btn-hover) 100%
+    );
+    cursor: pointer;
+    outline: none;
+  }
+
+  input[type=range].sb-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 2px solid var(--topic-color, var(--c-fixo));
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+  }
+
+  input[type=range].sb-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 2px solid var(--topic-color, var(--c-fixo));
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
     cursor: pointer;
   }
 
   .num-input {
-    background: var(--bg-card);
+    min-height: 36px;
+    background: var(--bg-btn);
     border: 1px solid var(--border-input);
     color: var(--text-title);
-    border-radius: 6px;
-    padding: 5px 6px;
+    border-radius: 10px;
+    padding: 5px 8px;
     text-align: right;
     font-size: 13px;
+    font-weight: 600;
     width: 100%;
-    font-weight: 500;
+    outline: none;
   }
 
-  @media (max-width: 620px) {
+  .num-input:focus {
+    border-color: var(--topic-color, var(--c-fixo));
+  }
+
+  /* ==================== MOBILE / SAFARI iOS ==================== */
+  @media (max-width: 820px) {
+    .topics-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
     .app-wrapper { padding: 10px; }
-    .card { padding: 14px; }
+    .card { padding: 14px; border-radius: 18px; }
+
+    .top-grid {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      gap: 8px;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .top-grid::-webkit-scrollbar { display: none; }
+    .kpi {
+      flex: 0 0 118px;
+      scroll-snap-align: start;
+    }
+
+    .month-select, .btn {
+      min-height: 44px;
+    }
+
     .row {
-      grid-template-columns: 1fr 78px 28px;
+      grid-template-columns: 1fr 84px 40px;
       grid-template-rows: auto auto;
       background: var(--bg-card);
-      padding: 8px 10px;
-      border-radius: 8px;
+      padding: 10px;
+      border-radius: 12px;
       border: 1px solid var(--border-sub);
     }
     .item-label {
       grid-column: 1 / 2;
       grid-row: 1 / 2;
-      font-weight: 500;
+      font-weight: 600;
+      padding-right: 4px;
     }
     .num-input {
       grid-column: 2 / 3;
       grid-row: 1 / 2;
+      min-height: 44px;
     }
     .row .btn-danger {
       grid-column: 3 / 4;
       grid-row: 1 / 2;
+      min-width: 40px;
+      min-height: 44px;
     }
-    .row input[type=range] {
+    .row input[type=range].sb-slider {
       grid-column: 1 / 4;
       grid-row: 2 / 3;
-      margin-top: 4px;
+      height: 8px;
+      margin-top: 6px;
+    }
+    input[type=range].sb-slider::-webkit-slider-thumb {
+      width: 22px;
+      height: 22px;
     }
   }
 
   .note {
     font-size: 12px;
     color: var(--text-muted);
-    margin-top: 12px;
-    line-height: 1.4;
+    margin-top: 8px;
+    line-height: 1.45;
   }
 
   /* ==================== MODAIS ==================== */
@@ -738,7 +884,8 @@
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.72);
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -749,24 +896,25 @@
   .modal-box {
     background: var(--bg-card);
     border: 1px solid var(--border-main);
-    border-radius: 16px;
+    border-radius: 20px;
     padding: 22px;
     width: 100%;
     max-width: 430px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
   }
 
   .modal-title {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 700;
     color: var(--text-title);
     margin: 0 0 6px 0;
+    letter-spacing: -0.015em;
   }
 
   .modal-sub {
-    font-size: 12px;
+    font-size: 12.5px;
     color: var(--text-muted);
     margin-bottom: 16px;
   }
@@ -775,16 +923,17 @@
     display: block;
     font-size: 12px;
     color: var(--text-label);
-    margin-bottom: 5px;
-    font-weight: 500;
+    margin-bottom: 6px;
+    font-weight: 600;
   }
 
   .modal-input, .modal-select {
     width: 100%;
+    min-height: 44px;
     background: var(--bg-box);
     border: 1px solid var(--border-input);
     color: var(--text-title);
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 10px 12px;
     font-size: 14px;
     margin-bottom: 12px;
@@ -804,9 +953,9 @@
   .installment-preview {
     background: var(--bg-box);
     border: 1px solid var(--border-sub);
-    border-radius: 10px;
-    padding: 10px 12px;
-    font-size: 12px;
+    border-radius: 12px;
+    padding: 11px 12px;
+    font-size: 12.5px;
     color: var(--c-sobra);
     margin-bottom: 10px;
     font-weight: 600;
@@ -815,8 +964,8 @@
   .parcel-list-item {
     background: var(--bg-box);
     border: 1px solid var(--border-sub);
-    border-radius: 10px;
-    padding: 10px 12px;
+    border-radius: 14px;
+    padding: 11px 12px;
     margin-bottom: 8px;
     display: flex;
     justify-content: space-between;
@@ -825,13 +974,13 @@
   }
 
   .parcel-list-title {
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 600;
     color: var(--text-title);
   }
 
   .parcel-list-meta {
-    font-size: 11px;
+    font-size: 11.5px;
     color: var(--text-muted);
     margin-top: 2px;
   }
@@ -840,14 +989,14 @@
     display: flex;
     justify-content: flex-end;
     gap: 8px;
-    margin-top: 8px;
+    margin-top: 10px;
     flex-wrap: wrap;
   }
 </style>
 </head>
 <body>
 
-<!-- ==================== TELA DE LOGIN ==================== -->
+<!-- ==================== TELA DE LOGIN LIQUID GLASS ==================== -->
 <div id="login-screen" class="sb-login-page">
   <div class="sb-bg-image"></div>
   <div class="sb-bg-overlay"></div>
@@ -930,7 +1079,7 @@
   </footer>
 </div>
 
-<!-- ==================== PAINEL FINANCEIRO ==================== -->
+<!-- ==================== PAINEL APPLE GOURMET ==================== -->
 <div id="app-screen" class="app-wrapper" style="display:none;">
   <div class="card">
     <div class="header-row">
@@ -954,7 +1103,7 @@
           </select>
           <select id="year-only-select" class="month-select" onchange="changeMonth()"></select>
         </div>
-        <span class="sync-badge" id="sync-status">⏳ Carregando...</span>
+        <span class="sync-badge" id="sync-status">● Carregando...</span>
       </div>
       <div class="actions">
         <button class="btn btn-accent" onclick="addTopic()">+ Novo Tópico</button>
@@ -968,15 +1117,15 @@
       </div>
     </div>
 
-    <div class="top-grid" id="kpi-container"></div>
+    <div class="top-grid num-tabular" id="kpi-container"></div>
     <div class="bar" id="bar-container"></div>
 
     <div class="income-box">
       <label>Salário / Entrada mensal (R$)</label>
-      <input type="number" id="income" class="income-input" value="0" step="10" oninput="onIncomeChange()">
+      <input type="number" id="income" class="income-input num-tabular" value="0" step="10" oninput="onIncomeChange()">
     </div>
 
-    <div id="topics-container"></div>
+    <div id="topics-container" class="topics-grid"></div>
 
     <button type="button" class="btn btn-accent btn-add-bottom" onclick="addTopic()">+ Criar Novo Tópico / Categoria</button>
 
@@ -1021,11 +1170,11 @@
       <div class="modal-grid-2">
         <div>
           <label class="modal-label">Valor total (R$)</label>
-          <input type="number" id="inst-total" class="modal-input" min="1" step="0.01" placeholder="300" oninput="updateInstallmentPreview()" required>
+          <input type="number" id="inst-total" class="modal-input num-tabular" min="1" step="0.01" placeholder="300" oninput="updateInstallmentPreview()" required>
         </div>
         <div>
           <label class="modal-label">Qtd. de parcelas</label>
-          <input type="number" id="inst-count" class="modal-input" min="1" max="60" step="1" value="3" oninput="updateInstallmentPreview()" required>
+          <input type="number" id="inst-count" class="modal-input num-tabular" min="1" max="60" step="1" value="3" oninput="updateInstallmentPreview()" required>
         </div>
       </div>
 
@@ -1053,7 +1202,7 @@
         </div>
       </div>
 
-      <div class="installment-preview" id="inst-preview">Parcela: R$ 0,00 / mês</div>
+      <div class="installment-preview num-tabular" id="inst-preview">Parcela: R$ 0,00 / mês</div>
 
       <div id="inst-feedback" style="font-size:12px; color:var(--c-neg); min-height:16px;"></div>
 
@@ -1085,7 +1234,7 @@
   // =========================================================
 
   const SESSION_KEY = 'stonks_multi_account_id_v1';
-  const PALETTE = ['#fcad70', '#8ab4f8', '#ff8bcb', '#fdd663', '#c58af9', '#81c995', '#f28b82', '#78d9ec'];
+  const PALETTE = ['#FF9F0A', '#0A84FF', '#FF375F', '#FFD60A', '#BF5AF2', '#30D158', '#64D2FF', '#FF6482'];
   const YEARS_LIST = ['2026', '2027', '2028', '2029', '2030', '2031', '2032', '2033', '2034', '2035'];
   const MONTH_NUMS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
   const SHORT_MONTH_NAMES = {
@@ -1093,7 +1242,6 @@
     '07': 'Jul', '08': 'Ago', '09': 'Set', '10': 'Out', '11': 'Nov', '12': 'Dez'
   };
 
-  // Gera lista cronológica de todos os meses de 2026 a 2035
   const ALL_MONTHS = [];
   YEARS_LIST.forEach(y => {
     MONTH_NUMS.forEach(m => {
@@ -1107,7 +1255,6 @@
     return `${SHORT_MONTH_NAMES[m] || m}/${y.slice(-2)}`;
   }
 
-  // Popula os seletores de anos (cabeçalho e modal de parcelamento)
   (function initYearSelectors() {
     const mainYearSel = document.getElementById('year-only-select');
     const instYearSel = document.getElementById('inst-start-year-only');
@@ -1115,13 +1262,13 @@
       const opt1 = document.createElement('option');
       opt1.value = y;
       opt1.textContent = y;
-      if (y === '2027') opt1.selected = true;
+      if (y === '2026') opt1.selected = true;
       mainYearSel.appendChild(opt1);
 
       const opt2 = document.createElement('option');
       opt2.value = y;
       opt2.textContent = y;
-      if (y === '2027') opt2.selected = true;
+      if (y === '2026') opt2.selected = true;
       instYearSel.appendChild(opt2);
     });
   })();
@@ -1138,7 +1285,7 @@
       id: 'top_cartao',
       name: '1. Cartão de Crédito',
       shortName: 'Cartão Crédito',
-      color: '#fcad70',
+      color: '#FF9F0A',
       items: [
         { id: 'it_cc_avista', label: 'Fatura / Compras à Vista', val: 0, max: 2000, step: 10 },
         { id: 'it_cc_assin', label: 'Assinaturas no Cartão', val: 0, max: 500, step: 5 }
@@ -1153,7 +1300,7 @@
         id: 'top_fixas',
         name: '2. Contas Fixas & Assinaturas',
         shortName: 'Contas Fixas',
-        color: '#8ab4f8',
+        color: '#0A84FF',
         items: [
           { id: 'it_net', label: 'Internet / Wi-Fi', val: 0, max: 500, step: 5 },
           { id: 'it_cel', label: 'Plano Celular', val: 0, max: 300, step: 5 },
@@ -1165,7 +1312,7 @@
         id: 'top_cabelo',
         name: '3. Cabelo & Cuidados Pessoais',
         shortName: 'Cabelo',
-        color: '#ff8bcb',
+        color: '#FF375F',
         items: [
           { id: 'it_corte', label: 'Corte de Cabelo / Barbearia', val: 0, max: 300, step: 5 },
           { id: 'it_prod', label: 'Produtos (Pomada / Shampoo / Creme)', val: 0, max: 300, step: 5 }
@@ -1175,7 +1322,7 @@
         id: 'top_lazer',
         name: '4. Lazer, Delivery & Rolês',
         shortName: 'Lazer',
-        color: '#fdd663',
+        color: '#FFD60A',
         items: [
           { id: 'it_ifood', label: 'iFood / Lanches', val: 0, max: 800, step: 10 },
           { id: 'it_sair', label: 'Saídas / Cinema / Rolês', val: 0, max: 800, step: 10 },
@@ -1186,7 +1333,7 @@
         id: 'top_reserva',
         name: '5. Fundo de Reserva (Emergência)',
         shortName: 'Fundo Reserva',
-        color: '#c58af9',
+        color: '#BF5AF2',
         items: [
           { id: 'it_emerg', label: 'Reserva de Emergência (Caixinha)', val: 0, max: 2000, step: 10 },
           { id: 'it_saude', label: 'Imprevistos / Saúde', val: 0, max: 1000, step: 10 }
@@ -1196,7 +1343,7 @@
         id: 'top_guardado',
         name: '6. Dinheiro Guardado & Metas',
         shortName: 'Guardado',
-        color: '#81c995',
+        color: '#30D158',
         items: [
           { id: 'it_inv', label: 'Investimentos / Cofrinho', val: 0, max: 2000, step: 10 },
           { id: 'it_meta', label: 'Meta Específica / Viagem / Upgrade', val: 0, max: 2000, step: 10 }
@@ -1205,7 +1352,6 @@
     ];
   }
 
-  // Garante que qualquer lista de tópicos tenha o tópico Cartão de Crédito
   function ensureCreditCardTopic(topicsList) {
     if (!Array.isArray(topicsList)) return getDefaultTopics();
     const hasCard = topicsList.some(t =>
@@ -1379,16 +1525,16 @@
 
     document.getElementById('active-user-badge').textContent = '👤 ' + newUser;
     closeAccountModal();
-    setStatus('⏳ Salvando conta...');
+    setStatus('● Salvando...');
     try {
       await pushCloudRoot();
-      setStatus('☁️ Conta atualizada');
+      setStatus('● Conta atualizada');
     } catch (err) {
-      setStatus('⚠️ Erro ao salvar conta');
+      setStatus('● Erro ao salvar');
     }
   }
 
-  // --- TEMA ---
+  // --- TEMA DUAL (OLED PURE BLACK / APPLE CLEAN LIGHT) ---
   function toggleTheme() {
     const isLight = document.body.classList.toggle('light-mode');
     document.getElementById('theme-btn').textContent = isLight ? '🌙 Escuro' : '☀️ Claro';
@@ -1631,7 +1777,7 @@
     const plans = getAccountInstallments();
 
     if (plans.length === 0) {
-      container.innerHTML = `<div style="text-align:center; padding:18px; font-size:12px; color:var(--text-muted);">Nenhuma compra parcelada cadastrada nesta conta.</div>`;
+      container.innerHTML = `<div style="text-align:center; padding:18px; font-size:12.5px; color:var(--text-muted);">Nenhuma compra parcelada cadastrada nesta conta.</div>`;
       return;
     }
 
@@ -1642,7 +1788,7 @@
         <div class="parcel-list-item">
           <div>
             <div class="parcel-list-title">${escapeHtml(p.desc)}</div>
-            <div class="parcel-list-meta">Total R$ ${Number(p.total).toFixed(2)} • ${p.count}x de R$ ${perMonth.toFixed(2)} • Início: ${mLabel}</div>
+            <div class="parcel-list-meta num-tabular">Total R$ ${Number(p.total).toFixed(2)} • ${p.count}x de R$ ${perMonth.toFixed(2)} • Início: ${mLabel}</div>
           </div>
           <div style="display:flex; gap:6px;">
             <button type="button" class="btn" onclick="closeParcelsManager(); openInstallmentModal('${p.id}')">✎ Editar</button>
@@ -1663,6 +1809,12 @@
   }
 
   // --- RENDERIZAÇÃO DINÂMICA ---
+  function syncSliderVisual(slider, val, maxVal) {
+    const safeMax = Math.max(1, parseFloat(maxVal) || 1);
+    const pct = Math.max(0, Math.min(100, (val / safeMax) * 100));
+    slider.style.setProperty('--pct', `${pct}%`);
+  }
+
   function renderTopics() {
     const container = document.getElementById('topics-container');
     container.innerHTML = '';
@@ -1670,6 +1822,7 @@
     currentTopics.forEach((topic, tIdx) => {
       const sec = document.createElement('div');
       sec.className = 'section';
+      sec.style.setProperty('--topic-color', topic.color);
 
       const totalTopic = topic.items.reduce((acc, it) => acc + (parseFloat(it.val) || 0), 0);
 
@@ -1677,10 +1830,10 @@
         <div class="sec-header">
           <div class="sec-title-area" style="color:${topic.color}" onclick="editTopic(${tIdx})" title="Clique para renomear tópico">
             <span>${escapeHtml(topic.name)}</span>
-            <span style="font-size:11px; opacity:0.7;">✎</span>
+            <span style="font-size:11px; opacity:0.75;">✎</span>
           </div>
           <div class="sec-controls">
-            <span id="sub-topic-${tIdx}" style="color:${topic.color}; font-weight:700;">R$ ${totalTopic.toFixed(0)}</span>
+            <span id="sub-topic-${tIdx}" class="num-tabular" style="color:${topic.color}; font-weight:700;">R$ ${totalTopic.toFixed(0)}</span>
             <button class="btn" onclick="openInstallmentModal(null, '${topic.id}')" title="Parcelar compra neste tópico">💳 Parcelar</button>
             <button class="btn" onclick="addItem(${tIdx})">+ Item</button>
             <button class="btn btn-danger" onclick="deleteTopic(${tIdx})" title="Excluir tópico">×</button>
@@ -1689,7 +1842,10 @@
       `;
 
       topic.items.forEach((item, iIdx) => {
-        const maxVal = Math.max(item.max || 1000, item.val || 0);
+        const val = parseFloat(item.val) || 0;
+        const maxVal = Math.max(item.max || 1000, val);
+        const pct = Math.max(0, Math.min(100, (val / Math.max(1, maxVal)) * 100));
+
         const row = document.createElement('div');
         row.className = 'row';
 
@@ -1703,8 +1859,8 @@
 
         row.innerHTML = `
           <span class="item-label" ${editClickAttr}>${escapeHtml(item.label)}${parcelBadge}</span>
-          <input type="range" style="accent-color:${topic.color}" min="0" max="${maxVal}" step="${item.step || 5}" value="${item.val}" oninput="onSliderChange(${tIdx}, ${iIdx}, this)">
-          <input type="number" class="num-input" value="${item.val}" oninput="onNumberChange(${tIdx}, ${iIdx}, this)">
+          <input type="range" class="sb-slider" style="--topic-color:${topic.color}; --pct:${pct}%" min="0" max="${maxVal}" step="${item.step || 5}" value="${val}" oninput="onSliderChange(${tIdx}, ${iIdx}, this)">
+          <input type="number" class="num-input num-tabular" value="${val}" oninput="onNumberChange(${tIdx}, ${iIdx}, this)">
           <button class="btn btn-danger" onclick="deleteItem(${tIdx}, ${iIdx})" title="Excluir item">×</button>
         `;
         sec.appendChild(row);
@@ -1773,18 +1929,28 @@
 
   function onSliderChange(tIdx, iIdx, el) {
     const val = parseFloat(el.value) || 0;
-    currentTopics[tIdx].items[iIdx].val = val;
-    el.nextElementSibling.value = val;
+    const item = currentTopics[tIdx].items[iIdx];
+    item.val = val;
+    const numInput = el.parentElement.querySelector('.num-input');
+    if (numInput) numInput.value = val;
+    syncSliderVisual(el, val, el.max);
     updateSummary();
     scheduleSave();
   }
 
   function onNumberChange(tIdx, iIdx, el) {
     const val = parseFloat(el.value) || 0;
-    currentTopics[tIdx].items[iIdx].val = val;
-    const slider = el.previousElementSibling;
-    if (val > parseFloat(slider.max)) slider.max = val;
-    slider.value = val;
+    const item = currentTopics[tIdx].items[iIdx];
+    item.val = val;
+    const slider = el.parentElement.querySelector('.sb-slider');
+    if (slider) {
+      if (val > parseFloat(slider.max)) {
+        slider.max = val;
+        item.max = val;
+      }
+      slider.value = val;
+      syncSliderVisual(slider, val, slider.max);
+    }
     updateSummary();
     scheduleSave();
   }
@@ -1900,7 +2066,7 @@
       const key = `${selectedYear}-${m}`;
       userMonths[key] = {
         income: currentIncome,
-        topics: JSON.parse(JSON.stringify(currentTopics))
+        topics: ensureCreditCardTopic(JSON.parse(JSON.stringify(currentTopics)))
       };
     });
     getAccountInstallments().forEach(plan => applyPlanToMonths(plan));
@@ -1914,7 +2080,7 @@
 
   async function loadFromCloud(silent = false) {
     if (!activeAccountId) return;
-    if (!silent) setStatus('🔄 Sincronizando...');
+    if (!silent) setStatus('● Sincronizando...');
     try {
       await fetchCloudRoot();
       const creds = cloudRoot.accounts[activeAccountId] || DEFAULT_ACCOUNTS[activeAccountId];
@@ -1924,9 +2090,9 @@
       hydrateMonthData(userMonths[getCurrentMonth()]);
       document.getElementById('income').value = currentIncome;
       renderTopics();
-      setStatus('☁️ Sincronizado');
+      setStatus('● Sincronizado');
     } catch (e) {
-      setStatus('⚠️ Erro de conexão');
+      setStatus('● Erro de conexão');
     }
   }
 
@@ -1938,16 +2104,16 @@
       topics: currentTopics
     };
 
-    setStatus('⏳ Salvando...');
+    setStatus('● Salvando...');
     clearTimeout(saveTimeout);
     saveTimeout = setTimeout(async () => {
       try {
         await pushCloudRoot();
         saveTimeout = null;
-        setStatus('☁️ Salvo na nuvem');
+        setStatus('● Sincronizado');
       } catch (e) {
         saveTimeout = null;
-        setStatus('⚠️ Erro ao salvar');
+        setStatus('● Erro ao salvar');
       }
     }, 600);
   }
