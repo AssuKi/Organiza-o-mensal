@@ -428,7 +428,7 @@
     background: var(--bg-card);
     border-radius: 20px;
     padding: 22px;
-    max-width: 1060px;
+    max-width: 1080px;
     margin: 0 auto;
     border: 1px solid var(--border-main);
     box-shadow: var(--shadow-card);
@@ -438,7 +438,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 18px;
+    margin-bottom: 14px;
     gap: 12px;
     flex-wrap: wrap;
   }
@@ -467,25 +467,6 @@
     border: 1px solid rgba(10, 132, 255, 0.25);
   }
 
-  .date-selectors {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .month-select {
-    min-height: 36px;
-    background: var(--bg-btn);
-    color: var(--text-title);
-    border: 1px solid var(--border-input);
-    border-radius: 999px;
-    padding: 6px 12px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    outline: none;
-  }
-
   .sync-badge {
     font-size: 11.5px;
     font-weight: 500;
@@ -495,6 +476,121 @@
     border: 1px solid var(--border-sub);
     color: var(--text-muted);
     white-space: nowrap;
+  }
+
+  /* ==================== SISTEMA DE PÁGINAS / FOLHEAMENTO ==================== */
+  .binder-bar {
+    background: var(--bg-box);
+    border: 1px solid var(--border-sub);
+    border-radius: 16px;
+    padding: 10px 12px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .binder-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .binder-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .page-indicator {
+    background: var(--bg-btn);
+    border: 1px solid var(--border-input);
+    border-radius: 12px;
+    padding: 7px 14px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text-title);
+    min-width: 156px;
+    text-align: center;
+  }
+
+  .page-counter {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .year-strip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+
+  .year-strip::-webkit-scrollbar { display: none; }
+
+  .year-chip {
+    border: 1px solid var(--border-sub);
+    background: transparent;
+    color: var(--text-muted);
+    border-radius: 9px;
+    padding: 5px 9px;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+
+  .year-chip.active {
+    background: rgba(48, 209, 88, 0.16);
+    border-color: rgba(48, 209, 88, 0.45);
+    color: var(--c-guardado);
+  }
+
+  .months-strip {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .month-page-tab {
+    border: 1px solid var(--border-sub);
+    background: var(--bg-card);
+    color: var(--text-label);
+    border-radius: 10px;
+    padding: 7px 4px;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.12s ease;
+  }
+
+  .month-page-tab:hover {
+    background: var(--bg-btn-hover);
+  }
+
+  .month-page-tab.active {
+    background: rgba(10, 132, 255, 0.18);
+    border-color: rgba(10, 132, 255, 0.5);
+    color: var(--text-title);
+    box-shadow: inset 0 -2px 0 var(--c-fixo);
+  }
+
+  @media (max-width: 720px) {
+    .months-strip {
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .months-strip::-webkit-scrollbar { display: none; }
+    .month-page-tab {
+      flex: 0 0 52px;
+    }
   }
 
   .actions {
@@ -583,7 +679,7 @@
   /* ==================== FAIXA DE KPIs ==================== */
   .top-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 10px;
     margin-bottom: 16px;
   }
@@ -610,7 +706,7 @@
   }
 
   .kpi-val {
-    font-size: 18px;
+    font-size: 16.5px;
     font-weight: 700;
     letter-spacing: -0.02em;
   }
@@ -654,16 +750,22 @@
     font-weight: 600;
   }
 
+  .income-sub {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
   .income-input {
     min-height: 44px;
     background: var(--bg-btn);
     border: 1px solid var(--border-input);
     border-radius: 12px;
     color: var(--text-title);
-    font-size: 19px;
+    font-size: 18px;
     font-weight: 700;
     text-align: right;
-    width: 145px;
+    width: 160px;
     padding: 6px 12px;
     outline: none;
   }
@@ -736,7 +838,7 @@
 
   .row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 96px 80px 34px;
+    grid-template-columns: minmax(0, 1fr) 92px 88px 34px;
     gap: 8px;
     align-items: center;
     padding: 6px 8px;
@@ -861,16 +963,16 @@
     }
     .top-grid::-webkit-scrollbar { display: none; }
     .kpi {
-      flex: 0 0 118px;
+      flex: 0 0 124px;
       scroll-snap-align: start;
     }
 
-    .month-select, .btn {
+    .btn {
       min-height: 44px;
     }
 
     .row {
-      grid-template-columns: 1fr 84px 40px;
+      grid-template-columns: 1fr 92px 40px;
       grid-template-rows: auto auto;
       background: var(--bg-card);
       padding: 10px;
@@ -1180,23 +1282,6 @@
       <div class="title-group">
         <span class="brand-tag">StonksBank</span>
         <span class="user-pill" id="active-user-badge">👤 Conta</span>
-        <div class="date-selectors">
-          <select id="month-only-select" class="month-select" onchange="changeMonth()">
-            <option value="01">Janeiro</option>
-            <option value="02">Fevereiro</option>
-            <option value="03">Março</option>
-            <option value="04">Abril</option>
-            <option value="05">Maio</option>
-            <option value="06">Junho</option>
-            <option value="07">Julho</option>
-            <option value="08">Agosto</option>
-            <option value="09">Setembro</option>
-            <option value="10">Outubro</option>
-            <option value="11">Novembro</option>
-            <option value="12">Dezembro</option>
-          </select>
-          <select id="year-only-select" class="month-select" onchange="changeMonth()"></select>
-        </div>
         <span class="sync-badge" id="sync-status">● Pronto</span>
       </div>
       <div class="actions">
@@ -1215,19 +1300,36 @@
       </div>
     </div>
 
+    <!-- SISTEMA DE FOLHEAMENTO DE PÁGINAS MENSAIS -->
+    <div class="binder-bar">
+      <div class="binder-top">
+        <div class="binder-nav">
+          <button type="button" class="btn" id="btn-prev-page" onclick="stepPage(-1)" title="Folhear mês anterior (Alt + ←)">◀ Anterior</button>
+          <div class="page-indicator num-tabular" id="current-page-label">Novembro 2026</div>
+          <button type="button" class="btn" id="btn-next-page" onclick="stepPage(1)" title="Folhear próximo mês (Alt + →)">Próxima ▶</button>
+          <span class="page-counter num-tabular" id="page-counter-label">Pág. 11/120</span>
+        </div>
+        <div class="year-strip" id="year-strip"></div>
+      </div>
+      <div class="months-strip" id="months-strip"></div>
+    </div>
+
     <div class="top-grid num-tabular" id="kpi-container"></div>
     <div class="bar" id="bar-container"></div>
 
     <div class="income-box">
-      <label>Salário / Entrada mensal (R$)</label>
-      <input type="number" id="income" class="income-input num-tabular" value="0" step="10" oninput="onIncomeChange()">
+      <div>
+        <label>Salário / Entrada mensal (R$)</label>
+        <div class="income-sub">Propaga automaticamente para os meses seguintes sem salário definido</div>
+      </div>
+      <input type="number" id="income" class="income-input num-tabular" value="0.00" step="0.01" oninput="onIncomeChange()">
     </div>
 
     <div id="topics-container" class="topics-grid"></div>
 
     <button type="button" class="btn btn-accent btn-add-bottom" onclick="addTopic()">+ Criar Novo Tópico / Categoria</button>
 
-    <div class="note">💡 <strong>Parcelas & Custos Fixos (2026–2035):</strong> Use <strong>💳 Parcelar</strong> para compras divididas e <strong>📌 Fixar</strong> para custos recorrentes mensais (ex.: Wi-Fi no Cartão de Crédito). Gerencie ou remova quando quiser em <strong>📑 Parcelas</strong> e <strong>📋 Fixos</strong>.</div>
+    <div class="note">💡 <strong>Caderno Mensal & Centavos (2026–2035):</strong> Folheie os meses pelos botões <strong>◀ Anterior / Próxima ▶</strong>, abas mensais ou <strong>Alt + ← / →</strong>. Centavos são calculados exatamente em todos os tópicos, KPIs e sobra livre, e cada custo fixo ou parcela fica no seu tópico correspondente.</div>
   </div>
 </div>
 
@@ -1235,16 +1337,16 @@
 <div id="fixed-modal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this) closeFixedModal()">
   <div class="modal-box">
     <h2 class="modal-title" id="fixed-modal-title">Fixar Custo Mensal</h2>
-    <div class="modal-sub">O custo fixo se repete automaticamente todos os meses a partir do início escolhido até você remover.</div>
+    <div class="modal-sub">O custo fixo se repete automaticamente todos os meses no tópico escolhido até você remover.</div>
     <form onsubmit="saveFixedCost(event)">
       <label class="modal-label">Descrição do custo fixo</label>
-      <input type="text" id="fixed-desc" class="modal-input" placeholder="Ex: Wi-Fi, Spotify, Academia" required>
+      <input type="text" id="fixed-desc" class="modal-input" placeholder="Ex: Internet Wi-Fi, Seguro iPhone" required>
 
       <label class="modal-label">Tópico / Categoria</label>
       <select id="fixed-topic" class="modal-select"></select>
 
       <label class="modal-label">Valor mensal (R$)</label>
-      <input type="number" id="fixed-val" class="modal-input num-tabular" min="0.01" step="0.01" placeholder="100" oninput="updateFixedPreview()" required>
+      <input type="number" id="fixed-val" class="modal-input num-tabular" min="0.01" step="0.01" placeholder="34.90" oninput="updateFixedPreview()" required>
 
       <div class="modal-grid-2">
         <div>
@@ -1299,7 +1401,7 @@
 <div id="import-modal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this) closeImportModal()">
   <div class="modal-box">
     <h2 class="modal-title">Código de Importação & Prompt</h2>
-    <div class="modal-sub">Cole o código gerado no chat para preencher este mês automaticamente.</div>
+    <div class="modal-sub">Cole o código gerado no chat para preencher esta página mensal automaticamente.</div>
 
     <div class="tab-bar">
       <button type="button" class="tab-btn active" id="tab-btn-paste" onclick="switchImportTab('paste')">📥 Colar Código</button>
@@ -1308,22 +1410,22 @@
 
     <div id="import-tab-paste">
       <label class="modal-label">Cole aqui o código JSON do cálculo</label>
-      <textarea id="import-code-input" class="modal-textarea" placeholder='{"income":2500,"topics":[{"name":"1. Cartão de Crédito","items":[{"label":"Fatura","val":400}]}]}' oninput="previewImportCode()"></textarea>
+      <textarea id="import-code-input" class="modal-textarea" placeholder='{"income":1650.00,"topics":[{"name":"1. Cartão de Crédito","items":[{"label":"Seguro iPhone","val":34.90}]}]}' oninput="previewImportCode()"></textarea>
 
       <div class="import-preview-box num-tabular" id="import-preview">Aguardando código para validar...</div>
       <div id="import-feedback" style="font-size:12px; color:var(--c-neg); min-height:16px;"></div>
 
       <div class="modal-actions">
         <button type="button" class="btn" onclick="closeImportModal()">Cancelar</button>
-        <button type="button" class="btn btn-accent" onclick="applyImportedCode()">Aplicar no Mês</button>
+        <button type="button" class="btn btn-accent" onclick="applyImportedCode()">Aplicar na Página</button>
       </div>
     </div>
 
     <div id="import-tab-prompt" style="display:none;">
       <label class="modal-label">Copie este prompt e cole aqui no chat junto com seus valores</label>
       <textarea id="import-prompt-text" class="modal-textarea" readonly>Converta o resumo financeiro a seguir em um código JSON válido para importação no StonksBank, sem explicações extras, apenas o bloco JSON:
-- Formato esperado: {"income": numero, "topics": [{"name": "Nome do Tópico", "items": [{"label": "Nome do Item", "val": numero}]}]}
-- Mantenha "1. Cartão de Crédito" se houver gastos de cartão ou se não for especificado outro tópico para ele.
+- Formato esperado: {"income": numero_com_centavos, "topics": [{"name": "Nome do Tópico", "items": [{"label": "Nome do Item", "val": numero_com_centavos}]}]}
+- Mantenha "1. Cartão de Crédito" para gastos de cartão e "2. Contas Fixas & Assinaturas" para contas fixas.
 - Meus dados do mês: [ESCREVA AQUI SEU SALÁRIO E SEUS GASTOS/TÓPICOS]</textarea>
 
       <div id="prompt-copy-feedback" style="font-size:12px; color:var(--c-guardado); min-height:16px;"></div>
@@ -1362,7 +1464,7 @@
 <div id="installment-modal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this) closeInstallmentModal()">
   <div class="modal-box">
     <h2 class="modal-title" id="inst-modal-title">Nova Compra Parcelada</h2>
-    <div class="modal-sub">O valor é dividido e lançado automaticamente nos próximos meses e anos.</div>
+    <div class="modal-sub">O valor é dividido com centavos e lançado no tópico escolhido nas páginas seguintes.</div>
     <form onsubmit="saveInstallmentPlan(event)">
       <label class="modal-label">Descrição da compra</label>
       <input type="text" id="inst-desc" class="modal-input" placeholder="Ex: Tênis, Teclado, Celular" required>
@@ -1373,7 +1475,7 @@
       <div class="modal-grid-2">
         <div>
           <label class="modal-label">Valor total (R$)</label>
-          <input type="number" id="inst-total" class="modal-input num-tabular" min="1" step="0.01" placeholder="300" oninput="updateInstallmentPreview()" required>
+          <input type="number" id="inst-total" class="modal-input num-tabular" min="0.01" step="0.01" placeholder="300.00" oninput="updateInstallmentPreview()" required>
         </div>
         <div>
           <label class="modal-label">Qtd. de parcelas</label>
@@ -1442,6 +1544,11 @@
   const PALETTE = ['#FF9F0A', '#0A84FF', '#FF375F', '#FFD60A', '#BF5AF2', '#30D158', '#64D2FF', '#FF6482'];
   const YEARS_LIST = ['2026', '2027', '2028', '2029', '2030', '2031', '2032', '2033', '2034', '2035'];
   const MONTH_NUMS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+  const FULL_MONTH_NAMES = {
+    '01': 'Janeiro', '02': 'Fevereiro', '03': 'Março', '04': 'Abril',
+    '05': 'Maio', '06': 'Junho', '07': 'Julho', '08': 'Agosto',
+    '09': 'Setembro', '10': 'Outubro', '11': 'Novembro', '12': 'Dezembro'
+  };
   const SHORT_MONTH_NAMES = {
     '01': 'Jan', '02': 'Fev', '03': 'Mar', '04': 'Abr', '05': 'Mai', '06': 'Jun',
     '07': 'Jul', '08': 'Ago', '09': 'Set', '10': 'Out', '11': 'Nov', '12': 'Dez'
@@ -1454,47 +1561,116 @@
     });
   });
 
+  function roundMoney(num) {
+    const n = Number(num);
+    if (!isFinite(n)) return 0;
+    return Math.round((n + Number.EPSILON) * 100) / 100;
+  }
+
+  function formatBRL(num) {
+    const val = roundMoney(num);
+    return 'R$ ' + val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
   function formatMonthKey(key) {
     if (!key || !key.includes('-')) return key || '';
     const [y, m] = key.split('-');
     return `${SHORT_MONTH_NAMES[m] || m}/${y.slice(-2)}`;
   }
 
-  function getInitialDateSelection() {
+  function getInitialMonthKey() {
     const saved = localStorage.getItem(LAST_DATE_KEY);
-    if (saved && ALL_MONTHS.includes(saved)) {
-      const [y, m] = saved.split('-');
-      return { year: y, month: m };
-    }
+    if (saved && ALL_MONTHS.includes(saved)) return saved;
     const now = new Date();
-    const yNow = String(now.getFullYear());
-    const mNow = String(now.getMonth() + 1).padStart(2, '0');
-    if (YEARS_LIST.includes(yNow)) {
-      return { year: yNow, month: mNow };
-    }
-    return { year: '2026', month: '01' };
+    const candidate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    return ALL_MONTHS.includes(candidate) ? candidate : '2026-11';
   }
 
-  (function initDateSelectors() {
-    const initial = getInitialDateSelection();
-    const monthSel = document.getElementById('month-only-select');
-    if (monthSel) monthSel.value = initial.month;
+  let activeMonthKey = getInitialMonthKey();
 
-    const yearSelectIds = ['year-only-select', 'inst-start-year-only', 'fixed-start-year-only'];
-    yearSelectIds.forEach(id => {
+  function getCurrentMonth() {
+    return activeMonthKey;
+  }
+
+  (function initModalYearSelectors() {
+    const initialYear = activeMonthKey.split('-')[0];
+    ['inst-start-year-only', 'fixed-start-year-only'].forEach(id => {
       const sel = document.getElementById(id);
       if (!sel) return;
       YEARS_LIST.forEach(y => {
         const opt = document.createElement('option');
         opt.value = y;
         opt.textContent = y;
-        if (y === initial.year) opt.selected = true;
+        if (y === initialYear) opt.selected = true;
         sel.appendChild(opt);
       });
     });
-
-    localStorage.setItem(LAST_DATE_KEY, `${initial.year}-${initial.month}`);
+    localStorage.setItem(LAST_DATE_KEY, activeMonthKey);
   })();
+
+  function renderBinderBar() {
+    const [curYear, curMonth] = activeMonthKey.split('-');
+    const pageIdx = ALL_MONTHS.indexOf(activeMonthKey);
+
+    document.getElementById('current-page-label').textContent = `${FULL_MONTH_NAMES[curMonth]} ${curYear}`;
+    document.getElementById('page-counter-label').textContent = `Pág. ${pageIdx + 1}/${ALL_MONTHS.length}`;
+    document.getElementById('btn-prev-page').disabled = pageIdx <= 0;
+    document.getElementById('btn-next-page').disabled = pageIdx >= ALL_MONTHS.length - 1;
+
+    const yearStrip = document.getElementById('year-strip');
+    const yFrag = document.createDocumentFragment();
+    YEARS_LIST.forEach(y => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'year-chip num-tabular' + (y === curYear ? ' active' : '');
+      btn.textContent = y;
+      btn.onclick = () => goToMonthKey(`${y}-${curMonth}`);
+      yFrag.appendChild(btn);
+    });
+    yearStrip.replaceChildren(yFrag);
+
+    const monthsStrip = document.getElementById('months-strip');
+    const mFrag = document.createDocumentFragment();
+    MONTH_NUMS.forEach(m => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'month-page-tab' + (m === curMonth ? ' active' : '');
+      btn.textContent = SHORT_MONTH_NAMES[m];
+      btn.onclick = () => goToMonthKey(`${curYear}-${m}`);
+      mFrag.appendChild(btn);
+    });
+    monthsStrip.replaceChildren(mFrag);
+  }
+
+  function goToMonthKey(nextKey) {
+    if (!ALL_MONTHS.includes(nextKey) || nextKey === activeMonthKey) return;
+    commitCurrentMonthToMemory(false);
+    activeMonthKey = nextKey;
+    localStorage.setItem(LAST_DATE_KEY, activeMonthKey);
+    renderBinderBar();
+    loadMonthIntoView(activeMonthKey);
+  }
+
+  function stepPage(delta) {
+    const idx = ALL_MONTHS.indexOf(activeMonthKey);
+    const nextIdx = idx + delta;
+    if (nextIdx >= 0 && nextIdx < ALL_MONTHS.length) {
+      goToMonthKey(ALL_MONTHS[nextIdx]);
+    }
+  }
+
+  document.addEventListener('keydown', e => {
+    if (!activeAccountId) return;
+    const tag = (e.target && e.target.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    if (e.altKey && e.key === 'ArrowLeft') {
+      e.preventDefault();
+      stepPage(-1);
+    } else if (e.altKey && e.key === 'ArrowRight') {
+      e.preventDefault();
+      stepPage(1);
+    }
+  });
 
   const DEFAULT_ACCOUNTS = {
     acc_kirito:      { username: 'kirito',      password: '2027' },
@@ -1510,8 +1686,8 @@
       shortName: 'Cartão Crédito',
       color: '#FF9F0A',
       items: [
-        { id: 'it_cc_avista', label: 'Fatura / Compras à Vista', val: 0, max: 2000, step: 10 },
-        { id: 'it_cc_assin', label: 'Assinaturas no Cartão', val: 0, max: 500, step: 5 }
+        { id: 'it_cc_avista', label: 'Fatura / Compras à Vista', val: 0, max: 2000, step: 0.01 },
+        { id: 'it_cc_assin', label: 'Assinaturas no Cartão', val: 0, max: 500, step: 0.01 }
       ]
     };
   }
@@ -1525,10 +1701,10 @@
         shortName: 'Contas Fixas',
         color: '#0A84FF',
         items: [
-          { id: 'it_net', label: 'Internet / Wi-Fi', val: 0, max: 500, step: 5 },
-          { id: 'it_cel', label: 'Plano Celular', val: 0, max: 300, step: 5 },
-          { id: 'it_spot', label: 'Spotify / Assinaturas', val: 0, max: 200, step: 5 },
-          { id: 'it_casa', label: 'Luz / Água / Casa', val: 0, max: 1000, step: 10 }
+          { id: 'it_net', label: 'Internet / Wi-Fi', val: 0, max: 500, step: 0.01 },
+          { id: 'it_cel', label: 'Plano Celular', val: 0, max: 300, step: 0.01 },
+          { id: 'it_spot', label: 'Spotify / Assinaturas', val: 0, max: 200, step: 0.01 },
+          { id: 'it_casa', label: 'Luz / Água / Casa', val: 0, max: 1000, step: 0.01 }
         ]
       },
       {
@@ -1537,8 +1713,8 @@
         shortName: 'Cabelo',
         color: '#FF375F',
         items: [
-          { id: 'it_corte', label: 'Corte de Cabelo / Barbearia', val: 0, max: 300, step: 5 },
-          { id: 'it_prod', label: 'Produtos (Pomada / Shampoo / Creme)', val: 0, max: 300, step: 5 }
+          { id: 'it_corte', label: 'Corte de Cabelo / Barbearia', val: 0, max: 300, step: 0.01 },
+          { id: 'it_prod', label: 'Produtos (Pomada / Shampoo / Creme)', val: 0, max: 300, step: 0.01 }
         ]
       },
       {
@@ -1547,9 +1723,9 @@
         shortName: 'Lazer',
         color: '#FFD60A',
         items: [
-          { id: 'it_ifood', label: 'iFood / Lanches', val: 0, max: 800, step: 10 },
-          { id: 'it_sair', label: 'Saídas / Cinema / Rolês', val: 0, max: 800, step: 10 },
-          { id: 'it_jogos', label: 'Jogos / Compras Pessoais', val: 0, max: 800, step: 10 }
+          { id: 'it_ifood', label: 'iFood / Lanches', val: 0, max: 800, step: 0.01 },
+          { id: 'it_sair', label: 'Saídas / Cinema / Rolês', val: 0, max: 800, step: 0.01 },
+          { id: 'it_jogos', label: 'Jogos / Compras Pessoais', val: 0, max: 800, step: 0.01 }
         ]
       },
       {
@@ -1558,8 +1734,8 @@
         shortName: 'Fundo Reserva',
         color: '#BF5AF2',
         items: [
-          { id: 'it_emerg', label: 'Reserva de Emergência (Caixinha)', val: 0, max: 2000, step: 10 },
-          { id: 'it_saude', label: 'Imprevistos / Saúde', val: 0, max: 1000, step: 10 }
+          { id: 'it_emerg', label: 'Reserva de Emergência (Caixinha)', val: 0, max: 2000, step: 0.01 },
+          { id: 'it_saude', label: 'Imprevistos / Saúde', val: 0, max: 1000, step: 0.01 }
         ]
       },
       {
@@ -1568,8 +1744,8 @@
         shortName: 'Guardado',
         color: '#30D158',
         items: [
-          { id: 'it_inv', label: 'Investimentos / Cofrinho', val: 0, max: 2000, step: 10 },
-          { id: 'it_meta', label: 'Meta Específica / Viagem / Upgrade', val: 0, max: 2000, step: 10 }
+          { id: 'it_inv', label: 'Investimentos / Cofrinho', val: 0, max: 2000, step: 0.01 },
+          { id: 'it_meta', label: 'Meta Específica / Viagem / Upgrade', val: 0, max: 2000, step: 0.01 }
         ]
       }
     ];
@@ -1652,47 +1828,6 @@
     saveLocalCache();
   }
 
-  function commitCurrentMonthToMemory(markTimestamp = true) {
-    if (!activeAccountId) return;
-    const monthsMap = getAccountMonthsMap();
-    const monthKey = getCurrentMonth();
-    monthsMap[monthKey] = {
-      initialized: true,
-      income: parseFloat(document.getElementById('income').value) || 0,
-      topics: currentTopics
-    };
-    if (markTimestamp) {
-      cloudRoot.updatedAt = Date.now();
-    }
-    saveLocalCache();
-  }
-
-  function scheduleBackgroundSave(delayMs = 400) {
-    if (!activeAccountId) return;
-    lastLocalEditAt = Date.now();
-    hasPendingSave = true;
-    commitCurrentMonthToMemory(true);
-    setStatus('● Salvando...');
-
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(async () => {
-      if (isSaving || !activeAccountId) return;
-      isSaving = true;
-      try {
-        do {
-          hasPendingSave = false;
-          commitCurrentMonthToMemory(true);
-          await pushCloudRootNow();
-        } while (hasPendingSave);
-        setStatus('● Sincronizado');
-      } catch (e) {
-        setStatus('● Salvo local (sem rede)');
-      } finally {
-        isSaving = false;
-      }
-    }, delayMs);
-  }
-
   function getAccountMonthsMap() {
     if (!cloudRoot.data[activeAccountId]) cloudRoot.data[activeAccountId] = {};
     return cloudRoot.data[activeAccountId];
@@ -1708,50 +1843,125 @@
     return cloudRoot.fixedCosts[activeAccountId];
   }
 
+  // Propaga salário base para meses posteriores que ainda não definiram salário próprio
+  function propagateIncomeForward(fromMonthKey, newIncome) {
+    const monthsMap = getAccountMonthsMap();
+    const startIdx = ALL_MONTHS.indexOf(fromMonthKey);
+    if (startIdx === -1) return;
+
+    for (let i = startIdx + 1; i < ALL_MONTHS.length; i++) {
+      const k = ALL_MONTHS[i];
+      const existing = monthsMap[k];
+      if (!existing || !existing.incomeCustom) {
+        monthsMap[k] = {
+          initialized: existing ? Boolean(existing.initialized) : false,
+          topics: existing ? existing.topics : null,
+          income: roundMoney(newIncome),
+          incomeCustom: false
+        };
+      }
+    }
+  }
+
+  // Herda tópicos base de um mês anterior caso o mês alvo ainda não tenha sido inicializado
+  function getInheritedBaseTopics(targetMonthKey) {
+    const monthsMap = getAccountMonthsMap();
+    const targetIdx = ALL_MONTHS.indexOf(targetMonthKey);
+    if (targetIdx > 0) {
+      for (let i = targetIdx - 1; i >= 0; i--) {
+        const prev = monthsMap[ALL_MONTHS[i]];
+        if (prev && (prev.initialized === true || Array.isArray(prev.topics))) {
+          return Array.isArray(prev.topics) ? prev.topics : [];
+        }
+      }
+    }
+    return getDefaultTopics();
+  }
+
+  function getInheritedIncome(targetMonthKey) {
+    const monthsMap = getAccountMonthsMap();
+    const targetIdx = ALL_MONTHS.indexOf(targetMonthKey);
+    if (targetIdx > 0) {
+      for (let i = targetIdx - 1; i >= 0; i--) {
+        const prev = monthsMap[ALL_MONTHS[i]];
+        if (prev && prev.income !== undefined && roundMoney(prev.income) > 0) {
+          return roundMoney(prev.income);
+        }
+      }
+    }
+    return 0;
+  }
+
+  function normalizeTopicKey(str) {
+    return String(str || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/^\d+\.\s*/, '')
+      .trim();
+  }
+
+  function createTopicFromMeta(topicId, topicName, fallbackColor) {
+    const norm = normalizeTopicKey(topicName);
+    const isCard = topicId === 'top_cartao' || norm.includes('cartao');
+    const isFixed = topicId === 'top_fixas' || norm.includes('contas fixas');
+    const cleanName = topicName || (isCard ? '1. Cartão de Crédito' : '2. Contas Fixas & Assinaturas');
+    const shortName = cleanName.replace(/^\d+\.\s*/, '').split('(')[0].trim().slice(0, 14) || cleanName;
+    const color = fallbackColor || (isCard ? '#FF9F0A' : (isFixed ? '#0A84FF' : '#64D2FF'));
+    return {
+      id: isCard ? 'top_cartao' : (topicId || 'top_' + norm.replace(/[^a-z0-9]+/g, '_')),
+      name: cleanName,
+      shortName,
+      color,
+      items: []
+    };
+  }
+
+  function resolveTargetTopic(list, planTopicId, planTopicName) {
+    const targetNorm = normalizeTopicKey(planTopicName);
+
+    let topicObj = list.find(t =>
+      (planTopicId && t.id === planTopicId) ||
+      (targetNorm && normalizeTopicKey(t.name) === targetNorm)
+    );
+
+    if (!topicObj && (planTopicId === 'top_cartao' || targetNorm.includes('cartao'))) {
+      topicObj = list.find(t => t.id === 'top_cartao' || normalizeTopicKey(t.name).includes('cartao'));
+    }
+
+    if (!topicObj) {
+      topicObj = createTopicFromMeta(planTopicId, planTopicName);
+      list.push(topicObj);
+    }
+    return topicObj;
+  }
+
   function buildTopicsForMonth(monthKey, rawMonthObj) {
     const isInitialized = Boolean(rawMonthObj && (rawMonthObj.initialized === true || Array.isArray(rawMonthObj.topics)));
     const source = isInitialized
-      ? (Array.isArray(rawMonthObj.topics) ? rawMonthObj.topics : [])
-      : getDefaultTopics();
+      ? (Array.isArray(rawMonthObj.topics) ? rawMonthObj.topics : getInheritedBaseTopics(monthKey))
+      : getInheritedBaseTopics(monthKey);
 
-    // Preserva exatamente os tópicos existentes (mesmo se o usuário excluiu todos ou excluiu o cartão)
     const list = source.map(t => ({
       ...t,
       items: Array.isArray(t.items)
-        ? t.items.filter(it => it && !it.installmentId && !it.fixedId).map(it => ({ ...it }))
+        ? t.items
+            .filter(it => it && !it.installmentId && !it.fixedId)
+            .map(it => ({ ...it, val: roundMoney(it.val || 0), step: it.step || 0.01 }))
         : []
     }));
 
     const mIdx = ALL_MONTHS.indexOf(monthKey);
     if (mIdx === -1) return list;
 
-    function resolveTargetTopic(planTopicId, planTopicName) {
-      let topicObj = list.find(t => t.id === planTopicId || t.name === planTopicName);
-      if (!topicObj) {
-        if (list.length > 0) {
-          topicObj = list[0];
-        } else {
-          topicObj = {
-            id: planTopicId || 'top_recorrentes',
-            name: planTopicName || '1. Cartão de Crédito',
-            shortName: (planTopicName || 'Cartão').slice(0, 14),
-            color: '#FF9F0A',
-            items: []
-          };
-          list.push(topicObj);
-        }
-      }
-      return topicObj;
-    }
-
     getAccountInstallments().forEach(plan => {
       const startIdx = ALL_MONTHS.indexOf(plan.startMonth);
       const count = Math.max(1, parseInt(plan.count, 10) || 1);
       if (startIdx !== -1 && mIdx >= startIdx && mIdx < startIdx + count) {
         const k = mIdx - startIdx;
-        const total = parseFloat(plan.total) || 0;
-        const installmentVal = Number((total / count).toFixed(2));
-        const topicObj = resolveTargetTopic(plan.topicId, plan.topicName);
+        const total = roundMoney(plan.total);
+        const installmentVal = roundMoney(total / count);
+        const topicObj = resolveTargetTopic(list, plan.topicId, plan.topicName);
         topicObj.items.push({
           id: `it_${plan.id}_${k + 1}`,
           installmentId: plan.id,
@@ -1759,8 +1969,8 @@
           parcelCount: count,
           label: `${plan.desc} (${k + 1}/${count})`,
           val: installmentVal,
-          max: Math.max(1000, installmentVal * 2),
-          step: 5
+          max: Math.max(1000, roundMoney(installmentVal * 2)),
+          step: 0.01
         });
       }
     });
@@ -1768,15 +1978,15 @@
     getAccountFixedCosts().forEach(fixed => {
       const startIdx = ALL_MONTHS.indexOf(fixed.startMonth || '2026-01');
       if (startIdx === -1 || mIdx >= startIdx) {
-        const val = Number((parseFloat(fixed.val) || 0).toFixed(2));
-        const topicObj = resolveTargetTopic(fixed.topicId, fixed.topicName);
+        const val = roundMoney(fixed.val);
+        const topicObj = resolveTargetTopic(list, fixed.topicId, fixed.topicName);
         topicObj.items.push({
           id: `it_${fixed.id}_${monthKey}`,
           fixedId: fixed.id,
           label: fixed.desc,
           val: val,
-          max: Math.max(1000, val * 2),
-          step: 5
+          max: Math.max(1000, roundMoney(val * 2)),
+          step: 0.01
         });
       }
     });
@@ -1787,31 +1997,94 @@
   function loadMonthIntoView(monthKey) {
     const monthsMap = getAccountMonthsMap();
     const raw = monthsMap[monthKey];
-    currentIncome = (raw && raw.income !== undefined) ? (parseFloat(raw.income) || 0) : 0;
+    const inc = (raw && raw.income !== undefined && roundMoney(raw.income) > 0)
+      ? roundMoney(raw.income)
+      : getInheritedIncome(monthKey);
+    currentIncome = inc;
     currentTopics = buildTopicsForMonth(monthKey, raw);
-    document.getElementById('income').value = currentIncome;
+    document.getElementById('income').value = currentIncome.toFixed(2);
     renderTopics();
   }
 
+  function commitCurrentMonthToMemory(markTimestamp = true, markIncomeCustom = false) {
+    if (!activeAccountId) return;
+    const monthsMap = getAccountMonthsMap();
+    const monthKey = getCurrentMonth();
+    const prev = monthsMap[monthKey] || {};
+    const incVal = roundMoney(parseFloat(document.getElementById('income').value) || 0);
+    const isCustom = markIncomeCustom ? true : Boolean(prev.incomeCustom);
+
+    monthsMap[monthKey] = {
+      initialized: true,
+      income: incVal,
+      incomeCustom: isCustom,
+      topics: currentTopics
+    };
+
+    if (markIncomeCustom) {
+      propagateIncomeForward(monthKey, incVal);
+    }
+
+    if (markTimestamp) {
+      cloudRoot.updatedAt = Date.now();
+    }
+    saveLocalCache();
+  }
+
+  function scheduleBackgroundSave(delayMs = 350, markIncomeCustom = false) {
+    if (!activeAccountId) return;
+    lastLocalEditAt = Date.now();
+    hasPendingSave = true;
+    commitCurrentMonthToMemory(true, markIncomeCustom);
+    setStatus('● Salvando...');
+
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      if (isSaving || !activeAccountId) return;
+      isSaving = true;
+      try {
+        do {
+          hasPendingSave = false;
+          commitCurrentMonthToMemory(true, false);
+          await pushCloudRootNow();
+        } while (hasPendingSave);
+        setStatus('● Sincronizado');
+      } catch (e) {
+        setStatus('● Salvo local (sem rede)');
+      } finally {
+        isSaving = false;
+      }
+    }, delayMs);
+  }
+
   // --- CUSTOS FIXOS ---
+  function populateTopicSelectWithKnownTopics(selectEl, preselectedId = null) {
+    selectEl.innerHTML = '';
+    const mapById = new Map();
+
+    currentTopics.forEach(t => mapById.set(t.id, t));
+    getDefaultTopics().forEach(t => {
+      if (!mapById.has(t.id)) mapById.set(t.id, t);
+    });
+
+    mapById.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.name;
+      selectEl.appendChild(opt);
+    });
+
+    if (preselectedId && mapById.has(preselectedId)) {
+      selectEl.value = preselectedId;
+    } else if (mapById.has('top_cartao')) {
+      selectEl.value = 'top_cartao';
+    }
+  }
+
   function openFixedModal(existingId = null, preselectedTopicId = null) {
     editingFixedId = existingId;
     const topicSelect = document.getElementById('fixed-topic');
-    topicSelect.innerHTML = '';
-
-    if (currentTopics.length === 0) {
-      const opt = document.createElement('option');
-      opt.value = 'top_cartao';
-      opt.textContent = '1. Cartão de Crédito';
-      topicSelect.appendChild(opt);
-    } else {
-      currentTopics.forEach(t => {
-        const opt = document.createElement('option');
-        opt.value = t.id;
-        opt.textContent = t.name;
-        topicSelect.appendChild(opt);
-      });
-    }
+    populateTopicSelectWithKnownTopics(topicSelect, preselectedTopicId);
 
     document.getElementById('fixed-feedback').textContent = '';
 
@@ -1820,23 +2093,18 @@
       if (!fixed) return;
       document.getElementById('fixed-modal-title').textContent = 'Editar Custo Fixo';
       document.getElementById('fixed-desc').value = fixed.desc;
-      topicSelect.value = fixed.topicId || (currentTopics[0] && currentTopics[0].id) || 'top_cartao';
-      document.getElementById('fixed-val').value = fixed.val;
+      if (fixed.topicId) topicSelect.value = fixed.topicId;
+      document.getElementById('fixed-val').value = roundMoney(fixed.val).toFixed(2);
       const [sy, sm] = (fixed.startMonth || '2026-01').split('-');
       document.getElementById('fixed-start-year-only').value = sy;
       document.getElementById('fixed-start-month-only').value = sm;
     } else {
       document.getElementById('fixed-modal-title').textContent = 'Fixar Custo Mensal';
       document.getElementById('fixed-desc').value = '';
-      if (preselectedTopicId) {
-        topicSelect.value = preselectedTopicId;
-      } else {
-        const cardTopic = currentTopics.find(t => t.id === 'top_cartao');
-        if (cardTopic) topicSelect.value = cardTopic.id;
-      }
       document.getElementById('fixed-val').value = '';
-      document.getElementById('fixed-start-month-only').value = document.getElementById('month-only-select').value;
-      document.getElementById('fixed-start-year-only').value = document.getElementById('year-only-select').value;
+      const [cy, cm] = activeMonthKey.split('-');
+      document.getElementById('fixed-start-month-only').value = cm;
+      document.getElementById('fixed-start-year-only').value = cy;
     }
 
     updateFixedPreview();
@@ -1849,11 +2117,11 @@
   }
 
   function updateFixedPreview() {
-    const val = parseFloat(document.getElementById('fixed-val').value) || 0;
+    const val = roundMoney(parseFloat(document.getElementById('fixed-val').value) || 0);
     const sm = document.getElementById('fixed-start-month-only').value;
     const sy = document.getElementById('fixed-start-year-only').value;
     document.getElementById('fixed-preview').textContent =
-      `Fixo mensal: R$ ${val.toFixed(2)} / mês • A partir de ${formatMonthKey(`${sy}-${sm}`)}`;
+      `Fixo mensal: ${formatBRL(val)} / mês • A partir de ${formatMonthKey(`${sy}-${sm}`)}`;
   }
 
   function saveFixedCost(e) {
@@ -1862,7 +2130,7 @@
     const topicSelect = document.getElementById('fixed-topic');
     const topicId = topicSelect.value;
     const selectedOptionText = topicSelect.options[topicSelect.selectedIndex]?.textContent || '';
-    const val = parseFloat(document.getElementById('fixed-val').value);
+    const val = roundMoney(parseFloat(document.getElementById('fixed-val').value));
     const startMonth = `${document.getElementById('fixed-start-year-only').value}-${document.getElementById('fixed-start-month-only').value}`;
     const fb = document.getElementById('fixed-feedback');
 
@@ -1925,7 +2193,7 @@
       <div class="parcel-list-item">
         <div>
           <div class="parcel-list-title">${escapeHtml(f.desc)}</div>
-          <div class="parcel-list-meta num-tabular">R$ ${Number(f.val).toFixed(2)} / mês • ${escapeHtml(f.topicName || 'Tópico')} • Desde ${formatMonthKey(f.startMonth)}</div>
+          <div class="parcel-list-meta num-tabular">${formatBRL(f.val)} / mês • ${escapeHtml(f.topicName || 'Tópico')} • Desde ${formatMonthKey(f.startMonth)}</div>
         </div>
         <div style="display:flex; gap:6px;">
           <button type="button" class="btn" onclick="closeFixedManager(); openFixedModal('${f.id}')">✎ Editar</button>
@@ -1948,21 +2216,7 @@
   function openInstallmentModal(existingId = null, preselectedTopicId = null) {
     editingInstallmentId = existingId;
     const topicSelect = document.getElementById('inst-topic');
-    topicSelect.innerHTML = '';
-
-    if (currentTopics.length === 0) {
-      const opt = document.createElement('option');
-      opt.value = 'top_cartao';
-      opt.textContent = '1. Cartão de Crédito';
-      topicSelect.appendChild(opt);
-    } else {
-      currentTopics.forEach(t => {
-        const opt = document.createElement('option');
-        opt.value = t.id;
-        opt.textContent = t.name;
-        topicSelect.appendChild(opt);
-      });
-    }
+    populateTopicSelectWithKnownTopics(topicSelect, preselectedTopicId);
 
     document.getElementById('inst-feedback').textContent = '';
 
@@ -1971,8 +2225,8 @@
       if (!plan) return;
       document.getElementById('inst-modal-title').textContent = 'Editar Compra Parcelada';
       document.getElementById('inst-desc').value = plan.desc;
-      topicSelect.value = plan.topicId || (currentTopics[0] && currentTopics[0].id) || 'top_cartao';
-      document.getElementById('inst-total').value = plan.total;
+      if (plan.topicId) topicSelect.value = plan.topicId;
+      document.getElementById('inst-total').value = roundMoney(plan.total).toFixed(2);
       document.getElementById('inst-count').value = plan.count;
       const [sy, sm] = (plan.startMonth || '2026-01').split('-');
       document.getElementById('inst-start-year-only').value = sy;
@@ -1980,16 +2234,11 @@
     } else {
       document.getElementById('inst-modal-title').textContent = 'Nova Compra Parcelada';
       document.getElementById('inst-desc').value = '';
-      if (preselectedTopicId) {
-        topicSelect.value = preselectedTopicId;
-      } else {
-        const cardTopic = currentTopics.find(t => t.id === 'top_cartao');
-        if (cardTopic) topicSelect.value = cardTopic.id;
-      }
       document.getElementById('inst-total').value = '';
       document.getElementById('inst-count').value = '3';
-      document.getElementById('inst-start-month-only').value = document.getElementById('month-only-select').value;
-      document.getElementById('inst-start-year-only').value = document.getElementById('year-only-select').value;
+      const [cy, cm] = activeMonthKey.split('-');
+      document.getElementById('inst-start-month-only').value = cm;
+      document.getElementById('inst-start-year-only').value = cy;
     }
 
     updateInstallmentPreview();
@@ -2002,13 +2251,13 @@
   }
 
   function updateInstallmentPreview() {
-    const total = parseFloat(document.getElementById('inst-total').value) || 0;
+    const total = roundMoney(parseFloat(document.getElementById('inst-total').value) || 0);
     const count = Math.max(1, parseInt(document.getElementById('inst-count').value, 10) || 1);
     const sm = document.getElementById('inst-start-month-only').value;
     const sy = document.getElementById('inst-start-year-only').value;
     const startMonth = `${sy}-${sm}`;
     const startIdx = ALL_MONTHS.indexOf(startMonth);
-    const perMonth = total / count;
+    const perMonth = roundMoney(total / count);
 
     let endLabel = '';
     if (startIdx !== -1) {
@@ -2017,7 +2266,7 @@
     }
 
     document.getElementById('inst-preview').textContent =
-      `Cada parcela: R$ ${perMonth.toFixed(2)} (${count}x)${endLabel}`;
+      `Cada parcela: ${formatBRL(perMonth)} (${count}x)${endLabel}`;
   }
 
   function saveInstallmentPlan(e) {
@@ -2026,7 +2275,7 @@
     const topicSelect = document.getElementById('inst-topic');
     const topicId = topicSelect.value;
     const selectedOptionText = topicSelect.options[topicSelect.selectedIndex]?.textContent || '';
-    const total = parseFloat(document.getElementById('inst-total').value);
+    const total = roundMoney(parseFloat(document.getElementById('inst-total').value));
     const count = parseInt(document.getElementById('inst-count').value, 10);
     const startMonth = `${document.getElementById('inst-start-year-only').value}-${document.getElementById('inst-start-month-only').value}`;
     const fb = document.getElementById('inst-feedback');
@@ -2089,12 +2338,12 @@
     }
 
     container.innerHTML = plans.map(p => {
-      const perMonth = (parseFloat(p.total) || 0) / Math.max(1, parseInt(p.count, 10) || 1);
+      const perMonth = roundMoney((parseFloat(p.total) || 0) / Math.max(1, parseInt(p.count, 10) || 1));
       return `
         <div class="parcel-list-item">
           <div>
             <div class="parcel-list-title">${escapeHtml(p.desc)}</div>
-            <div class="parcel-list-meta num-tabular">Total R$ ${Number(p.total).toFixed(2)} • ${p.count}x de R$ ${perMonth.toFixed(2)} • Início: ${formatMonthKey(p.startMonth)}</div>
+            <div class="parcel-list-meta num-tabular">Total ${formatBRL(p.total)} • ${p.count}x de ${formatBRL(perMonth)} • Início: ${formatMonthKey(p.startMonth)}</div>
           </div>
           <div style="display:flex; gap:6px;">
             <button type="button" class="btn" onclick="closeParcelsManager(); openInstallmentModal('${p.id}')">✎ Editar</button>
@@ -2146,7 +2395,7 @@
     const parsed = JSON.parse(clean);
     if (!parsed || typeof parsed !== 'object') throw new Error('O código precisa ser um objeto JSON.');
 
-    const income = Number(parsed.income);
+    const income = roundMoney(Number(parsed.income));
     if (isNaN(income) || income < 0) throw new Error('Campo "income" inválido.');
     if (!Array.isArray(parsed.topics)) {
       throw new Error('Campo "topics" inválido.');
@@ -2155,20 +2404,20 @@
     const normalizedTopics = parsed.topics.map((t, idx) => {
       const name = String(t.name || `Tópico ${idx + 1}`).trim();
       const shortName = String(t.shortName || name.replace(/^\d+\.\s*/, '').split('(')[0].trim().slice(0, 14) || name);
-      const isCard = name.toLowerCase().includes('cartão') || name.toLowerCase().includes('cartao');
+      const isCard = normalizeTopicKey(name).includes('cartao');
       const color = t.color || (isCard ? '#FF9F0A' : PALETTE[idx % PALETTE.length]);
       const rawItems = Array.isArray(t.items) ? t.items : [];
 
       const items = rawItems.map((it, iIdx) => {
-        const val = Number(it.val);
+        const val = roundMoney(Number(it.val));
         const safeVal = isNaN(val) ? 0 : val;
-        const max = Math.max(Number(it.max) || 1000, safeVal * 2);
+        const max = Math.max(Number(it.max) || 1000, roundMoney(safeVal * 2));
         return {
           id: it.id || `it_imp_${Date.now()}_${idx}_${iIdx}`,
           label: String(it.label || `Item ${iIdx + 1}`).trim(),
           val: safeVal,
           max: max,
-          step: Number(it.step) || 5
+          step: Number(it.step) || 0.01
         };
       });
 
@@ -2197,12 +2446,12 @@
 
     try {
       const data = extractAndParseImport(raw);
-      const totalGastos = data.topics.reduce(
-        (sum, t) => sum + t.items.reduce((acc, it) => acc + (parseFloat(it.val) || 0), 0),
+      const totalGastos = roundMoney(data.topics.reduce(
+        (sum, t) => sum + t.items.reduce((acc, it) => acc + roundMoney(it.val || 0), 0),
         0
-      );
+      ));
       prevEl.style.color = 'var(--c-guardado)';
-      prevEl.textContent = `Válido • Salário: R$ ${data.income.toFixed(2)} • ${data.topics.length} tópicos • Total gastos: R$ ${totalGastos.toFixed(2)}`;
+      prevEl.textContent = `Válido • Salário: ${formatBRL(data.income)} • ${data.topics.length} tópicos • Gastos: ${formatBRL(totalGastos)}`;
     } catch (err) {
       prevEl.style.color = 'var(--c-neg)';
       prevEl.textContent = 'Código inválido ou incompleto.';
@@ -2218,10 +2467,10 @@
       const data = extractAndParseImport(raw);
       currentIncome = data.income;
       currentTopics = buildTopicsForMonth(getCurrentMonth(), { initialized: true, topics: data.topics });
-      document.getElementById('income').value = currentIncome;
+      document.getElementById('income').value = currentIncome.toFixed(2);
       renderTopics();
       closeImportModal();
-      scheduleBackgroundSave(200);
+      scheduleBackgroundSave(200, true);
     } catch (err) {
       fbEl.textContent = err.message;
     }
@@ -2251,6 +2500,7 @@
       document.getElementById('app-screen').style.display = 'block';
 
       loadLocalCache();
+      renderBinderBar();
       const creds = cloudRoot.accounts[activeAccountId] || DEFAULT_ACCOUNTS[activeAccountId];
       document.getElementById('active-user-badge').textContent = '👤 ' + creds.username;
       loadMonthIntoView(getCurrentMonth());
@@ -2373,15 +2623,9 @@
     document.getElementById('theme-btn').textContent = '🌙 Escuro';
   }
 
-  function getCurrentMonth() {
-    const m = document.getElementById('month-only-select').value;
-    const y = document.getElementById('year-only-select').value;
-    return `${y}-${m}`;
-  }
-
-  // --- RENDERIZAÇÃO DINÂMICA ---
+  // --- RENDERIZAÇÃO DINÂMICA COM CENTAVOS ---
   function syncSliderVisual(slider, val, maxVal) {
-    const safeMax = Math.max(1, parseFloat(maxVal) || 1);
+    const safeMax = Math.max(0.01, parseFloat(maxVal) || 1);
     const pct = Math.max(0, Math.min(100, (val / safeMax) * 100));
     slider.style.setProperty('--pct', `${pct}%`);
   }
@@ -2393,7 +2637,7 @@
     if (currentTopics.length === 0) {
       const empty = document.createElement('div');
       empty.className = 'empty-topics-box';
-      empty.innerHTML = 'Nenhum tópico neste mês. Clique em <strong>+ Novo Tópico</strong> para criar os seus ou em <strong>⚡ Padrão</strong> se quiser restaurar os 6 tópicos iniciais.';
+      empty.innerHTML = 'Nenhum tópico nesta página mensal. Clique em <strong>+ Novo Tópico</strong> para criar os seus ou em <strong>⚡ Padrão</strong> se quiser restaurar os 6 tópicos iniciais.';
       frag.appendChild(empty);
       container.replaceChildren(frag);
       updateSummary();
@@ -2405,7 +2649,7 @@
       sec.className = 'section';
       sec.style.setProperty('--topic-color', topic.color);
 
-      const totalTopic = topic.items.reduce((acc, it) => acc + (parseFloat(it.val) || 0), 0);
+      const totalTopic = roundMoney(topic.items.reduce((acc, it) => acc + roundMoney(it.val || 0), 0));
 
       const header = document.createElement('div');
       header.className = 'sec-header';
@@ -2415,7 +2659,7 @@
           <span style="font-size:11px; opacity:0.75;">✎</span>
         </div>
         <div class="sec-controls">
-          <span id="sub-topic-${tIdx}" class="num-tabular" style="color:${topic.color}; font-weight:700;">R$ ${totalTopic.toFixed(0)}</span>
+          <span id="sub-topic-${tIdx}" class="num-tabular" style="color:${topic.color}; font-weight:700;">${formatBRL(totalTopic)}</span>
           <button type="button" class="btn" onclick="openFixedModal(null, '${topic.id}')" title="Fixar custo recorrente neste tópico">📌 Fixar</button>
           <button type="button" class="btn" onclick="openInstallmentModal(null, '${topic.id}')" title="Parcelar compra neste tópico">💳 Parcelar</button>
           <button type="button" class="btn" onclick="addItem(${tIdx})">+ Item</button>
@@ -2425,9 +2669,9 @@
       sec.appendChild(header);
 
       topic.items.forEach((item, iIdx) => {
-        const val = parseFloat(item.val) || 0;
+        const val = roundMoney(parseFloat(item.val) || 0);
         const maxVal = Math.max(item.max || 1000, val);
-        const pct = Math.max(0, Math.min(100, (val / Math.max(1, maxVal)) * 100));
+        const pct = Math.max(0, Math.min(100, (val / Math.max(0.01, maxVal)) * 100));
 
         const row = document.createElement('div');
         row.className = 'row';
@@ -2445,8 +2689,8 @@
 
         row.innerHTML = `
           <span class="item-label" ${editClickAttr}>${escapeHtml(item.label)}${badgeHtml}</span>
-          <input type="range" class="sb-slider" style="--topic-color:${topic.color}; --pct:${pct}%" min="0" max="${maxVal}" step="${item.step || 5}" value="${val}" oninput="onSliderChange(${tIdx}, ${iIdx}, this)">
-          <input type="number" class="num-input num-tabular" value="${val}" oninput="onNumberChange(${tIdx}, ${iIdx}, this)">
+          <input type="range" class="sb-slider" style="--topic-color:${topic.color}; --pct:${pct}%" min="0" max="${maxVal}" step="0.01" value="${val}" oninput="onSliderChange(${tIdx}, ${iIdx}, this)">
+          <input type="number" class="num-input num-tabular" step="0.01" value="${val}" oninput="onNumberChange(${tIdx}, ${iIdx}, this)">
           <button type="button" class="btn btn-danger" onclick="deleteItem(${tIdx}, ${iIdx})" title="Excluir item">×</button>
         `;
         sec.appendChild(row);
@@ -2460,7 +2704,7 @@
   }
 
   function updateSummary() {
-    const inc = parseFloat(document.getElementById('income').value) || 0;
+    const inc = roundMoney(parseFloat(document.getElementById('income').value) || 0);
     currentIncome = inc;
 
     const kpiFrag = document.createDocumentFragment();
@@ -2469,18 +2713,19 @@
     let totalGasto = 0;
 
     currentTopics.forEach((topic, tIdx) => {
-      const sum = topic.items.reduce((acc, it) => acc + (parseFloat(it.val) || 0), 0);
-      totalGasto += sum;
-      const pct = inc > 0 ? Math.round((sum / inc) * 100) : 0;
+      const sum = roundMoney(topic.items.reduce((acc, it) => acc + roundMoney(it.val || 0), 0));
+      totalGasto = roundMoney(totalGasto + sum);
+      const pct = inc > 0 ? ((sum / inc) * 100).toFixed(1) : '0.0';
+      const pctNum = inc > 0 ? (sum / inc) * 100 : 0;
 
       const subEl = document.getElementById(`sub-topic-${tIdx}`);
-      if (subEl) subEl.textContent = 'R$ ' + sum.toFixed(0);
+      if (subEl) subEl.textContent = formatBRL(sum);
 
       const kpi = document.createElement('div');
       kpi.className = 'kpi';
       kpi.innerHTML = `
         <div class="kpi-label">${escapeHtml(topic.shortName || topic.name)}</div>
-        <div class="kpi-val" style="color:${topic.color}">R$ ${sum.toFixed(0)}</div>
+        <div class="kpi-val" style="color:${topic.color}">${formatBRL(sum)}</div>
         <div class="kpi-pct" style="color:${topic.color}">${pct}%</div>
       `;
       kpiFrag.appendChild(kpi);
@@ -2488,19 +2733,20 @@
       const seg = document.createElement('div');
       seg.className = 'seg';
       seg.style.background = topic.color;
-      seg.style.width = `${Math.min(100, pct)}%`;
+      seg.style.width = `${Math.min(100, pctNum)}%`;
       barFrag.appendChild(seg);
     });
 
-    const sobra = inc - totalGasto;
-    const pctSobra = inc > 0 ? Math.round((sobra / inc) * 100) : 0;
+    const sobra = roundMoney(inc - totalGasto);
+    const pctSobra = inc > 0 ? ((sobra / inc) * 100).toFixed(1) : '0.0';
+    const pctSobraNum = inc > 0 ? (sobra / inc) * 100 : 0;
     const sobraColor = sobra < 0 ? 'var(--c-neg)' : 'var(--c-sobra)';
 
     const sobraKpi = document.createElement('div');
     sobraKpi.className = 'kpi';
     sobraKpi.innerHTML = `
       <div class="kpi-label">Sobra Livre</div>
-      <div class="kpi-val" style="color:${sobraColor}">R$ ${sobra.toFixed(0)}</div>
+      <div class="kpi-val" style="color:${sobraColor}">${formatBRL(sobra)}</div>
       <div class="kpi-pct" style="color:${sobraColor}">${pctSobra}%</div>
     `;
     kpiFrag.appendChild(sobraKpi);
@@ -2508,7 +2754,7 @@
     const sobraSeg = document.createElement('div');
     sobraSeg.className = 'seg';
     sobraSeg.style.background = sobraColor;
-    sobraSeg.style.width = `${Math.max(0, Math.min(100, pctSobra))}%`;
+    sobraSeg.style.width = `${Math.max(0, Math.min(100, pctSobraNum))}%`;
     barFrag.appendChild(sobraSeg);
 
     document.getElementById('kpi-container').replaceChildren(kpiFrag);
@@ -2518,21 +2764,21 @@
   // --- INTERAÇÕES E CRUD INSTANTÂNEOS ---
   function onIncomeChange() {
     updateSummary();
-    scheduleBackgroundSave(600);
+    scheduleBackgroundSave(500, true);
   }
 
   function onSliderChange(tIdx, iIdx, el) {
-    const val = parseFloat(el.value) || 0;
+    const val = roundMoney(parseFloat(el.value) || 0);
     currentTopics[tIdx].items[iIdx].val = val;
     const numInput = el.parentElement.querySelector('.num-input');
     if (numInput) numInput.value = val;
     syncSliderVisual(el, val, el.max);
     updateSummary();
-    scheduleBackgroundSave(600);
+    scheduleBackgroundSave(500);
   }
 
   function onNumberChange(tIdx, iIdx, el) {
-    const val = parseFloat(el.value) || 0;
+    const val = roundMoney(parseFloat(el.value) || 0);
     const item = currentTopics[tIdx].items[iIdx];
     item.val = val;
     const slider = el.parentElement.querySelector('.sb-slider');
@@ -2545,7 +2791,7 @@
       syncSliderVisual(slider, val, slider.max);
     }
     updateSummary();
-    scheduleBackgroundSave(600);
+    scheduleBackgroundSave(500);
   }
 
   function addTopic() {
@@ -2566,14 +2812,14 @@
 
     const firstItem = prompt('Deseja já criar um primeiro item dentro desse tópico? (Deixe em branco para criar depois)');
     if (firstItem && firstItem.trim()) {
-      const valInput = prompt('Valor inicial desse item em R$ (pode deixar 0):', '0');
-      const initVal = parseFloat(valInput) || 0;
+      const valInput = prompt('Valor inicial desse item em R$ (ex: 34.90 ou 0):', '0.00');
+      const initVal = roundMoney(parseFloat(String(valInput || '0').replace(',', '.')) || 0);
       newTopic.items.push({
         id: 'it_' + Date.now(),
         label: firstItem.trim(),
         val: initVal,
-        max: Math.max(1000, initVal * 2),
-        step: 5
+        max: Math.max(1000, roundMoney(initVal * 2)),
+        step: 0.01
       });
     }
 
@@ -2603,16 +2849,16 @@
   function addItem(tIdx) {
     const label = prompt('Nome do gasto/item:');
     if (!label || !label.trim()) return;
-    const valInput = prompt('Valor inicial em R$ (pode deixar 0):', '0');
-    const initVal = parseFloat(valInput) || 0;
-    const maxVal = Math.max(1000, initVal * 2);
+    const valInput = prompt('Valor inicial em R$ (ex: 34.90 ou 0):', '0.00');
+    const initVal = roundMoney(parseFloat(String(valInput || '0').replace(',', '.')) || 0);
+    const maxVal = Math.max(1000, roundMoney(initVal * 2));
 
     currentTopics[tIdx].items.push({
       id: 'it_' + Date.now(),
       label: label.trim(),
       val: initVal,
       max: maxVal,
-      step: 5
+      step: 0.01
     });
     renderTopics();
     scheduleBackgroundSave(250);
@@ -2655,25 +2901,17 @@
     scheduleBackgroundSave(250);
   }
 
-  function changeMonth() {
-    const nextMonth = getCurrentMonth();
-    localStorage.setItem(LAST_DATE_KEY, nextMonth);
-    loadMonthIntoView(nextMonth);
-  }
-
   function resetToDefaultStructure() {
-    if (!confirm('Restaurar todas as 6 repartições padrão zeradas neste mês (mantendo suas parcelas e custos fixos ativos)?')) return;
-    currentIncome = 0;
+    if (!confirm('Restaurar todas as 6 repartições padrão zeradas nesta página mensal (mantendo suas parcelas e custos fixos ativos)?')) return;
     currentTopics = buildTopicsForMonth(getCurrentMonth(), { initialized: true, topics: getDefaultTopics() });
-    document.getElementById('income').value = 0;
     renderTopics();
     scheduleBackgroundSave(250);
   }
 
   function copyToAllMonths() {
-    commitCurrentMonthToMemory(true);
-    const selectedYear = document.getElementById('year-only-select').value;
-    if (!confirm(`Copiar o salário e todas as repartições deste mês para os 12 meses de ${selectedYear} (somente nesta conta)?`)) return;
+    commitCurrentMonthToMemory(true, true);
+    const selectedYear = activeMonthKey.split('-')[0];
+    if (!confirm(`Copiar o salário e todas as repartições desta página para os 12 meses de ${selectedYear} (somente nesta conta)?`)) return;
     const userMonths = getAccountMonthsMap();
     const snapshotTopics = JSON.parse(JSON.stringify(currentTopics));
     MONTH_NUMS.forEach(m => {
@@ -2681,6 +2919,7 @@
       userMonths[key] = {
         initialized: true,
         income: currentIncome,
+        incomeCustom: true,
         topics: buildTopicsForMonth(key, { initialized: true, topics: snapshotTopics })
       };
     });
@@ -2698,7 +2937,7 @@
     if (!activeAccountId) return;
     if (hasPendingSave) {
       clearTimeout(saveTimer);
-      commitCurrentMonthToMemory(true);
+      commitCurrentMonthToMemory(true, false);
       try {
         setStatus('● Salvando...');
         await pushCloudRootNow();
@@ -2725,7 +2964,6 @@
         return;
       }
 
-      // Se o cache local for mais recente do que a nuvem, envia o local para a nuvem em vez de sobrescrever exclusões
       if (!forcePull && cloudRoot.updatedAt > (fresh.updatedAt || 0)) {
         await pushCloudRootNow();
         setStatus('● Sincronizado');
@@ -2738,6 +2976,7 @@
 
         const creds = cloudRoot.accounts[activeAccountId] || DEFAULT_ACCOUNTS[activeAccountId];
         document.getElementById('active-user-badge').textContent = '👤 ' + creds.username;
+        renderBinderBar();
         loadMonthIntoView(getCurrentMonth());
       }
       setStatus('● Sincronizado');
