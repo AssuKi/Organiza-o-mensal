@@ -744,17 +744,18 @@
     transition: width 0.2s ease;
   }
 
-  /* ==================== CARD CENTRAL DE RENDA ==================== */
+  /* ==================== CARD CENTRAL DE RENDA & ORDENAÇÃO GERAL ==================== */
   .income-box {
     background: var(--bg-box);
     padding: 14px 18px;
     border-radius: 16px;
-    margin-bottom: 18px;
+    margin-bottom: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 12px;
     border: 1px solid var(--border-sub);
+    flex-wrap: wrap;
   }
 
   .income-box label {
@@ -784,6 +785,42 @@
   }
 
   .income-input:focus {
+    border-color: var(--c-guardado);
+  }
+
+  .global-sort-bar {
+    background: var(--bg-box);
+    border: 1px solid var(--border-sub);
+    border-radius: 14px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .global-sort-title {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-label);
+  }
+
+  .sort-select {
+    background: var(--bg-btn);
+    color: var(--text-title);
+    border: 1px solid var(--border-input);
+    border-radius: 10px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+    min-height: 34px;
+  }
+
+  .sort-select:focus {
     border-color: var(--c-guardado);
   }
 
@@ -1406,11 +1443,22 @@
       <input type="number" id="income" class="income-input num-tabular" value="0.00" step="0.01" oninput="onIncomeChange()">
     </div>
 
+    <div class="global-sort-bar">
+      <span class="global-sort-title">↕ Ordenar tópicos deste mês (propaga para os meses seguintes):</span>
+      <select class="sort-select" id="global-topic-sort" onchange="sortAllTopics(this.value); this.value='';">
+        <option value="">Escolher ordenação dos tópicos...</option>
+        <option value="val_desc">Maior valor (R$)</option>
+        <option value="val_asc">Menor valor (R$)</option>
+        <option value="alpha_asc">Ordem alfabética (A–Z)</option>
+        <option value="alpha_desc">Ordem alfabética (Z–A)</option>
+      </select>
+    </div>
+
     <div id="topics-container" class="topics-grid"></div>
 
     <button type="button" class="btn btn-accent btn-add-bottom" onclick="addTopic()">+ Criar Novo Tópico / Categoria</button>
 
-    <div class="note">💡 <strong>Prioridade & Flexibilidade Mensal (2026–2035):</strong> Itens <strong>FIXO</strong> aparecem no topo de cada tópico e você pode clicar e segurar <strong>⋮⋮</strong> para reordenar tópicos ou itens livremente. Excluir um item propaga a remoção para os próximos meses.</div>
+    <div class="note">💡 <strong>Prioridade & Flexibilidade Mensal (2026–2035):</strong> Itens <strong>FIXO</strong> ficam no topo de cada tópico, mas você pode arrastar <strong>⋮⋮</strong> ou usar o seletor de ordenação dentro/fora dos tópicos a qualquer hora. Alterações de ordem e exclusões propagam para os meses seguintes.</div>
   </div>
 </div>
 
@@ -1867,7 +1915,6 @@
         color: '#FFD60A',
         items: [
           { id: 'it_ifood', label: 'iFood / Lanches', val: 0, max: 800, step: 0.01 },
-          { id: 'it_sair', label: 'Saídas / Cinema / Rolês', val: 0, max: 800, step: 0.01 },
           { id: 'it_jogos', label: 'Jogos / Compras Pessoais', val: 0, max: 800, step: 0.01 }
         ]
       },
@@ -2024,12 +2071,87 @@
     }
   }
 
+  function applyOrderSnapshotToTopicList(targetTopics, orderedSnapshotTopics) {
+    if (!Array.isArray(orderedSnapshotTopics) || orderedSnapshotTopics.length === 0) {
+      return targetTopics;
+    }
+
+    const topicRankMap = new Map();
+    const itemRankByTopic = new Map();
+
+    orderedSnapshotTopics.forEach((snapT, tPos) => {
+      const tKey = snapT.id || normalizeTopicKey(snapT.name);
+      topicRankMap.set(tKey, tPos);
+
+      const iMap = new Map();
+      if (Array.isArray(snapT.items)) {
+        snapT.items.forEach((snapIt, iPos) => {
+          const iKey = snapIt.fixedId
+            ? `fixed:${snapIt.fixedId}`
+            : (snapIt.installmentId ? `inst:${snapIt.installmentId}` : `lbl:${normalizeTopicKey(snapIt.label)}`);
+          iMap.set(iKey, iPos);
+        });
+      }
+      itemRankByTopic.set(tKey, iMap);
+    });
+
+    const sortedTopics = [...targetTopics].sort((a, b) => {
+      const ka = a.id || normalizeTopicKey(a.name);
+      const kb = b.id || normalizeTopicKey(b.name);
+      const ra = topicRankMap.has(ka) ? topicRankMap.get(ka) : 9999;
+      const rb = topicRankMap.has(kb) ? topicRankMap.get(kb) : 9999;
+      return ra - rb;
+    });
+
+    return sortedTopics.map(t => {
+      const tKey = t.id || normalizeTopicKey(t.name);
+      const iMap = itemRankByTopic.get(tKey);
+      if (!iMap || !Array.isArray(t.items)) return t;
+
+      const sortedItems = [...t.items].sort((x, y) => {
+        const kx = x.fixedId
+          ? `fixed:${x.fixedId}`
+          : (x.installmentId ? `inst:${x.installmentId}` : `lbl:${normalizeTopicKey(x.label)}`);
+        const ky = y.fixedId
+          ? `fixed:${y.fixedId}`
+          : (y.installmentId ? `inst:${y.installmentId}` : `lbl:${normalizeTopicKey(y.label)}`);
+        const rx = iMap.has(kx) ? iMap.get(kx) : 9999;
+        const ry = iMap.has(ky) ? iMap.get(ky) : 9999;
+        return rx - ry;
+      });
+
+      return { ...t, items: sortedItems };
+    });
+  }
+
+  function propagateOrderForward(fromMonthKey, orderedTopicsSnapshot) {
+    const monthsMap = getAccountMonthsMap();
+    const startIdx = ALL_MONTHS.indexOf(fromMonthKey);
+    if (startIdx === -1) return;
+
+    for (let i = startIdx + 1; i < ALL_MONTHS.length; i++) {
+      const k = ALL_MONTHS[i];
+      const existing = monthsMap[k];
+      const baseForMonth = buildTopicsForMonth(k, existing);
+      const reordered = applyOrderSnapshotToTopicList(baseForMonth, orderedTopicsSnapshot);
+
+      monthsMap[k] = {
+        initialized: true,
+        topics: reordered,
+        deletedKeys: existing && Array.isArray(existing.deletedKeys) ? existing.deletedKeys : [],
+        income: existing ? existing.income : undefined,
+        incomeCustom: existing ? Boolean(existing.incomeCustom) : false
+      };
+    }
+  }
+
   function propagateItemDeletionForward(fromMonthKey, item) {
     const monthsMap = getAccountMonthsMap();
     const startIdx = ALL_MONTHS.indexOf(fromMonthKey);
     if (startIdx === -1) return;
 
     const itemSig = item.id ? `id:${item.id}` : `lbl:${normalizeTopicKey(item.label)}`;
+    const itemLabelNorm = normalizeTopicKey(item.label);
 
     for (let i = startIdx + 1; i < ALL_MONTHS.length; i++) {
       const k = ALL_MONTHS[i];
@@ -2044,7 +2166,7 @@
               ? t.items.filter(it => {
                   if (!it) return false;
                   const sig = it.id ? `id:${it.id}` : `lbl:${normalizeTopicKey(it.label)}`;
-                  return sig !== itemSig && normalizeTopicKey(it.label) !== normalizeTopicKey(item.label);
+                  return sig !== itemSig && normalizeTopicKey(it.label) !== itemLabelNorm;
                 })
               : []
           }))
@@ -2262,11 +2384,15 @@
     saveLocalCache();
   }
 
-  function scheduleBackgroundSave(delayMs = 350, markIncomeCustom = false) {
+  function scheduleBackgroundSave(delayMs = 350, markIncomeCustom = false, propagateOrder = false) {
     if (!activeAccountId) return;
     lastLocalEditAt = Date.now();
     hasPendingSave = true;
     commitCurrentMonthToMemory(true, markIncomeCustom);
+    if (propagateOrder) {
+      propagateOrderForward(getCurrentMonth(), JSON.parse(JSON.stringify(currentTopics)));
+      saveLocalCache();
+    }
     setStatus('● Salvando...');
 
     clearTimeout(saveTimer);
@@ -2317,6 +2443,39 @@
     scheduleBackgroundSave(250);
   }
 
+  // --- ORDENAÇÃO POR VALOR OU ORDEM ALFABÉTICA (TÓPICOS E ITENS) ---
+  function getTopicTotal(topic) {
+    if (!topic || !Array.isArray(topic.items)) return 0;
+    return roundMoney(topic.items.reduce((sum, it) => sum + roundMoney(it.val || 0), 0));
+  }
+
+  function sortAllTopics(mode) {
+    if (!mode || !Array.isArray(currentTopics)) return;
+    currentTopics.sort((a, b) => {
+      if (mode === 'val_desc') return getTopicTotal(b) - getTopicTotal(a);
+      if (mode === 'val_asc') return getTopicTotal(a) - getTopicTotal(b);
+      if (mode === 'alpha_asc') return String(a.name || '').localeCompare(String(b.name || ''), 'pt-BR', { sensitivity: 'base' });
+      if (mode === 'alpha_desc') return String(b.name || '').localeCompare(String(a.name || ''), 'pt-BR', { sensitivity: 'base' });
+      return 0;
+    });
+    renderTopics();
+    scheduleBackgroundSave(250, false, true);
+  }
+
+  function sortItemsInTopic(tIdx, mode) {
+    const topic = currentTopics[tIdx];
+    if (!mode || !topic || !Array.isArray(topic.items)) return;
+    topic.items.sort((a, b) => {
+      if (mode === 'val_desc') return roundMoney(b.val || 0) - roundMoney(a.val || 0);
+      if (mode === 'val_asc') return roundMoney(a.val || 0) - roundMoney(b.val || 0);
+      if (mode === 'alpha_asc') return String(a.label || '').localeCompare(String(b.label || ''), 'pt-BR', { sensitivity: 'base' });
+      if (mode === 'alpha_desc') return String(b.label || '').localeCompare(String(a.label || ''), 'pt-BR', { sensitivity: 'base' });
+      return 0;
+    });
+    renderTopics();
+    scheduleBackgroundSave(250, false, true);
+  }
+
   // --- ARRASTAR E SOLTAR POR PRIORIDADE (TÓPICOS E ITENS) ---
   function handleTopicDragStart(e, tIdx) {
     e.stopPropagation();
@@ -2350,7 +2509,7 @@
     const [moved] = currentTopics.splice(from, 1);
     currentTopics.splice(to, 0, moved);
     renderTopics();
-    scheduleBackgroundSave(250);
+    scheduleBackgroundSave(250, false, true);
   }
 
   function handleItemDragStart(e, tIdx, iIdx) {
@@ -2391,7 +2550,7 @@
     const [movedItem] = sourceItems.splice(fromI, 1);
     targetItems.splice(iIdx, 0, movedItem);
     renderTopics();
-    scheduleBackgroundSave(250);
+    scheduleBackgroundSave(250, false, true);
   }
 
   function handleTouchDragStart(e, mode, tIdx, iIdx = null) {
@@ -2458,7 +2617,7 @@
         const [moved] = currentTopics.splice(st.fromT, 1);
         currentTopics.splice(st.toT, 0, moved);
         renderTopics();
-        scheduleBackgroundSave(250);
+        scheduleBackgroundSave(250, false, true);
       } else if (st.type === 'item' && (st.fromT !== st.toT || st.fromI !== st.toI)) {
         const sourceItems = currentTopics[st.fromT]?.items;
         const targetItems = currentTopics[st.toT]?.items;
@@ -2467,7 +2626,7 @@
           const insertAt = Math.min(targetItems.length, st.toI);
           targetItems.splice(insertAt, 0, movedItem);
           renderTopics();
-          scheduleBackgroundSave(250);
+          scheduleBackgroundSave(250, false, true);
         }
       }
     };
@@ -3138,7 +3297,7 @@
       sec.addEventListener('dragover', e => handleTopicDragOver(e, tIdx));
       sec.addEventListener('drop', e => handleTopicDrop(e, tIdx));
 
-      const totalTopic = roundMoney(topic.items.reduce((acc, it) => acc + roundMoney(it.val || 0), 0));
+      const totalTopic = getTopicTotal(topic);
 
       const header = document.createElement('div');
       header.className = 'sec-header';
@@ -3171,6 +3330,13 @@
       controls.className = 'sec-controls';
       controls.innerHTML = `
         <span id="sub-topic-${tIdx}" class="num-tabular" style="color:${topic.color}; font-weight:700;">${formatBRL(totalTopic)}</span>
+        <select class="sort-select" title="Ordenar itens deste tópico" onchange="sortItemsInTopic(${tIdx}, this.value); this.value='';">
+          <option value="">↕ Ordenar</option>
+          <option value="val_desc">Maior valor</option>
+          <option value="val_asc">Menor valor</option>
+          <option value="alpha_asc">Alfabética (A–Z)</option>
+          <option value="alpha_desc">Alfabética (Z–A)</option>
+        </select>
         <button type="button" class="btn" onclick="openFixedModal(null, '${topic.id}')" title="Fixar custo recorrente neste tópico">📌 Fixar</button>
         <button type="button" class="btn" onclick="openInstallmentModal(null, '${topic.id}')" title="Parcelar compra neste tópico">💳 Parcelar</button>
         <button type="button" class="btn" onclick="addItem(${tIdx})">+ Item</button>
@@ -3280,7 +3446,7 @@
     let totalGasto = 0;
 
     currentTopics.forEach((topic, tIdx) => {
-      const sum = roundMoney(topic.items.reduce((acc, it) => acc + roundMoney(it.val || 0), 0));
+      const sum = getTopicTotal(topic);
       totalGasto = roundMoney(totalGasto + sum);
       const pct = inc > 0 ? ((sum / inc) * 100).toFixed(1) : '0.0';
       const pctNum = inc > 0 ? (sum / inc) * 100 : 0;
@@ -3391,7 +3557,7 @@
     currentTopics.push(newTopic);
     currentTopics = applyTopicColors(currentTopics);
     renderTopics();
-    scheduleBackgroundSave(250);
+    scheduleBackgroundSave(250, false, true);
   }
 
   function editTopic(tIdx) {
@@ -3403,14 +3569,14 @@
     currentTopics[tIdx].shortName = cleanName.replace(/^\d+\.\s*/, '').split('(')[0].trim().slice(0, 14);
     currentTopics = applyTopicColors(currentTopics);
     renderTopics();
-    scheduleBackgroundSave(250);
+    scheduleBackgroundSave(250, false, true);
   }
 
   function deleteTopic(tIdx) {
     if (!confirm(`Excluir o tópico "${currentTopics[tIdx].name}"?`)) return;
     currentTopics.splice(tIdx, 1);
     renderTopics();
-    scheduleBackgroundSave(250);
+    scheduleBackgroundSave(250, false, true);
   }
 
   function addItem(tIdx) {
