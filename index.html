@@ -489,6 +489,15 @@
     font-weight: 600;
   }
 
+  .btn-add-bottom {
+    width: 100%;
+    padding: 11px;
+    font-size: 13px;
+    border-style: dashed;
+    border-width: 1.5px;
+    margin-bottom: 14px;
+  }
+
   .btn-danger {
     color: var(--c-neg);
     border-color: transparent;
@@ -894,7 +903,9 @@
 
     <div id="topics-container"></div>
 
-    <div class="note">💡 <strong>Conta individual isolada:</strong> Seus cálculos, tópicos e metas pertencem somente a esta conta. Use <strong>⚙️ Conta</strong> no topo para alterar seu nome de login ou senha a qualquer momento.</div>
+    <button type="button" class="btn btn-accent btn-add-bottom" onclick="addTopic()">+ Criar Novo Tópico / Categoria</button>
+
+    <div class="note">💡 <strong>Conta individual isolada:</strong> Crie quantos tópicos quiser com <strong>+ Novo Tópico</strong>, adicione itens com <strong>+ Item</strong> e use <strong>⚙️ Conta</strong> no topo para alterar seu nome de login ou senha a qualquer momento.</div>
   </div>
 </div>
 
@@ -1005,7 +1016,6 @@
   let currentTopics = [];
   let saveTimeout = null;
 
-  // Garante que a estrutura multi-usuário exista no objeto da nuvem
   function normalizeCloudRoot(raw) {
     const root = (raw && typeof raw === 'object') ? { ...raw } : {};
     if (!root.accounts || typeof root.accounts !== 'object') {
@@ -1139,7 +1149,6 @@
       return;
     }
 
-    // Impede duplicar o mesmo nome de login em duas contas diferentes
     for (const [accId, creds] of Object.entries(cloudRoot.accounts)) {
       if (accId !== activeAccountId && creds.username.trim().toLowerCase() === newUser.toLowerCase()) {
         fb.textContent = 'Este nome de usuário já está em uso em outra conta.';
@@ -1315,19 +1324,35 @@
   }
 
   function addTopic() {
-    const name = prompt('Nome do novo tópico (ex: Cartão de Crédito, Moto, Faculdade):');
+    const nextNum = currentTopics.length + 1;
+    const name = prompt(`Nome do novo tópico (ex: ${nextNum}. Cartão, Transporte, Faculdade):`);
     if (!name || !name.trim()) return;
     const cleanName = name.trim();
     const shortName = cleanName.replace(/^\d+\.\s*/, '').split('(')[0].trim().slice(0, 14);
     const color = PALETTE[currentTopics.length % PALETTE.length];
 
-    currentTopics.push({
+    const newTopic = {
       id: 'top_' + Date.now(),
       name: cleanName,
       shortName: shortName || cleanName,
       color: color,
       items: []
-    });
+    };
+
+    const firstItem = prompt('Deseja já criar um primeiro item dentro desse tópico? (Deixe em branco para criar depois)');
+    if (firstItem && firstItem.trim()) {
+      const valInput = prompt('Valor inicial desse item em R$ (pode deixar 0):', '0');
+      const initVal = parseFloat(valInput) || 0;
+      newTopic.items.push({
+        id: 'it_' + Date.now(),
+        label: firstItem.trim(),
+        val: initVal,
+        max: Math.max(1000, initVal * 2),
+        step: 5
+      });
+    }
+
+    currentTopics.push(newTopic);
     renderTopics();
     scheduleSave();
   }
@@ -1392,7 +1417,7 @@
   }
 
   function resetToDefaultStructure() {
-    if (!confirm('Restaurar todas as 5 repartições padrão zeradas neste mês para esta conta?')) return;
+    if (!confirm('Restaurar as 5 repartições padrão zeradas neste mês para esta conta?')) return;
     currentIncome = 0;
     currentTopics = getDefaultTopics();
     document.getElementById('income').value = 0;
