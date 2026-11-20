@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle Financeiro 2027</title>
+<style>
+  :root {
+    --bg-body: #131314;
+    --bg-card: #1e1f20;
+    --bg-box: #131314;
+    --bg-btn: #2c2d2f;
+    --bg-btn-hover: #3c4043;
+    --border-main: #333537;
+    --border-sub: #2c2d2f;
+    --border-input: #3c4043;
+    --text-main: #e3e3e3;
+    --text-title: #ffffff;
+    --text-label: #c4c7c5;
+    --text-muted: #9aa0a6;
+    --c-fixo: #8ab4f8;
+    --c-lazer: #fdd663;
+    --c-reserva: #c58af9;
+    --c-guardado: #81c995;
+    --c-sobra: #78d9ec;
+    --c-neg: #f28b82;
+  }
+
+  body.light-mode {
+    --bg-body: #f0f4f9;
+    --bg-card: #ffffff;
+    --bg-box: #f8fafd;
+    --bg-btn: #e8eaed;
+    --bg-btn-hover: #dadce0;
+    --border-main: #dadce0;
+    --border-sub: #e0e3e7;
+    --border-input: #bdc1c6;
+    --text-main: #1f1f1f;
+    --text-title: #1f1f1f;
+    --text-label: #3c4043;
+    --text-muted: #5f6368;
+    --c-fixo: #1a73e8;
+    --c-lazer: #d97706;
+    --c-reserva: #8430ce;
+    --c-guardado: #188038;
+    --c-sobra: #007b83;
+    --c-neg: #d93025;
+  }
+
+  * {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  }
+
+  body {
+    background: var(--bg-body);
+    color: var(--text-main);
+    margin: 0;
+    padding: 16px;
+  }
+
+  .card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 20px;
+    max-width: 820px;
+    margin: 0 auto;
+    border: 1px solid var(--border-main);
+  }
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-title);
+  }
+
+  .month-select {
+    background: var(--bg-btn);
+    color: var(--text-title);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .sync-badge {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: var(--bg-box);
+    border: 1px solid var(--border-sub);
+    color: var(--text-muted);
+  }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .btn {
+    background: var(--bg-btn);
+    color: var(--text-main);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+
+  .btn:hover {
+    background: var(--bg-btn-hover);
+  }
+
+  .top-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  @media (max-width: 680px) {
+    .top-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .kpi {
+    background: var(--bg-box);
+    border-radius: 12px;
+    padding: 12px 8px;
+    text-align: center;
+    border: 1px solid var(--border-sub);
+  }
+
+  .kpi-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 600;
+  }
+
+  .kpi-val {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .kpi-pct {
+    font-size: 11px;
+    margin-top: 4px;
+    opacity: 0.9;
+    font-weight: 500;
+  }
+
+  .c-fixo { color: var(--c-fixo); }
+  .c-lazer { color: var(--c-lazer); }
+  .c-reserva { color: var(--c-reserva); }
+  .c-guardado { color: var(--c-guardado); }
+  .c-sobra { color: var(--c-sobra); }
+  .c-neg { color: var(--c-neg); }
+
+  .income-box {
+    background: var(--bg-box);
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--border-sub);
+  }
+
+  .income-box label {
+    font-size: 13px;
+    color: var(--text-label);
+    font-weight: 500;
+  }
+
+  .income-input {
+    background: transparent;
+    border: none;
+    color: var(--text-title);
+    font-size: 18px;
+    font-weight: 700;
+    text-align: right;
+    width: 110px;
+    outline: none;
+  }
+
+  .bar {
+    height: 10px;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    background: var(--border-sub);
+    margin-bottom: 20px;
+  }
+
+  .seg {
+    height: 100%;
+    transition: width 0.2s;
+  }
+
+  .section {
+    margin-bottom: 14px;
+    background: var(--bg-box);
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border-sub);
+  }
+
+  .sec-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 120px 75px;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .row:last-child {
+    margin-bottom: 0;
+  }
+
+  .row label {
+    font-size: 13px;
+    color: var(--text-label);
+  }
+
+  input[type=range] {
+    width: 100%;
+    accent-color: var(--c-fixo);
+    cursor: pointer;
+  }
+
+  .num-input {
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    color: var(--text-title);
+    border-radius: 6px;
+    padding: 4px 8px;
+    text-align: right;
+    font-size: 13px;
+    width: 100%;
+    font-weight: 500;
+  }
+
+  .note {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 12px;
+    line-height: 1.4;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header-row">
+    <div class="title-group">
+      <select id="month-select" class="month-select" onchange="changeMonth()">
+        <option value="2027-01">Janeiro 2027</option>
+        <option value="2027-02">Fevereiro 2027</option>
+        <option value="2027-03">Março 2027</option>
+        <option value="2027-04">Abril 2027</option>
+        <option value="2027-05">Maio 2027</option>
+        <option value="2027-06">Junho 2027</option>
+        <option value="2027-07">Julho 2027</option>
+        <option value="2027-08">Agosto 2027</option>
+        <option value="2027-09">Setembro 2027</option>
+        <option value="2027-10">Outubro 2027</option>
+        <option value="2027-11">Novembro 2027</option>
+        <option value="2027-12">Dezembro 2027</option>
+      </select>
+      <span class="sync-badge" id="sync-status">⏳ Carregando...</span>
+    </div>
+    <div class="actions">
+      <button class="btn" id="theme-btn" onclick="toggleTheme()">☀️ Modo Claro</button>
+      <button class="btn" onclick="resetDefaults()">Restaurar mês</button>
+    </div>
+  </div>
+
+  <div class="top-grid">
+    <div class="kpi">
+      <div class="kpi-label">Fixo</div>
+      <div class="kpi-val c-fixo" id="v-fixo">R$ 226</div>
+      <div class="kpi-pct c-fixo" id="p-fixo">14%</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Lazer</div>
+      <div class="kpi-val c-lazer" id="v-lazer">R$ 450</div>
+      <div class="kpi-pct c-lazer" id="p-lazer">27%</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Reserva Emergência</div>
+      <div class="kpi-val c-reserva" id="v-reserva">R$ 450</div>
+      <div class="kpi-pct c-reserva" id="p-reserva">27%</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Dinheiro Guardado</div>
+      <div class="kpi-val c-guardado" id="v-guardado">R$ 400</div>
+      <div class="kpi-pct c-guardado" id="p-guardado">24%</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Sobra Livre</div>
+      <div class="kpi-val c-sobra" id="v-sobra">R$ 124</div>
+      <div class="kpi-pct c-sobra" id="p-sobra">8%</div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <div class="seg" id="b-fixo" style="background:var(--c-fixo);width:14%"></div>
+    <div class="seg" id="b-lazer" style="background:var(--c-lazer);width:27%"></div>
+    <div class="seg" id="b-reserva" style="background:var(--c-reserva);width:27%"></div>
+    <div class="seg" id="b-guardado" style="background:var(--c-guardado);width:24%"></div>
+    <div class="seg" id="b-sobra" style="background:var(--c-sobra);width:8%"></div>
+  </div>
+
+  <div class="income-box">
+    <label>Salário líquido mensal (R$)</label>
+    <input type="number" id="income" class="income-input" value="1650" step="10">
+  </div>
+
+  <div class="section">
+    <div class="sec-header"><span class="c-fixo">1. Fixo (Cartão Automático + Pix)</span><span id="sub-fixo" class="c-fixo">R$ 226</span></div>
+    <div class="row"><label>Wi-Fi residencial (cartão)</label><input type="range" min="0" max="300" step="5" value="100" data-key="wifi" data-default="100" data-cat="fixo" oninput="sync(this)"><input type="number" class="num-input" value="100" data-key="wifi" data-default="100" data-cat="fixo" oninput="syncNum(this)"></div>
+    <div class="row"><label>Internet celular (cartão)</label><input type="range" min="0" max="200" step="1" value="64" data-key="celular" data-default="64" data-cat="fixo" oninput="sync(this)"><input type="number" class="num-input" value="64" data-key="celular" data-default="64" data-cat="fixo" oninput="syncNum(this)"></div>
+    <div class="row"><label>Seguro iPhone (cartão)</label><input type="range" min="0" max="200" step="5" value="45" data-key="seguro" data-default="45" data-cat="fixo" oninput="sync(this)"><input type="number" class="num-input" value="45" data-key="seguro" data-default="45" data-cat="fixo" oninput="syncNum(this)"></div>
+    <div class="row"><label>Crunchyroll (Pix)</label><input type="range" min="0" max="50" step="1" value="10" data-key="crunchyroll" data-default="10" data-cat="fixo" oninput="sync(this)"><input type="number" class="num-input" value="10" data-key="crunchyroll" data-default="10" data-cat="fixo" oninput="syncNum(this)"></div>
+    <div class="row"><label>Spotify (R$ 41 ÷ 6 pessoas)</label><input type="range" min="0" max="50" step="1" value="7" data-key="spotify" data-default="7" data-cat="fixo" oninput="sync(this)"><input type="number" class="num-input" value="7" data-key="spotify" data-default="7" data-cat="fixo" oninput="syncNum(this)"></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-header"><span class="c-lazer">2. Lazer e Dia a Dia (Débito / Pix)</span><span id="sub-lazer" class="c-lazer">R$ 450</span></div>
+    <div class="row"><label>Lazer, saídas, jogos e lanches</label><input type="range" min="0" max="1000" step="25" value="300" data-key="lazer" data-default="300" data-cat="lazer" oninput="sync(this)"><input type="number" class="num-input" value="300" data-key="lazer" data-default="300" data-cat="lazer" oninput="syncNum(this)"></div>
+    <div class="row"><label>Dia a dia, transporte e compras</label><input type="range" min="0" max="600" step="10" value="150" data-key="diadia" data-default="150" data-cat="lazer" oninput="sync(this)"><input type="number" class="num-input" value="150" data-key="diadia" data-default="150" data-cat="lazer" oninput="syncNum(this)"></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-header"><span class="c-reserva">3. Reserva de Emergência (Intocável)</span><span id="sub-reserva" class="c-reserva">R$ 450</span></div>
+    <div class="row"><label>Aporte mensal Reserva de Emergência</label><input type="range" min="0" max="1200" step="25" value="450" data-key="reserva" data-default="450" data-cat="reserva" oninput="sync(this)"><input type="number" class="num-input" value="450" data-key="reserva" data-default="450" data-cat="reserva" oninput="syncNum(this)"></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-header"><span class="c-guardado">4. Dinheiro Guardado (Metas e Projetos)</span><span id="sub-guardado" class="c-guardado">R$ 400</span></div>
+    <div class="row"><label>Aporte mensal Dinheiro Guardado</label><input type="range" min="0" max="1200" step="25" value="400" data-key="guardado" data-default="400" data-cat="guardado" oninput="sync(this)"><input type="number" class="num-input" value="400" data-key="guardado" data-default="400" data-cat="guardado" oninput="syncNum(this)"></div>
+  </div>
+
+  <div class="note">O quadro <strong>Sobra Livre</strong> mostra automaticamente quanto resta na sua conta após pagar o Fixo e separar Lazer, Reserva de Emergência e Dinheiro Guardado.</div>
+</div>
+
+<script>
+  const BIN_ID = '6b002f89ffd5d16053d0ed5b';
+  const API_KEY = '$2a$10$AR3I3zDpxSH2Cp9igqh4sO7XrBtKrzKsTKNepTEaTxlYl3SUvLYhi';
+
+  let allMonthsData = {};
+  let saveTimeout = null;
+  const statusEl = document.getElementById('sync-status');
+
+  function toggleTheme() {
+    const isLight = document.body.classList.toggle('light-mode');
+    document.getElementById('theme-btn').textContent = isLight ? '🌙 Modo Noturno' : '☀️ Modo Claro';
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  }
+
+  if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.add('light-mode');
+    document.getElementById('theme-btn').textContent = '🌙 Modo Noturno';
+  }
+
+  function setStatus(text) {
+    statusEl.textContent = text;
+  }
+
+  function getCurrentMonth() {
+    return document.getElementById('month-select').value;
+  }
+
+  function captureCurrentScreen() {
+    const data = { income: parseFloat(document.getElementById('income').value) || 0 };
+    document.querySelectorAll('.num-input').forEach(inp => {
+      data[inp.dataset.key] = parseFloat(inp.value) || 0;
+    });
+    return data;
+  }
+
+  function applyDataToScreen(data) {
+    document.getElementById('income').value = (data && data.income !== undefined) ? data.income : 1650;
+    document.querySelectorAll('input[data-key]').forEach(el => {
+      const key = el.dataset.key;
+      el.value = (data && data[key] !== undefined) ? data[key] : el.dataset.default;
+    });
+    calc();
+  }
+
+  async function loadFromCloud(silent = false) {
+    if (!silent) setStatus('🔄 Sincronizando...');
+    try {
+      const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+        headers: { 'X-Master-Key': API_KEY }
+      });
+      if (!res.ok) throw new Error();
+      const json = await res.json();
+      allMonthsData = json.record || {};
+      applyDataToScreen(allMonthsData[getCurrentMonth()]);
+      setStatus('☁️ Sincronizado');
+    } catch (e) {
+      setStatus('⚠️ Erro de conexão');
+    }
+  }
+
+  function scheduleSave() {
+    allMonthsData[getCurrentMonth()] = captureCurrentScreen();
+
+    setStatus('⏳ Salvando...');
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(async () => {
+      try {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Master-Key': API_KEY
+          },
+          body: JSON.stringify(allMonthsData)
+        });
+        if (!res.ok) throw new Error();
+        saveTimeout = null;
+        setStatus('☁️ Salvo na nuvem');
+      } catch (e) {
+        saveTimeout = null;
+        setStatus('⚠️ Erro ao salvar');
+      }
+    }, 600);
+  }
+
+  function changeMonth() {
+    applyDataToScreen(allMonthsData[getCurrentMonth()]);
+  }
+
+  function sync(rangeEl) {
+    rangeEl.nextElementSibling.value = rangeEl.value;
+    calc();
+    scheduleSave();
+  }
+
+  function syncNum(numEl) {
+    numEl.previousElementSibling.value = numEl.value;
+    calc();
+    scheduleSave();
+  }
+
+  function resetDefaults() {
+    applyDataToScreen(null);
+    scheduleSave();
+  }
+
+  document.getElementById('income').addEventListener('input', () => {
+    calc();
+    scheduleSave();
+  });
+
+  function calc() {
+    const inc = parseFloat(document.getElementById('income').value) || 0;
+    let totals = { fixo: 0, lazer: 0, reserva: 0, guardado: 0 };
+    document.querySelectorAll('.num-input').forEach(inp => {
+      totals[inp.dataset.cat] += parseFloat(inp.value) || 0;
+    });
+    const sobra = inc - (totals.fixo + totals.lazer + totals.reserva + totals.guardado);
+
+    document.getElementById('v-fixo').textContent = 'R$ ' + totals.fixo.toFixed(0);
+    document.getElementById('sub-fixo').textContent = 'R$ ' + totals.fixo.toFixed(0);
+    document.getElementById('v-lazer').textContent = 'R$ ' + totals.lazer.toFixed(0);
+    document.getElementById('sub-lazer').textContent = 'R$ ' + totals.lazer.toFixed(0);
+    document.getElementById('v-reserva').textContent = 'R$ ' + totals.reserva.toFixed(0);
+    document.getElementById('sub-reserva').textContent = 'R$ ' + totals.reserva.toFixed(0);
+    document.getElementById('v-guardado').textContent = 'R$ ' + totals.guardado.toFixed(0);
+    document.getElementById('sub-guardado').textContent = 'R$ ' + totals.guardado.toFixed(0);
+
+    const sEl = document.getElementById('v-sobra');
+    sEl.textContent = 'R$ ' + sobra.toFixed(0);
+    sEl.className = 'kpi-val ' + (sobra < 0 ? 'c-neg' : 'c-sobra');
+
+    const pFixo = inc > 0 ? Math.round((totals.fixo / inc) * 100) : 0;
+    const pLazer = inc > 0 ? Math.round((totals.lazer / inc) * 100) : 0;
+    const pReserva = inc > 0 ? Math.round((totals.reserva / inc) * 100) : 0;
+    const pGuardado = inc > 0 ? Math.round((totals.guardado / inc) * 100) : 0;
+    const pSobra = inc > 0 ? Math.max(0, Math.round((sobra / inc) * 100)) : 0;
+
+    document.getElementById('p-fixo').textContent = pFixo + '%';
+    document.getElementById('p-lazer').textContent = pLazer + '%';
+    document.getElementById('p-reserva').textContent = pReserva + '%';
+    document.getElementById('p-guardado').textContent = pGuardado + '%';
+    document.getElementById('p-sobra').textContent = (inc > 0 ? Math.round((sobra / inc) * 100) : 0) + '%';
+
+    document.getElementById('b-fixo').style.width = Math.min(100, pFixo) + '%';
+    document.getElementById('b-lazer').style.width = Math.min(100, pLazer) + '%';
+    document.getElementById('b-reserva').style.width = Math.min(100, pReserva) + '%';
+    document.getElementById('b-guardado').style.width = Math.min(100, pGuardado) + '%';
+    document.getElementById('b-sobra').style.width = pSobra + '%';
+  }
+
+  calc();
+  loadFromCloud();
+
+  setInterval(() => {
+    if (!saveTimeout) loadFromCloud(true);
+  }, 5000);
+</script>
+</body>
+</html>
