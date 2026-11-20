@@ -1035,7 +1035,7 @@
     border-radius: 20px;
     padding: 22px;
     width: 100%;
-    max-width: 460px;
+    max-width: 470px;
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
@@ -1144,6 +1144,7 @@
     color: var(--c-sobra);
     margin-bottom: 10px;
     font-weight: 600;
+    line-height: 1.4;
   }
 
   .fixed-preview {
@@ -1155,6 +1156,7 @@
     color: var(--c-cartao);
     margin-bottom: 10px;
     font-weight: 600;
+    line-height: 1.4;
   }
 
   .parcel-list-item {
@@ -1329,7 +1331,7 @@
 
     <button type="button" class="btn btn-accent btn-add-bottom" onclick="addTopic()">+ Criar Novo Tópico / Categoria</button>
 
-    <div class="note">💡 <strong>Caderno Mensal & Centavos (2026–2035):</strong> Folheie os meses pelos botões <strong>◀ Anterior / Próxima ▶</strong>, abas mensais ou <strong>Alt + ← / →</strong>. Centavos são calculados exatamente em todos os tópicos, KPIs e sobra livre, e cada custo fixo ou parcela fica no seu tópico correspondente.</div>
+    <div class="note">💡 <strong>Caderno Mensal & Centavos (2026–2035):</strong> Tópicos mantêm sempre a mesma ordem e cor em todos os meses. Folheie com <strong>◀ Anterior / Próxima ▶</strong>, abas mensais ou <strong>Alt + ← / →</strong>, e defina períodos de <strong>A partir de ... até ...</strong> nos seus custos fixos e parcelas.</div>
   </div>
 </div>
 
@@ -1337,7 +1339,7 @@
 <div id="fixed-modal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this) closeFixedModal()">
   <div class="modal-box">
     <h2 class="modal-title" id="fixed-modal-title">Fixar Custo Mensal</h2>
-    <div class="modal-sub">O custo fixo se repete automaticamente todos os meses no tópico escolhido até você remover.</div>
+    <div class="modal-sub">Defina o tópico, valor mensal e o período de vigência (a partir de até quando).</div>
     <form onsubmit="saveFixedCost(event)">
       <label class="modal-label">Descrição do custo fixo</label>
       <input type="text" id="fixed-desc" class="modal-input" placeholder="Ex: Internet Wi-Fi, Seguro iPhone" required>
@@ -1350,7 +1352,7 @@
 
       <div class="modal-grid-2">
         <div>
-          <label class="modal-label">Mês de início</label>
+          <label class="modal-label">A partir de (Mês)</label>
           <select id="fixed-start-month-only" class="modal-select" onchange="updateFixedPreview()">
             <option value="01">Janeiro</option>
             <option value="02">Fevereiro</option>
@@ -1367,8 +1369,35 @@
           </select>
         </div>
         <div>
-          <label class="modal-label">Ano de início</label>
+          <label class="modal-label">A partir de (Ano)</label>
           <select id="fixed-start-year-only" class="modal-select" onchange="updateFixedPreview()"></select>
+        </div>
+      </div>
+
+      <div class="modal-grid-2">
+        <div>
+          <label class="modal-label">Até (Mês)</label>
+          <select id="fixed-end-month-only" class="modal-select" onchange="updateFixedPreview()">
+            <option value="NONE">Sem limite (até 2035)</option>
+            <option value="01">Janeiro</option>
+            <option value="02">Fevereiro</option>
+            <option value="03">Março</option>
+            <option value="04">Abril</option>
+            <option value="05">Maio</option>
+            <option value="06">Junho</option>
+            <option value="07">Julho</option>
+            <option value="08">Agosto</option>
+            <option value="09">Setembro</option>
+            <option value="10">Outubro</option>
+            <option value="11">Novembro</option>
+            <option value="12">Dezembro</option>
+          </select>
+        </div>
+        <div>
+          <label class="modal-label">Até (Ano)</label>
+          <select id="fixed-end-year-only" class="modal-select" onchange="updateFixedPreview()">
+            <option value="NONE">Sem limite</option>
+          </select>
         </div>
       </div>
 
@@ -1388,7 +1417,7 @@
 <div id="fixed-list-modal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this) closeFixedManager()">
   <div class="modal-box">
     <h2 class="modal-title">Custos Fixos Ativos</h2>
-    <div class="modal-sub">Edite o valor, troque o tópico ou remova custos fixos quando quiser.</div>
+    <div class="modal-sub">Edite o valor, tópico, período ou remova custos fixos quando quiser.</div>
     <div id="fixed-list-container"></div>
     <div class="modal-actions">
       <button type="button" class="btn btn-fixed" onclick="closeFixedManager(); openFixedModal();">+ Novo Custo Fixo</button>
@@ -1464,7 +1493,7 @@
 <div id="installment-modal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this) closeInstallmentModal()">
   <div class="modal-box">
     <h2 class="modal-title" id="inst-modal-title">Nova Compra Parcelada</h2>
-    <div class="modal-sub">O valor é dividido com centavos e lançado no tópico escolhido nas páginas seguintes.</div>
+    <div class="modal-sub">Defina o tópico, valor total, parcelas e o início (ou período até o mês/ano final).</div>
     <form onsubmit="saveInstallmentPlan(event)">
       <label class="modal-label">Descrição da compra</label>
       <input type="text" id="inst-desc" class="modal-input" placeholder="Ex: Tênis, Teclado, Celular" required>
@@ -1479,14 +1508,14 @@
         </div>
         <div>
           <label class="modal-label">Qtd. de parcelas</label>
-          <input type="number" id="inst-count" class="modal-input num-tabular" min="1" max="60" step="1" value="3" oninput="updateInstallmentPreview()" required>
+          <input type="number" id="inst-count" class="modal-input num-tabular" min="1" max="120" step="1" value="3" oninput="syncCountFromEndDate(); updateInstallmentPreview()" required>
         </div>
       </div>
 
       <div class="modal-grid-2">
         <div>
-          <label class="modal-label">Mês da 1ª parcela</label>
-          <select id="inst-start-month-only" class="modal-select" onchange="updateInstallmentPreview()">
+          <label class="modal-label">A partir de (Mês)</label>
+          <select id="inst-start-month-only" class="modal-select" onchange="syncCountFromEndDate(); updateInstallmentPreview()">
             <option value="01">Janeiro</option>
             <option value="02">Fevereiro</option>
             <option value="03">Março</option>
@@ -1502,8 +1531,35 @@
           </select>
         </div>
         <div>
-          <label class="modal-label">Ano da 1ª parcela</label>
-          <select id="inst-start-year-only" class="modal-select" onchange="updateInstallmentPreview()"></select>
+          <label class="modal-label">A partir de (Ano)</label>
+          <select id="inst-start-year-only" class="modal-select" onchange="syncCountFromEndDate(); updateInstallmentPreview()"></select>
+        </div>
+      </div>
+
+      <div class="modal-grid-2">
+        <div>
+          <label class="modal-label">Até (Mês opcional)</label>
+          <select id="inst-end-month-only" class="modal-select" onchange="syncCountFromEndDate(); updateInstallmentPreview()">
+            <option value="AUTO">Automático pela qtd.</option>
+            <option value="01">Janeiro</option>
+            <option value="02">Fevereiro</option>
+            <option value="03">Março</option>
+            <option value="04">Abril</option>
+            <option value="05">Maio</option>
+            <option value="06">Junho</option>
+            <option value="07">Julho</option>
+            <option value="08">Agosto</option>
+            <option value="09">Setembro</option>
+            <option value="10">Outubro</option>
+            <option value="11">Novembro</option>
+            <option value="12">Dezembro</option>
+          </select>
+        </div>
+        <div>
+          <label class="modal-label">Até (Ano opcional)</label>
+          <select id="inst-end-year-only" class="modal-select" onchange="syncCountFromEndDate(); updateInstallmentPreview()">
+            <option value="AUTO">Automático</option>
+          </select>
         </div>
       </div>
 
@@ -1523,7 +1579,7 @@
 <div id="parcels-list-modal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this) closeParcelsManager()">
   <div class="modal-box">
     <h2 class="modal-title">Compras Parceladas</h2>
-    <div class="modal-sub">Edite valor, parcelas ou remova compras parceladas desta conta.</div>
+    <div class="modal-sub">Edite valor, parcelas, período ou remova compras parceladas desta conta.</div>
     <div id="parcels-list-container"></div>
     <div class="modal-actions">
       <button type="button" class="btn btn-installment" onclick="closeParcelsManager(); openInstallmentModal();">+ Nova Compra Parcelada</button>
@@ -1605,6 +1661,18 @@
         sel.appendChild(opt);
       });
     });
+
+    ['inst-end-year-only', 'fixed-end-year-only'].forEach(id => {
+      const sel = document.getElementById(id);
+      if (!sel) return;
+      YEARS_LIST.forEach(y => {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        sel.appendChild(opt);
+      });
+    });
+
     localStorage.setItem(LAST_DATE_KEY, activeMonthKey);
   })();
 
@@ -1644,7 +1712,7 @@
 
   function goToMonthKey(nextKey) {
     if (!ALL_MONTHS.includes(nextKey) || nextKey === activeMonthKey) return;
-    commitCurrentMonthToMemory(false);
+    commitCurrentMonthToMemory(false, false);
     activeMonthKey = nextKey;
     localStorage.setItem(LAST_DATE_KEY, activeMonthKey);
     renderBinderBar();
@@ -1679,22 +1747,18 @@
     acc_beta_tester: { username: 'beta tester', password: '2027' }
   };
 
-  function getCreditCardTopicTemplate() {
-    return {
-      id: 'top_cartao',
-      name: '1. Cartão de Crédito',
-      shortName: 'Cartão Crédito',
-      color: '#FF9F0A',
-      items: [
-        { id: 'it_cc_avista', label: 'Fatura / Compras à Vista', val: 0, max: 2000, step: 0.01 },
-        { id: 'it_cc_assin', label: 'Assinaturas no Cartão', val: 0, max: 500, step: 0.01 }
-      ]
-    };
-  }
-
   function getDefaultTopics() {
     return [
-      getCreditCardTopicTemplate(),
+      {
+        id: 'top_cartao',
+        name: '1. Cartão de Crédito',
+        shortName: 'Cartão Crédito',
+        color: '#FF9F0A',
+        items: [
+          { id: 'it_cc_avista', label: 'Fatura / Compras à Vista', val: 0, max: 2000, step: 0.01 },
+          { id: 'it_cc_assin', label: 'Assinaturas no Cartão', val: 0, max: 500, step: 0.01 }
+        ]
+      },
       {
         id: 'top_fixas',
         name: '2. Contas Fixas & Assinaturas',
@@ -1749,6 +1813,29 @@
         ]
       }
     ];
+  }
+
+  function getCanonicalOrderRank(topic) {
+    const id = String(topic.id || '');
+    const norm = normalizeTopicKey(topic.name);
+    if (id === 'top_cartao' || norm.includes('cartao')) return 1;
+    if (id === 'top_fixas' || norm.includes('contas fixas')) return 2;
+    if (id === 'top_cabelo' || norm.includes('cabelo')) return 3;
+    if (id === 'top_lazer' || norm.includes('lazer')) return 4;
+    if (id === 'top_reserva' || norm.includes('reserva')) return 5;
+    if (id === 'top_guardado' || norm.includes('guardado')) return 6;
+    return 100;
+  }
+
+  function getCanonicalColor(topic, fallbackIdx) {
+    const rank = getCanonicalOrderRank(topic);
+    if (rank === 1) return '#FF9F0A';
+    if (rank === 2) return '#0A84FF';
+    if (rank === 3) return '#FF375F';
+    if (rank === 4) return '#FFD60A';
+    if (rank === 5) return '#BF5AF2';
+    if (rank === 6) return '#30D158';
+    return topic.color || PALETTE[fallbackIdx % PALETTE.length];
   }
 
   let cloudRoot = { accounts: {}, data: {}, installments: {}, fixedCosts: {}, updatedAt: 0 };
@@ -1843,7 +1930,6 @@
     return cloudRoot.fixedCosts[activeAccountId];
   }
 
-  // Propaga salário base para meses posteriores que ainda não definiram salário próprio
   function propagateIncomeForward(fromMonthKey, newIncome) {
     const monthsMap = getAccountMonthsMap();
     const startIdx = ALL_MONTHS.indexOf(fromMonthKey);
@@ -1863,7 +1949,6 @@
     }
   }
 
-  // Herda tópicos base de um mês anterior caso o mês alvo ainda não tenha sido inicializado
   function getInheritedBaseTopics(targetMonthKey) {
     const monthsMap = getAccountMonthsMap();
     const targetIdx = ALL_MONTHS.indexOf(targetMonthKey);
@@ -1936,6 +2021,19 @@
     return topicObj;
   }
 
+  function orderAndColorTopics(list) {
+    const sorted = [...list].sort((a, b) => {
+      const ra = getCanonicalOrderRank(a);
+      const rb = getCanonicalOrderRank(b);
+      if (ra !== rb) return ra - rb;
+      return String(a.name || '').localeCompare(String(b.name || ''), 'pt-BR');
+    });
+    return sorted.map((t, idx) => ({
+      ...t,
+      color: getCanonicalColor(t, idx)
+    }));
+  }
+
   function buildTopicsForMonth(monthKey, rawMonthObj) {
     const isInitialized = Boolean(rawMonthObj && (rawMonthObj.initialized === true || Array.isArray(rawMonthObj.topics)));
     const source = isInitialized
@@ -1952,12 +2050,13 @@
     }));
 
     const mIdx = ALL_MONTHS.indexOf(monthKey);
-    if (mIdx === -1) return list;
+    if (mIdx === -1) return orderAndColorTopics(list);
 
     getAccountInstallments().forEach(plan => {
       const startIdx = ALL_MONTHS.indexOf(plan.startMonth);
       const count = Math.max(1, parseInt(plan.count, 10) || 1);
-      if (startIdx !== -1 && mIdx >= startIdx && mIdx < startIdx + count) {
+      const endIdx = plan.endMonth ? ALL_MONTHS.indexOf(plan.endMonth) : (startIdx + count - 1);
+      if (startIdx !== -1 && mIdx >= startIdx && mIdx <= Math.min(ALL_MONTHS.length - 1, endIdx)) {
         const k = mIdx - startIdx;
         const total = roundMoney(plan.total);
         const installmentVal = roundMoney(total / count);
@@ -1977,7 +2076,10 @@
 
     getAccountFixedCosts().forEach(fixed => {
       const startIdx = ALL_MONTHS.indexOf(fixed.startMonth || '2026-01');
-      if (startIdx === -1 || mIdx >= startIdx) {
+      const endIdx = fixed.endMonth ? ALL_MONTHS.indexOf(fixed.endMonth) : (ALL_MONTHS.length - 1);
+      const afterStart = (startIdx === -1 || mIdx >= startIdx);
+      const beforeEnd = (endIdx === -1 || mIdx <= endIdx);
+      if (afterStart && beforeEnd) {
         const val = roundMoney(fixed.val);
         const topicObj = resolveTargetTopic(list, fixed.topicId, fixed.topicName);
         topicObj.items.push({
@@ -1991,7 +2093,7 @@
       }
     });
 
-    return list;
+    return orderAndColorTopics(list);
   }
 
   function loadMonthIntoView(monthKey) {
@@ -2062,9 +2164,8 @@
     selectEl.innerHTML = '';
     const mapById = new Map();
 
-    currentTopics.forEach(t => mapById.set(t.id, t));
-    getDefaultTopics().forEach(t => {
-      if (!mapById.has(t.id)) mapById.set(t.id, t);
+    orderAndColorTopics([...getDefaultTopics(), ...currentTopics]).forEach(t => {
+      mapById.set(t.id, t);
     });
 
     mapById.forEach(t => {
@@ -2098,6 +2199,15 @@
       const [sy, sm] = (fixed.startMonth || '2026-01').split('-');
       document.getElementById('fixed-start-year-only').value = sy;
       document.getElementById('fixed-start-month-only').value = sm;
+
+      if (fixed.endMonth && fixed.endMonth.includes('-')) {
+        const [ey, em] = fixed.endMonth.split('-');
+        document.getElementById('fixed-end-year-only').value = ey;
+        document.getElementById('fixed-end-month-only').value = em;
+      } else {
+        document.getElementById('fixed-end-year-only').value = 'NONE';
+        document.getElementById('fixed-end-month-only').value = 'NONE';
+      }
     } else {
       document.getElementById('fixed-modal-title').textContent = 'Fixar Custo Mensal';
       document.getElementById('fixed-desc').value = '';
@@ -2105,6 +2215,8 @@
       const [cy, cm] = activeMonthKey.split('-');
       document.getElementById('fixed-start-month-only').value = cm;
       document.getElementById('fixed-start-year-only').value = cy;
+      document.getElementById('fixed-end-month-only').value = 'NONE';
+      document.getElementById('fixed-end-year-only').value = 'NONE';
     }
 
     updateFixedPreview();
@@ -2116,12 +2228,24 @@
     document.getElementById('fixed-modal').style.display = 'none';
   }
 
+  function getFixedEndMonthFromInputs() {
+    const em = document.getElementById('fixed-end-month-only').value;
+    const ey = document.getElementById('fixed-end-year-only').value;
+    if (em === 'NONE' || ey === 'NONE') return null;
+    return `${ey}-${em}`;
+  }
+
   function updateFixedPreview() {
     const val = roundMoney(parseFloat(document.getElementById('fixed-val').value) || 0);
     const sm = document.getElementById('fixed-start-month-only').value;
     const sy = document.getElementById('fixed-start-year-only').value;
+    const startKey = `${sy}-${sm}`;
+    const endKey = getFixedEndMonthFromInputs();
+    const periodo = endKey
+      ? `${formatMonthKey(startKey)} até ${formatMonthKey(endKey)}`
+      : `A partir de ${formatMonthKey(startKey)} (sem fim)`;
     document.getElementById('fixed-preview').textContent =
-      `Fixo mensal: ${formatBRL(val)} / mês • A partir de ${formatMonthKey(`${sy}-${sm}`)}`;
+      `Fixo mensal: ${formatBRL(val)} / mês • ${periodo}`;
   }
 
   function saveFixedCost(e) {
@@ -2132,6 +2256,7 @@
     const selectedOptionText = topicSelect.options[topicSelect.selectedIndex]?.textContent || '';
     const val = roundMoney(parseFloat(document.getElementById('fixed-val').value));
     const startMonth = `${document.getElementById('fixed-start-year-only').value}-${document.getElementById('fixed-start-month-only').value}`;
+    const endMonth = getFixedEndMonthFromInputs();
     const fb = document.getElementById('fixed-feedback');
 
     if (!desc || isNaN(val) || val <= 0) {
@@ -2139,7 +2264,12 @@
       return;
     }
 
-    const topicObj = currentTopics.find(t => t.id === topicId);
+    if (endMonth && ALL_MONTHS.indexOf(endMonth) < ALL_MONTHS.indexOf(startMonth)) {
+      fb.textContent = 'A data final não pode ser anterior à data de início.';
+      return;
+    }
+
+    const topicObj = currentTopics.find(t => t.id === topicId) || getDefaultTopics().find(t => t.id === topicId);
     const fixedList = getAccountFixedCosts();
 
     if (editingFixedId) {
@@ -2151,7 +2281,8 @@
           topicId: topicObj ? topicObj.id : topicId,
           topicName: topicObj ? topicObj.name : selectedOptionText,
           val,
-          startMonth
+          startMonth,
+          endMonth
         };
       }
     } else {
@@ -2161,7 +2292,8 @@
         topicId: topicObj ? topicObj.id : topicId,
         topicName: topicObj ? topicObj.name : selectedOptionText,
         val,
-        startMonth
+        startMonth,
+        endMonth
       });
     }
 
@@ -2189,18 +2321,23 @@
       return;
     }
 
-    container.innerHTML = fixedList.map(f => `
-      <div class="parcel-list-item">
-        <div>
-          <div class="parcel-list-title">${escapeHtml(f.desc)}</div>
-          <div class="parcel-list-meta num-tabular">${formatBRL(f.val)} / mês • ${escapeHtml(f.topicName || 'Tópico')} • Desde ${formatMonthKey(f.startMonth)}</div>
+    container.innerHTML = fixedList.map(f => {
+      const rangeText = f.endMonth
+        ? `${formatMonthKey(f.startMonth)} até ${formatMonthKey(f.endMonth)}`
+        : `Desde ${formatMonthKey(f.startMonth)}`;
+      return `
+        <div class="parcel-list-item">
+          <div>
+            <div class="parcel-list-title">${escapeHtml(f.desc)}</div>
+            <div class="parcel-list-meta num-tabular">${formatBRL(f.val)} / mês • ${escapeHtml(f.topicName || 'Tópico')} • ${rangeText}</div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button type="button" class="btn" onclick="closeFixedManager(); openFixedModal('${f.id}')">✎ Editar</button>
+            <button type="button" class="btn btn-danger" onclick="deleteFixedCost('${f.id}')" title="Remover custo fixo">×</button>
+          </div>
         </div>
-        <div style="display:flex; gap:6px;">
-          <button type="button" class="btn" onclick="closeFixedManager(); openFixedModal('${f.id}')">✎ Editar</button>
-          <button type="button" class="btn btn-danger" onclick="deleteFixedCost('${f.id}')" title="Remover custo fixo">×</button>
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   function deleteFixedCost(fixedId) {
@@ -2231,6 +2368,8 @@
       const [sy, sm] = (plan.startMonth || '2026-01').split('-');
       document.getElementById('inst-start-year-only').value = sy;
       document.getElementById('inst-start-month-only').value = sm;
+      document.getElementById('inst-end-month-only').value = 'AUTO';
+      document.getElementById('inst-end-year-only').value = 'AUTO';
     } else {
       document.getElementById('inst-modal-title').textContent = 'Nova Compra Parcelada';
       document.getElementById('inst-desc').value = '';
@@ -2239,6 +2378,8 @@
       const [cy, cm] = activeMonthKey.split('-');
       document.getElementById('inst-start-month-only').value = cm;
       document.getElementById('inst-start-year-only').value = cy;
+      document.getElementById('inst-end-month-only').value = 'AUTO';
+      document.getElementById('inst-end-year-only').value = 'AUTO';
     }
 
     updateInstallmentPreview();
@@ -2248,6 +2389,19 @@
   function closeInstallmentModal() {
     editingInstallmentId = null;
     document.getElementById('installment-modal').style.display = 'none';
+  }
+
+  function syncCountFromEndDate() {
+    const em = document.getElementById('inst-end-month-only').value;
+    const ey = document.getElementById('inst-end-year-only').value;
+    if (em === 'AUTO' || ey === 'AUTO') return;
+    const startKey = `${document.getElementById('inst-start-year-only').value}-${document.getElementById('inst-start-month-only').value}`;
+    const endKey = `${ey}-${em}`;
+    const sIdx = ALL_MONTHS.indexOf(startKey);
+    const eIdx = ALL_MONTHS.indexOf(endKey);
+    if (sIdx !== -1 && eIdx >= sIdx) {
+      document.getElementById('inst-count').value = String(eIdx - sIdx + 1);
+    }
   }
 
   function updateInstallmentPreview() {
@@ -2278,6 +2432,8 @@
     const total = roundMoney(parseFloat(document.getElementById('inst-total').value));
     const count = parseInt(document.getElementById('inst-count').value, 10);
     const startMonth = `${document.getElementById('inst-start-year-only').value}-${document.getElementById('inst-start-month-only').value}`;
+    const startIdx = ALL_MONTHS.indexOf(startMonth);
+    const endMonth = startIdx !== -1 ? ALL_MONTHS[Math.min(ALL_MONTHS.length - 1, startIdx + count - 1)] : null;
     const fb = document.getElementById('inst-feedback');
 
     if (!desc || isNaN(total) || total <= 0 || isNaN(count) || count < 1) {
@@ -2285,7 +2441,7 @@
       return;
     }
 
-    const topicObj = currentTopics.find(t => t.id === topicId);
+    const topicObj = currentTopics.find(t => t.id === topicId) || getDefaultTopics().find(t => t.id === topicId);
     const plans = getAccountInstallments();
 
     if (editingInstallmentId) {
@@ -2298,7 +2454,8 @@
           topicName: topicObj ? topicObj.name : selectedOptionText,
           total,
           count,
-          startMonth
+          startMonth,
+          endMonth
         };
       }
     } else {
@@ -2309,7 +2466,8 @@
         topicName: topicObj ? topicObj.name : selectedOptionText,
         total,
         count,
-        startMonth
+        startMonth,
+        endMonth
       });
     }
 
@@ -2339,11 +2497,13 @@
 
     container.innerHTML = plans.map(p => {
       const perMonth = roundMoney((parseFloat(p.total) || 0) / Math.max(1, parseInt(p.count, 10) || 1));
+      const startIdx = ALL_MONTHS.indexOf(p.startMonth);
+      const endKey = p.endMonth || (startIdx !== -1 ? ALL_MONTHS[Math.min(ALL_MONTHS.length - 1, startIdx + (parseInt(p.count, 10) || 1) - 1)] : p.startMonth);
       return `
         <div class="parcel-list-item">
           <div>
             <div class="parcel-list-title">${escapeHtml(p.desc)}</div>
-            <div class="parcel-list-meta num-tabular">Total ${formatBRL(p.total)} • ${p.count}x de ${formatBRL(perMonth)} • Início: ${formatMonthKey(p.startMonth)}</div>
+            <div class="parcel-list-meta num-tabular">Total ${formatBRL(p.total)} • ${p.count}x de ${formatBRL(perMonth)} • ${formatMonthKey(p.startMonth)} até ${formatMonthKey(endKey)}</div>
           </div>
           <div style="display:flex; gap:6px;">
             <button type="button" class="btn" onclick="closeParcelsManager(); openInstallmentModal('${p.id}')">✎ Editar</button>
@@ -2824,6 +2984,7 @@
     }
 
     currentTopics.push(newTopic);
+    currentTopics = orderAndColorTopics(currentTopics);
     renderTopics();
     scheduleBackgroundSave(250);
   }
@@ -2835,6 +2996,7 @@
     const cleanName = updated.trim();
     currentTopics[tIdx].name = cleanName;
     currentTopics[tIdx].shortName = cleanName.replace(/^\d+\.\s*/, '').split('(')[0].trim().slice(0, 14);
+    currentTopics = orderAndColorTopics(currentTopics);
     renderTopics();
     scheduleBackgroundSave(250);
   }
