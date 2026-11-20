@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>StonksBank 2027</title>
+<title>StonksBank</title>
 <link rel="apple-touch-icon" href="icon.png">
 <style>
   :root {
@@ -401,7 +401,7 @@
     background: var(--bg-card);
     border-radius: 16px;
     padding: 18px;
-    max-width: 880px;
+    max-width: 900px;
     margin: 0 auto;
     border: 1px solid var(--border-main);
   }
@@ -439,13 +439,19 @@
     border: 1px solid rgba(138, 180, 248, 0.35);
   }
 
+  .date-selectors {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
   .month-select {
     background: var(--bg-btn);
     color: var(--text-title);
     border: 1px solid var(--border-input);
     border-radius: 8px;
     padding: 6px 10px;
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 600;
     cursor: pointer;
     outline: none;
@@ -520,7 +526,7 @@
 
   .top-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
     gap: 8px;
     margin-bottom: 16px;
   }
@@ -746,7 +752,7 @@
     border-radius: 16px;
     padding: 22px;
     width: 100%;
-    max-width: 420px;
+    max-width: 430px;
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 20px 50px rgba(0,0,0,0.5);
@@ -931,28 +937,31 @@
       <div class="title-group">
         <span class="brand-tag">StonksBank</span>
         <span class="user-pill" id="active-user-badge">👤 Conta</span>
-        <select id="month-select" class="month-select" onchange="changeMonth()">
-          <option value="2027-01">Janeiro 2027</option>
-          <option value="2027-02">Fevereiro 2027</option>
-          <option value="2027-03">Março 2027</option>
-          <option value="2027-04">Abril 2027</option>
-          <option value="2027-05">Maio 2027</option>
-          <option value="2027-06">Junho 2027</option>
-          <option value="2027-07">Julho 2027</option>
-          <option value="2027-08">Agosto 2027</option>
-          <option value="2027-09">Setembro 2027</option>
-          <option value="2027-10">Outubro 2027</option>
-          <option value="2027-11">Novembro 2027</option>
-          <option value="2027-12">Dezembro 2027</option>
-        </select>
+        <div class="date-selectors">
+          <select id="month-only-select" class="month-select" onchange="changeMonth()">
+            <option value="01">Janeiro</option>
+            <option value="02">Fevereiro</option>
+            <option value="03">Março</option>
+            <option value="04">Abril</option>
+            <option value="05">Maio</option>
+            <option value="06">Junho</option>
+            <option value="07">Julho</option>
+            <option value="08">Agosto</option>
+            <option value="09">Setembro</option>
+            <option value="10">Outubro</option>
+            <option value="11">Novembro</option>
+            <option value="12">Dezembro</option>
+          </select>
+          <select id="year-only-select" class="month-select" onchange="changeMonth()"></select>
+        </div>
         <span class="sync-badge" id="sync-status">⏳ Carregando...</span>
       </div>
       <div class="actions">
         <button class="btn btn-accent" onclick="addTopic()">+ Novo Tópico</button>
         <button class="btn btn-installment" onclick="openInstallmentModal()">💳 Parcelar</button>
         <button class="btn" onclick="openInstallmentsManager()">📑 Parcelas</button>
-        <button class="btn" onclick="resetToDefaultStructure()" title="Carrega as 5 repartições padrão zeradas nesta conta">⚡ Padrão</button>
-        <button class="btn" onclick="copyToAllMonths()" title="Copia os tópicos e valores deste mês para todo o ano desta conta">📋 Replicar p/ Ano</button>
+        <button class="btn" onclick="resetToDefaultStructure()" title="Carrega as 6 repartições padrão (incluindo Cartão de Crédito) zeradas neste mês">⚡ Padrão</button>
+        <button class="btn" onclick="copyToAllMonths()" title="Copia os tópicos e valores deste mês para todos os 12 meses do ano selecionado">📋 Replicar p/ Ano</button>
         <button class="btn" onclick="openAccountModal()" title="Alterar nome de usuário e senha desta conta">⚙️ Conta</button>
         <button class="btn" id="theme-btn" onclick="toggleTheme()">☀️ Claro</button>
         <button class="btn" onclick="logout()" title="Trocar de conta / Sair">🔒 Sair</button>
@@ -971,7 +980,7 @@
 
     <button type="button" class="btn btn-accent btn-add-bottom" onclick="addTopic()">+ Criar Novo Tópico / Categoria</button>
 
-    <div class="note">💡 <strong>Parcelamento inteligente:</strong> Use <strong>💳 Parcelar</strong> para lançar compras divididas em várias vezes nos próximos meses e <strong>📑 Parcelas</strong> para editar valor, parcelas ou excluir a qualquer hora.</div>
+    <div class="note">💡 <strong>Multi-ano (2026–2035) & Cartão de Crédito:</strong> O tópico <strong>Cartão de Crédito</strong> está presente em todos os meses. Use <strong>💳 Parcelar</strong> para dividir compras inclusive atravessando a virada de ano.</div>
   </div>
 </div>
 
@@ -1001,7 +1010,7 @@
 <div id="installment-modal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this) closeInstallmentModal()">
   <div class="modal-box">
     <h2 class="modal-title" id="inst-modal-title">Nova Compra Parcelada</h2>
-    <div class="modal-sub">O valor é dividido e lançado automaticamente nos próximos meses.</div>
+    <div class="modal-sub">O valor é dividido e lançado automaticamente nos próximos meses e anos.</div>
     <form onsubmit="saveInstallmentPlan(event)">
       <label class="modal-label">Descrição da compra</label>
       <input type="text" id="inst-desc" class="modal-input" placeholder="Ex: Tênis, Teclado, Celular" required>
@@ -1016,25 +1025,33 @@
         </div>
         <div>
           <label class="modal-label">Qtd. de parcelas</label>
-          <input type="number" id="inst-count" class="modal-input" min="1" max="12" step="1" value="3" oninput="updateInstallmentPreview()" required>
+          <input type="number" id="inst-count" class="modal-input" min="1" max="60" step="1" value="3" oninput="updateInstallmentPreview()" required>
         </div>
       </div>
 
-      <label class="modal-label">Mês da 1ª parcela</label>
-      <select id="inst-start-month" class="modal-select" onchange="updateInstallmentPreview()">
-        <option value="2027-01">Janeiro 2027</option>
-        <option value="2027-02">Fevereiro 2027</option>
-        <option value="2027-03">Março 2027</option>
-        <option value="2027-04">Abril 2027</option>
-        <option value="2027-05">Maio 2027</option>
-        <option value="2027-06">Junho 2027</option>
-        <option value="2027-07">Julho 2027</option>
-        <option value="2027-08">Agosto 2027</option>
-        <option value="2027-09">Setembro 2027</option>
-        <option value="2027-10">Outubro 2027</option>
-        <option value="2027-11">Novembro 2027</option>
-        <option value="2027-12">Dezembro 2027</option>
-      </select>
+      <div class="modal-grid-2">
+        <div>
+          <label class="modal-label">Mês da 1ª parcela</label>
+          <select id="inst-start-month-only" class="modal-select" onchange="updateInstallmentPreview()">
+            <option value="01">Janeiro</option>
+            <option value="02">Fevereiro</option>
+            <option value="03">Março</option>
+            <option value="04">Abril</option>
+            <option value="05">Maio</option>
+            <option value="06">Junho</option>
+            <option value="07">Julho</option>
+            <option value="08">Agosto</option>
+            <option value="09">Setembro</option>
+            <option value="10">Outubro</option>
+            <option value="11">Novembro</option>
+            <option value="12">Dezembro</option>
+          </select>
+        </div>
+        <div>
+          <label class="modal-label">Ano da 1ª parcela</label>
+          <select id="inst-start-year-only" class="modal-select" onchange="updateInstallmentPreview()"></select>
+        </div>
+      </div>
 
       <div class="installment-preview" id="inst-preview">Parcela: R$ 0,00 / mês</div>
 
@@ -1068,16 +1085,46 @@
   // =========================================================
 
   const SESSION_KEY = 'stonks_multi_account_id_v1';
-  const PALETTE = ['#8ab4f8', '#ff8bcb', '#fdd663', '#c58af9', '#81c995', '#f28b82', '#78d9ec', '#fcad70'];
-  const ALL_MONTHS = [
-    '2027-01', '2027-02', '2027-03', '2027-04', '2027-05', '2027-06',
-    '2027-07', '2027-08', '2027-09', '2027-10', '2027-11', '2027-12'
-  ];
-  const MONTH_LABELS = {
-    '2027-01': 'Jan/27', '2027-02': 'Fev/27', '2027-03': 'Mar/27', '2027-04': 'Abr/27',
-    '2027-05': 'Mai/27', '2027-06': 'Jun/27', '2027-07': 'Jul/27', '2027-08': 'Ago/27',
-    '2027-09': 'Set/27', '2027-10': 'Out/27', '2027-11': 'Nov/27', '2027-12': 'Dez/27'
+  const PALETTE = ['#fcad70', '#8ab4f8', '#ff8bcb', '#fdd663', '#c58af9', '#81c995', '#f28b82', '#78d9ec'];
+  const YEARS_LIST = ['2026', '2027', '2028', '2029', '2030', '2031', '2032', '2033', '2034', '2035'];
+  const MONTH_NUMS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+  const SHORT_MONTH_NAMES = {
+    '01': 'Jan', '02': 'Fev', '03': 'Mar', '04': 'Abr', '05': 'Mai', '06': 'Jun',
+    '07': 'Jul', '08': 'Ago', '09': 'Set', '10': 'Out', '11': 'Nov', '12': 'Dez'
   };
+
+  // Gera lista cronológica de todos os meses de 2026 a 2035
+  const ALL_MONTHS = [];
+  YEARS_LIST.forEach(y => {
+    MONTH_NUMS.forEach(m => {
+      ALL_MONTHS.push(`${y}-${m}`);
+    });
+  });
+
+  function formatMonthKey(key) {
+    if (!key || !key.includes('-')) return key || '';
+    const [y, m] = key.split('-');
+    return `${SHORT_MONTH_NAMES[m] || m}/${y.slice(-2)}`;
+  }
+
+  // Popula os seletores de anos (cabeçalho e modal de parcelamento)
+  (function initYearSelectors() {
+    const mainYearSel = document.getElementById('year-only-select');
+    const instYearSel = document.getElementById('inst-start-year-only');
+    YEARS_LIST.forEach(y => {
+      const opt1 = document.createElement('option');
+      opt1.value = y;
+      opt1.textContent = y;
+      if (y === '2027') opt1.selected = true;
+      mainYearSel.appendChild(opt1);
+
+      const opt2 = document.createElement('option');
+      opt2.value = y;
+      opt2.textContent = y;
+      if (y === '2027') opt2.selected = true;
+      instYearSel.appendChild(opt2);
+    });
+  })();
 
   const DEFAULT_ACCOUNTS = {
     acc_kirito:      { username: 'kirito',      password: '2027' },
@@ -1086,11 +1133,25 @@
     acc_beta_tester: { username: 'beta tester', password: '2027' }
   };
 
+  function getCreditCardTopicTemplate() {
+    return {
+      id: 'top_cartao',
+      name: '1. Cartão de Crédito',
+      shortName: 'Cartão Crédito',
+      color: '#fcad70',
+      items: [
+        { id: 'it_cc_avista', label: 'Fatura / Compras à Vista', val: 0, max: 2000, step: 10 },
+        { id: 'it_cc_assin', label: 'Assinaturas no Cartão', val: 0, max: 500, step: 5 }
+      ]
+    };
+  }
+
   function getDefaultTopics() {
     return [
+      getCreditCardTopicTemplate(),
       {
         id: 'top_fixas',
-        name: '1. Contas Fixas & Assinaturas',
+        name: '2. Contas Fixas & Assinaturas',
         shortName: 'Contas Fixas',
         color: '#8ab4f8',
         items: [
@@ -1102,7 +1163,7 @@
       },
       {
         id: 'top_cabelo',
-        name: '2. Cabelo & Cuidados Pessoais',
+        name: '3. Cabelo & Cuidados Pessoais',
         shortName: 'Cabelo',
         color: '#ff8bcb',
         items: [
@@ -1112,7 +1173,7 @@
       },
       {
         id: 'top_lazer',
-        name: '3. Lazer, Delivery & Rolês',
+        name: '4. Lazer, Delivery & Rolês',
         shortName: 'Lazer',
         color: '#fdd663',
         items: [
@@ -1123,7 +1184,7 @@
       },
       {
         id: 'top_reserva',
-        name: '4. Fundo de Reserva (Emergência)',
+        name: '5. Fundo de Reserva (Emergência)',
         shortName: 'Fundo Reserva',
         color: '#c58af9',
         items: [
@@ -1133,7 +1194,7 @@
       },
       {
         id: 'top_guardado',
-        name: '5. Dinheiro Guardado & Metas',
+        name: '6. Dinheiro Guardado & Metas',
         shortName: 'Guardado',
         color: '#81c995',
         items: [
@@ -1142,6 +1203,20 @@
         ]
       }
     ];
+  }
+
+  // Garante que qualquer lista de tópicos tenha o tópico Cartão de Crédito
+  function ensureCreditCardTopic(topicsList) {
+    if (!Array.isArray(topicsList)) return getDefaultTopics();
+    const hasCard = topicsList.some(t =>
+      t.id === 'top_cartao' ||
+      (t.name && t.name.toLowerCase().includes('cartão')) ||
+      (t.name && t.name.toLowerCase().includes('cartao'))
+    );
+    if (!hasCard) {
+      topicsList.unshift(getCreditCardTopicTemplate());
+    }
+    return topicsList;
   }
 
   let cloudRoot = { accounts: {}, data: {}, installments: {} };
@@ -1327,7 +1402,9 @@
 
   // --- DADOS ISOLADOS DA CONTA ATIVA ---
   function getCurrentMonth() {
-    return document.getElementById('month-select').value;
+    const m = document.getElementById('month-only-select').value;
+    const y = document.getElementById('year-only-select').value;
+    return `${y}-${m}`;
   }
 
   function getAccountMonthsMap() {
@@ -1351,7 +1428,7 @@
       return;
     }
     currentIncome = raw.income !== undefined ? raw.income : 0;
-    currentTopics = JSON.parse(JSON.stringify(raw.topics));
+    currentTopics = ensureCreditCardTopic(JSON.parse(JSON.stringify(raw.topics)));
   }
 
   // --- SISTEMA DE COMPRAS PARCELADAS ---
@@ -1393,6 +1470,8 @@
           income: 0,
           topics: getDefaultTopics()
         };
+      } else {
+        monthsMap[monthKey].topics = ensureCreditCardTopic(monthsMap[monthKey].topics);
       }
 
       const targetMonthTopics = (monthKey === getCurrentMonth()) ? currentTopics : monthsMap[monthKey].topics;
@@ -1441,16 +1520,22 @@
       topicSelect.value = plan.topicId || (currentTopics[0] && currentTopics[0].id);
       document.getElementById('inst-total').value = plan.total;
       document.getElementById('inst-count').value = plan.count;
-      document.getElementById('inst-start-month').value = plan.startMonth;
+      const [sy, sm] = plan.startMonth.split('-');
+      document.getElementById('inst-start-year-only').value = sy;
+      document.getElementById('inst-start-month-only').value = sm;
     } else {
       document.getElementById('inst-modal-title').textContent = 'Nova Compra Parcelada';
       document.getElementById('inst-desc').value = '';
       if (preselectedTopicId) {
         topicSelect.value = preselectedTopicId;
+      } else {
+        const cardTopic = currentTopics.find(t => t.id === 'top_cartao');
+        if (cardTopic) topicSelect.value = cardTopic.id;
       }
       document.getElementById('inst-total').value = '';
       document.getElementById('inst-count').value = '3';
-      document.getElementById('inst-start-month').value = getCurrentMonth();
+      document.getElementById('inst-start-month-only').value = document.getElementById('month-only-select').value;
+      document.getElementById('inst-start-year-only').value = document.getElementById('year-only-select').value;
     }
 
     updateInstallmentPreview();
@@ -1465,14 +1550,16 @@
   function updateInstallmentPreview() {
     const total = parseFloat(document.getElementById('inst-total').value) || 0;
     const count = Math.max(1, parseInt(document.getElementById('inst-count').value, 10) || 1);
-    const startMonth = document.getElementById('inst-start-month').value;
+    const sm = document.getElementById('inst-start-month-only').value;
+    const sy = document.getElementById('inst-start-year-only').value;
+    const startMonth = `${sy}-${sm}`;
     const startIdx = ALL_MONTHS.indexOf(startMonth);
     const perMonth = total / count;
 
     let endLabel = '';
     if (startIdx !== -1) {
       const endIdx = Math.min(ALL_MONTHS.length - 1, startIdx + count - 1);
-      endLabel = ` • ${MONTH_LABELS[startMonth]} até ${MONTH_LABELS[ALL_MONTHS[endIdx]]}`;
+      endLabel = ` • ${formatMonthKey(startMonth)} até ${formatMonthKey(ALL_MONTHS[endIdx])}`;
     }
 
     document.getElementById('inst-preview').textContent =
@@ -1485,7 +1572,7 @@
     const topicId = document.getElementById('inst-topic').value;
     const total = parseFloat(document.getElementById('inst-total').value);
     const count = parseInt(document.getElementById('inst-count').value, 10);
-    const startMonth = document.getElementById('inst-start-month').value;
+    const startMonth = `${document.getElementById('inst-start-year-only').value}-${document.getElementById('inst-start-month-only').value}`;
     const fb = document.getElementById('inst-feedback');
 
     if (!desc || isNaN(total) || total <= 0 || isNaN(count) || count < 1) {
@@ -1550,7 +1637,7 @@
 
     container.innerHTML = plans.map(p => {
       const perMonth = (parseFloat(p.total) || 0) / Math.max(1, parseInt(p.count, 10) || 1);
-      const mLabel = MONTH_LABELS[p.startMonth] || p.startMonth;
+      const mLabel = formatMonthKey(p.startMonth);
       return `
         <div class="parcel-list-item">
           <div>
@@ -1567,7 +1654,7 @@
   }
 
   function deleteInstallmentPlan(planId) {
-    if (!confirm('Remover esta compra parcelada de todos os meses?')) return;
+    if (!confirm('Remover esta compra parcelada de todos os meses e anos?')) return;
     cloudRoot.installments[activeAccountId] = getAccountInstallments().filter(p => p.id !== planId);
     removePlanFromAllMonths(planId);
     renderInstallmentsManager();
@@ -1704,7 +1791,7 @@
 
   function addTopic() {
     const nextNum = currentTopics.length + 1;
-    const name = prompt(`Nome do novo tópico (ex: ${nextNum}. Cartão, Transporte, Faculdade):`);
+    const name = prompt(`Nome do novo tópico (ex: ${nextNum}. Transporte, Faculdade, Moto):`);
     if (!name || !name.trim()) return;
     const cleanName = name.trim();
     const shortName = cleanName.replace(/^\d+\.\s*/, '').split('(')[0].trim().slice(0, 14);
@@ -1797,7 +1884,7 @@
   }
 
   function resetToDefaultStructure() {
-    if (!confirm('Restaurar as 5 repartições padrão zeradas neste mês para esta conta?')) return;
+    if (!confirm('Restaurar todas as 6 repartições padrão (incluindo Cartão de Crédito) zeradas neste mês para esta conta?')) return;
     currentIncome = 0;
     currentTopics = getDefaultTopics();
     document.getElementById('income').value = 0;
@@ -1806,10 +1893,12 @@
   }
 
   function copyToAllMonths() {
-    if (!confirm('Copiar o salário e todas as repartições deste mês para os outros 11 meses de 2027 (somente nesta conta)?')) return;
+    const selectedYear = document.getElementById('year-only-select').value;
+    if (!confirm(`Copiar o salário e todas as repartições deste mês para os 12 meses de ${selectedYear} (somente nesta conta)?`)) return;
     const userMonths = getAccountMonthsMap();
-    ALL_MONTHS.forEach(m => {
-      userMonths[m] = {
+    MONTH_NUMS.forEach(m => {
+      const key = `${selectedYear}-${m}`;
+      userMonths[key] = {
         income: currentIncome,
         topics: JSON.parse(JSON.stringify(currentTopics))
       };
