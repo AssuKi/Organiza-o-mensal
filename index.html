@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>StonksBank 2027</title>
+<link rel="apple-touch-icon" href="icon.png">
 <style>
   :root {
     --bg-body: #131314;
@@ -50,84 +51,362 @@
   * {
     box-sizing: border-box;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
   }
 
   body {
     background: var(--bg-body);
     color: var(--text-main);
     margin: 0;
-    padding: 14px;
+    padding: 0;
   }
 
-  /* TELA DE LOGIN */
-  .login-wrapper {
-    min-height: 85vh;
+  /* ==================== TELA DE LOGIN LIQUID GLASS ==================== */
+  .sb-login-page {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow-x: hidden;
+    background: radial-gradient(circle at 25% 35%, #2e5388 0%, #1b3864 45%, #0f1f3d 100%);
+    color: #ffffff;
+  }
+
+  .sb-bg-image {
+    position: fixed;
+    inset: -24px;
+    background-image: url('icon.png');
+    background-size: cover;
+    background-position: center;
+    filter: blur(18px) brightness(0.78) saturate(1.2);
+    transform: scale(1.06);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .sb-bg-overlay {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(16, 40, 78, 0.58) 0%, rgba(12, 26, 52, 0.65) 100%);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .sb-topbar {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 32px;
+    gap: 12px;
+  }
+
+  .sb-logo-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.3px;
+  }
+
+  .sb-chart-icon {
+    width: 26px;
+    height: 26px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #1b3864;
+  }
+
+  .sb-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .sb-nav-links a {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .sb-nav-links a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+  }
+
+  .sb-btn-open-top {
+    background: #ffffff;
+    color: #111827 !important;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  }
+
+  .sb-center-wrap {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    flex: 1;
+  }
+
+  .sb-glass-card {
+    width: 100%;
+    max-width: 340px;
+    background: rgba(255, 255, 255, 0.13);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 24px;
+    padding: 28px 24px 24px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+
+  .sb-card-logo {
+    width: 36px;
+    height: 36px;
+    margin: 0 auto 10px;
+    background: rgba(255, 255, 255, 0.88);
+    border-radius: 9px;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #1b3864;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 
-  .login-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-main);
-    border-radius: 18px;
-    padding: 28px 24px;
-    width: 100%;
-    max-width: 360px;
-    text-align: center;
-  }
-
-  .login-title {
+  .sb-card-title {
+    margin: 0;
     font-size: 22px;
     font-weight: 700;
-    color: var(--text-title);
-    margin: 0 0 6px 0;
+    color: #ffffff;
+    letter-spacing: -0.3px;
   }
 
-  .login-sub {
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-bottom: 20px;
+  .sb-card-sub {
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 4px 0 20px;
   }
 
-  .login-input {
-    width: 100%;
-    background: var(--bg-box);
-    border: 1px solid var(--border-input);
-    color: var(--text-title);
-    border-radius: 10px;
-    padding: 12px 14px;
-    font-size: 15px;
+  .sb-field-group {
+    position: relative;
     margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+  }
+
+  .sb-field-icon {
+    position: absolute;
+    left: 14px;
+    color: rgba(255, 255, 255, 0.72);
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  .sb-input {
+    width: 100%;
+    background: rgba(15, 20, 28, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 12px;
+    padding: 13px 38px 13px 40px;
+    color: #ffffff;
+    font-size: 14px;
     outline: none;
   }
 
-  .login-input:focus {
-    border-color: var(--c-guardado);
+  .sb-input::placeholder {
+    color: rgba(255, 255, 255, 0.65);
   }
 
-  .login-btn {
-    width: 100%;
-    background: var(--c-guardado);
-    color: #131314;
+  .sb-input:focus {
+    border-color: #81c995;
+    background: rgba(15, 20, 28, 0.94);
+  }
+
+  .sb-eye-btn {
+    position: absolute;
+    right: 12px;
+    background: none;
     border: none;
-    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+  }
+
+  .sb-remember-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    margin: 6px 0 12px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .sb-remember-row input {
+    accent-color: #81c995;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+  }
+
+  .sb-help-links {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 16px;
+  }
+
+  .sb-help-links a {
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.92);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .sb-help-links a:hover {
+    text-decoration: underline;
+  }
+
+  .sb-btn-enter {
+    width: 100%;
+    background: #82c896;
+    color: #0e1a12;
+    border: none;
+    border-radius: 999px;
     padding: 12px;
     font-size: 15px;
     font-weight: 700;
     cursor: pointer;
-    margin-top: 4px;
+    box-shadow: 0 6px 18px rgba(130, 200, 150, 0.35);
+    transition: transform 0.15s, background-color 0.15s;
   }
 
-  .login-error {
-    color: var(--c-neg);
-    font-size: 12px;
+  .sb-btn-enter:hover {
+    background: #93d6a6;
+    transform: translateY(-1px);
+  }
+
+  .sb-btn-secondary {
+    width: 100%;
     margin-top: 10px;
-    min-height: 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 999px;
+    padding: 8px 14px;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.2;
   }
 
-  /* PAINEL PRINCIPAL */
+  .sb-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.16);
+  }
+
+  .sb-btn-secondary strong {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .sb-btn-secondary span {
+    font-size: 10.5px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .sb-qr-link {
+    margin-top: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.92);
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
+
+  .sb-qr-link:hover {
+    text-decoration: underline;
+  }
+
+  .sb-login-msg {
+    margin-top: 10px;
+    font-size: 12px;
+    min-height: 16px;
+    color: #ffd663;
+  }
+
+  .sb-footer {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .sb-footer-links {
+    display: flex;
+    gap: 18px;
+  }
+
+  .sb-footer-links a {
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .sb-footer-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+  }
+
+  @media (max-width: 720px) {
+    .sb-topbar { padding: 14px 18px; }
+    .sb-nav-links a:not(.sb-btn-open-top) { display: none; }
+    .sb-footer {
+      flex-direction: column;
+      text-align: center;
+      padding: 14px 16px;
+      gap: 8px;
+    }
+  }
+
+  /* ==================== PAINEL FINANCEIRO ==================== */
+  .app-wrapper {
+    padding: 14px;
+  }
+
   .card {
     background: var(--bg-card);
     border-radius: 16px;
@@ -223,7 +502,6 @@
     background: rgba(242, 139, 130, 0.15);
   }
 
-  /* KPIS DINÂMICOS */
   .top-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -305,6 +583,16 @@
     transition: width 0.2s;
   }
 
+  .empty-state {
+    background: var(--bg-box);
+    border: 1px dashed var(--border-input);
+    border-radius: 12px;
+    padding: 32px 16px;
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+
   .section {
     margin-bottom: 14px;
     background: var(--bg-box);
@@ -382,9 +670,8 @@
     font-weight: 500;
   }
 
-  /* RESPONSIVIDADE CELULAR (iPhone 15) */
   @media (max-width: 620px) {
-    body { padding: 10px; }
+    .app-wrapper { padding: 10px; }
     .card { padding: 14px; }
     .row {
       grid-template-columns: 1fr 78px 28px;
@@ -424,61 +711,140 @@
 </head>
 <body>
 
-<!-- TELA DE LOGIN -->
-<div id="login-screen" class="login-wrapper">
-  <div class="login-card">
-    <div style="font-size: 36px; margin-bottom: 8px;">📈</div>
-    <h1 class="login-title">StonksBank</h1>
-    <div class="login-sub">Acesso restrito ao controle financeiro</div>
-    <form onsubmit="handleLogin(event)">
-      <input type="text" id="login-user" class="login-input" placeholder="Usuário" autocomplete="username" required>
-      <input type="password" id="login-pass" class="login-input" placeholder="Senha" autocomplete="current-password" required>
-      <button type="submit" class="login-btn">Entrar</button>
-    </form>
-    <div id="login-error" class="login-error"></div>
-  </div>
+<!-- ==================== TELA DE LOGIN ==================== -->
+<div id="login-screen" class="sb-login-page">
+  <div class="sb-bg-image"></div>
+  <div class="sb-bg-overlay"></div>
+
+  <!-- Barra Superior -->
+  <header class="sb-topbar">
+    <div class="sb-logo-top">
+      <span class="sb-chart-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+      </span>
+      <span>StonksBank</span>
+    </div>
+    <nav class="sb-nav-links">
+      <a onclick="demoToast('Menu decorativo')">Para Você</a>
+      <a onclick="demoToast('Menu decorativo')">Para Empresas</a>
+      <a onclick="demoToast('Menu decorativo')">Ajuda</a>
+      <a onclick="demoToast('Menu decorativo')">Segurança</a>
+      <a class="sb-btn-open-top" onclick="demoToast('Acesso restrito ao titular')">Abra sua conta</a>
+    </nav>
+  </header>
+
+  <!-- Cartão Central Glass -->
+  <main class="sb-center-wrap">
+    <div class="sb-glass-card">
+      <div class="sb-card-logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+      </div>
+      <h1 class="sb-card-title">StonksBank</h1>
+      <div class="sb-card-sub">Acesso restrito ao controle financeiro</div>
+
+      <form onsubmit="handleLogin(event)">
+        <div class="sb-field-group">
+          <span class="sb-field-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+          </span>
+          <input type="text" id="login-user" class="sb-input" placeholder="Usuário" autocomplete="username" required>
+        </div>
+
+        <div class="sb-field-group">
+          <span class="sb-field-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+          </span>
+          <input type="password" id="login-pass" class="sb-input" placeholder="Senha" autocomplete="current-password" required>
+          <button type="button" class="sb-eye-btn" onclick="togglePassVisibility()" title="Mostrar/ocultar senha">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+          </button>
+        </div>
+
+        <label class="sb-remember-row">
+          <input type="checkbox" id="remember-me" checked>
+          <span>Manter login conectado neste dispositivo</span>
+        </label>
+
+        <div class="sb-help-links">
+          <a onclick="demoToast('Senha configurada no código (padrão: 2027)')">Esqueci minha senha</a>
+          <a onclick="demoToast('Usuário configurado no código (padrão: ricardo)')">Esqueci meu usuário</a>
+        </div>
+
+        <button type="submit" class="sb-btn-enter">Entrar</button>
+
+        <button type="button" class="sb-btn-secondary" onclick="demoToast('Conta pessoal já ativada')">
+          <strong>Abrir minha conta</strong>
+          <span>Primeiro acesso</span>
+        </button>
+      </form>
+
+      <div id="login-error" class="sb-login-msg"></div>
+    </div>
+
+    <button type="button" class="sb-qr-link" onclick="demoToast('Login via QR Code apenas ilustrativo')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><path d="M14 14h3v3h-3zM18 18h3v3h-3zM14 19h2v2h-2zM19 14h2v2h-2z"/></svg>
+      <span>Acessar com QR Code</span>
+    </button>
+  </main>
+
+  <!-- Rodapé -->
+  <footer class="sb-footer">
+    <div class="sb-footer-links">
+      <a onclick="demoToast('Termos de Uso StonksBank')">Termos de Uso</a>
+      <a onclick="demoToast('Privacidade StonksBank')">Privacidade</a>
+      <a onclick="demoToast('Atendimento 24h')">Atendimento</a>
+    </div>
+    <div class="sb-footer-badge">
+      <span>Acesso seguro • Banco Central</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2z"/></svg>
+    </div>
+    <div>StonksBank S.A. © Todos os direitos reservados</div>
+  </footer>
 </div>
 
-<!-- PAINEL FINANCEIRO -->
-<div id="app-screen" class="card" style="display:none;">
-  <div class="header-row">
-    <div class="title-group">
-      <span class="brand-tag">StonksBank</span>
-      <select id="month-select" class="month-select" onchange="changeMonth()">
-        <option value="2027-01">Janeiro 2027</option>
-        <option value="2027-02">Fevereiro 2027</option>
-        <option value="2027-03">Março 2027</option>
-        <option value="2027-04">Abril 2027</option>
-        <option value="2027-05">Maio 2027</option>
-        <option value="2027-06">Junho 2027</option>
-        <option value="2027-07">Julho 2027</option>
-        <option value="2027-08">Agosto 2027</option>
-        <option value="2027-09">Setembro 2027</option>
-        <option value="2027-10">Outubro 2027</option>
-        <option value="2027-11">Novembro 2027</option>
-        <option value="2027-12">Dezembro 2027</option>
-      </select>
-      <span class="sync-badge" id="sync-status">⏳ Carregando...</span>
+<!-- ==================== PAINEL FINANCEIRO ==================== -->
+<div id="app-screen" class="app-wrapper" style="display:none;">
+  <div class="card">
+    <div class="header-row">
+      <div class="title-group">
+        <span class="brand-tag">StonksBank</span>
+        <select id="month-select" class="month-select" onchange="changeMonth()">
+          <option value="2027-01">Janeiro 2027</option>
+          <option value="2027-02">Fevereiro 2027</option>
+          <option value="2027-03">Março 2027</option>
+          <option value="2027-04">Abril 2027</option>
+          <option value="2027-05">Maio 2027</option>
+          <option value="2027-06">Junho 2027</option>
+          <option value="2027-07">Julho 2027</option>
+          <option value="2027-08">Agosto 2027</option>
+          <option value="2027-09">Setembro 2027</option>
+          <option value="2027-10">Outubro 2027</option>
+          <option value="2027-11">Novembro 2027</option>
+          <option value="2027-12">Dezembro 2027</option>
+        </select>
+        <span class="sync-badge" id="sync-status">⏳ Carregando...</span>
+      </div>
+      <div class="actions">
+        <button class="btn btn-accent" onclick="addTopic()">+ Novo Tópico</button>
+        <button class="btn" onclick="copyToAllMonths()" title="Copia os tópicos e valores deste mês para todo o ano">📋 Replicar p/ Ano</button>
+        <button class="btn" id="theme-btn" onclick="toggleTheme()">☀️ Claro</button>
+        <button class="btn" onclick="clearMonth()">Zerar mês</button>
+        <button class="btn" onclick="logout()" title="Encerrar sessão">🔒 Sair</button>
+      </div>
     </div>
-    <div class="actions">
-      <button class="btn btn-accent" onclick="addTopic()">+ Novo Tópico</button>
-      <button class="btn" id="theme-btn" onclick="toggleTheme()">☀️ Claro</button>
-      <button class="btn" onclick="resetDefaults()">Restaurar</button>
-      <button class="btn" onclick="logout()" title="Bloquear tela">🔒 Sair</button>
+
+    <div class="top-grid" id="kpi-container"></div>
+    <div class="bar" id="bar-container"></div>
+
+    <div class="income-box">
+      <label>Salário / Entrada mensal (R$)</label>
+      <input type="number" id="income" class="income-input" value="0" step="10" oninput="onIncomeChange()">
     </div>
+
+    <div id="topics-container"></div>
+
+    <div class="note">💡 <strong>Salvamento automático ativo:</strong> Tudo o que você criar, editar ou alterar fica salvo na nuvem automaticamente. Use <strong>Replicar p/ Ano</strong> depois de montar seu padrão para preencher os outros meses de uma vez.</div>
   </div>
-
-  <div class="top-grid" id="kpi-container"></div>
-  <div class="bar" id="bar-container"></div>
-
-  <div class="income-box">
-    <label>Salário líquido mensal (R$)</label>
-    <input type="number" id="income" class="income-input" value="1650" step="10" oninput="onIncomeChange()">
-  </div>
-
-  <div id="topics-container"></div>
-
-  <div class="note">💡 <strong>Dica:</strong> Toque no nome de qualquer tópico ou gasto para <strong>editar</strong> o nome, clique no <strong>×</strong> para <strong>excluir</strong>, ou use <strong>+ Item</strong> / <strong>+ Novo Tópico</strong> para adicionar mais categorias.</div>
 </div>
 
 <script>
@@ -490,60 +856,25 @@
   const API_KEY = '$2a$10$AR3I3zDpxSH2Cp9igqh4sO7XrBtKrzKsTKNepTEaTxlYl3SUvLYhi';
   // ===================================================================
 
+  const SESSION_KEY = 'stonks_persistent_session_v2';
   const PALETTE = ['#8ab4f8', '#fdd663', '#c58af9', '#81c995', '#ff8bcb', '#f28b82', '#78d9ec', '#fcad70'];
-
-  const DEFAULT_TOPICS = [
-    {
-      id: 'fixo',
-      name: '1. Fixo (Cartão + Pix)',
-      shortName: 'Fixo',
-      color: '#8ab4f8',
-      items: [
-        { id: 'wifi', label: 'Wi-Fi residencial (cartão)', val: 100, max: 300, step: 5 },
-        { id: 'celular', label: 'Internet celular (cartão)', val: 64, max: 200, step: 1 },
-        { id: 'seguro', label: 'Seguro iPhone (cartão)', val: 45, max: 200, step: 5 },
-        { id: 'crunchyroll', label: 'Crunchyroll (Pix)', val: 10, max: 50, step: 1 },
-        { id: 'spotify', label: 'Spotify (R$ 41 ÷ 6 pessoas)', val: 7, max: 50, step: 1 }
-      ]
-    },
-    {
-      id: 'lazer',
-      name: '2. Lazer e Dia a Dia',
-      shortName: 'Lazer',
-      color: '#fdd663',
-      items: [
-        { id: 'lazer', label: 'Lazer, saídas, jogos e lanches', val: 300, max: 1000, step: 25 },
-        { id: 'diadia', label: 'Dia a dia, transporte e compras', val: 150, max: 600, step: 10 }
-      ]
-    },
-    {
-      id: 'reserva',
-      name: '3. Reserva de Emergência',
-      shortName: 'Reserva',
-      color: '#c58af9',
-      items: [
-        { id: 'reserva', label: 'Aporte mensal Reserva de Emergência', val: 450, max: 1200, step: 25 }
-      ]
-    },
-    {
-      id: 'guardado',
-      name: '4. Dinheiro Guardado',
-      shortName: 'Guardado',
-      color: '#81c995',
-      items: [
-        { id: 'guardado', label: 'Aporte mensal Dinheiro Guardado', val: 400, max: 1200, step: 25 }
-      ]
-    }
+  const ALL_MONTHS = [
+    '2027-01', '2027-02', '2027-03', '2027-04', '2027-05', '2027-06',
+    '2027-07', '2027-08', '2027-09', '2027-10', '2027-11', '2027-12'
   ];
 
   let allMonthsData = {};
-  let currentIncome = 1650;
-  let currentTopics = JSON.parse(JSON.stringify(DEFAULT_TOPICS));
+  let currentIncome = 0;
+  let currentTopics = [];
   let saveTimeout = null;
 
-  // --- AUTENTICAÇÃO ---
+  // --- AUTENTICAÇÃO PERSISTENTE ---
+  function isAuthenticated() {
+    return localStorage.getItem(SESSION_KEY) === 'active' || sessionStorage.getItem(SESSION_KEY) === 'active';
+  }
+
   function checkAuth() {
-    if (localStorage.getItem('stonks_auth') === 'ok') {
+    if (isAuthenticated()) {
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('app-screen').style.display = 'block';
       loadFromCloud();
@@ -557,8 +888,14 @@
     e.preventDefault();
     const u = document.getElementById('login-user').value.trim().toLowerCase();
     const p = document.getElementById('login-pass').value;
+    const keepLogged = document.getElementById('remember-me').checked;
+
     if (u === AUTH_USER.toLowerCase() && p === AUTH_PASS) {
-      localStorage.setItem('stonks_auth', 'ok');
+      if (keepLogged) {
+        localStorage.setItem(SESSION_KEY, 'active');
+      } else {
+        sessionStorage.setItem(SESSION_KEY, 'active');
+      }
       document.getElementById('login-error').textContent = '';
       checkAuth();
     } else {
@@ -567,8 +904,20 @@
   }
 
   function logout() {
-    localStorage.removeItem('stonks_auth');
+    localStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_KEY);
     checkAuth();
+  }
+
+  function togglePassVisibility() {
+    const inp = document.getElementById('login-pass');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  }
+
+  function demoToast(msg) {
+    const el = document.getElementById('login-error');
+    el.textContent = msg;
+    setTimeout(() => { if (el.textContent === msg) el.textContent = ''; }, 3000);
   }
 
   // --- TEMA ---
@@ -583,37 +932,38 @@
     document.getElementById('theme-btn').textContent = '🌙 Escuro';
   }
 
-  // --- DADOS E COMPATIBILIDADE ---
+  // --- DADOS ZERADOS POR PADRÃO ---
   function getCurrentMonth() {
     return document.getElementById('month-select').value;
   }
 
   function hydrateMonthData(raw) {
-    if (!raw) {
-      currentIncome = 1650;
-      currentTopics = JSON.parse(JSON.stringify(DEFAULT_TOPICS));
+    if (!raw || !Array.isArray(raw.topics)) {
+      currentIncome = raw && raw.income !== undefined ? raw.income : 0;
+      currentTopics = [];
       return;
     }
-    if (Array.isArray(raw.topics)) {
-      currentIncome = raw.income !== undefined ? raw.income : 1650;
-      currentTopics = JSON.parse(JSON.stringify(raw.topics));
-      return;
-    }
-    // Converte formato antigo automaticamente se existir na nuvem
-    currentIncome = raw.income !== undefined ? raw.income : 1650;
-    const cloned = JSON.parse(JSON.stringify(DEFAULT_TOPICS));
-    cloned.forEach(t => {
-      t.items.forEach(it => {
-        if (raw[it.id] !== undefined) it.val = raw[it.id];
-      });
-    });
-    currentTopics = cloned;
+    currentIncome = raw.income !== undefined ? raw.income : 0;
+    currentTopics = JSON.parse(JSON.stringify(raw.topics));
   }
 
   // --- RENDERIZAÇÃO DINÂMICA ---
   function renderTopics() {
     const container = document.getElementById('topics-container');
     container.innerHTML = '';
+
+    if (currentTopics.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div style="font-size:28px; margin-bottom:8px;">🧾</div>
+          <div style="font-weight:600; color:var(--text-title); margin-bottom:4px;">Nenhuma conta cadastrada neste mês</div>
+          <div style="font-size:13px; margin-bottom:14px;">Comece preenchendo sua entrada acima e clique no botão abaixo para criar seu primeiro tópico.</div>
+          <button class="btn btn-accent" onclick="addTopic()">+ Criar Primeiro Tópico</button>
+        </div>
+      `;
+      updateSummary();
+      return;
+    }
 
     currentTopics.forEach((topic, tIdx) => {
       const sec = document.createElement('div');
@@ -636,7 +986,7 @@
       `;
 
       topic.items.forEach((item, iIdx) => {
-        const maxVal = Math.max(item.max || 500, item.val || 0);
+        const maxVal = Math.max(item.max || 1000, item.val || 0);
         const row = document.createElement('div');
         row.className = 'row';
         row.innerHTML = `
@@ -728,7 +1078,7 @@
   }
 
   function addTopic() {
-    const name = prompt('Nome do novo tópico (ex: 5. Investimentos ou Cartão Nubank):');
+    const name = prompt('Nome do novo tópico (ex: Contas Fixas, Cartão, Investimentos):');
     if (!name || !name.trim()) return;
     const cleanName = name.trim();
     const shortName = cleanName.replace(/^\d+\.\s*/, '').split('(')[0].trim().slice(0, 14);
@@ -739,9 +1089,7 @@
       name: cleanName,
       shortName: shortName || cleanName,
       color: color,
-      items: [
-        { id: 'it_' + Date.now(), label: 'Novo gasto', val: 0, max: 1000, step: 10 }
-      ]
+      items: []
     });
     renderTopics();
     scheduleSave();
@@ -759,24 +1107,25 @@
   }
 
   function deleteTopic(tIdx) {
-    if (!confirm(`Excluir o tópico "${currentTopics[tIdx].name}" e todos os seus itens?`)) return;
+    if (!confirm(`Excluir o tópico "${currentTopics[tIdx].name}"?`)) return;
     currentTopics.splice(tIdx, 1);
     renderTopics();
     scheduleSave();
   }
 
   function addItem(tIdx) {
-    const label = prompt('Nome do novo item/gasto:');
+    const label = prompt('Nome do gasto/item:');
     if (!label || !label.trim()) return;
-    const maxInput = prompt('Valor máximo da barra deslizante (ex: 500, 1000, 2000):', '1000');
-    const maxVal = parseFloat(maxInput) || 1000;
+    const valInput = prompt('Valor inicial em R$ (pode deixar 0):', '0');
+    const initVal = parseFloat(valInput) || 0;
+    const maxVal = Math.max(1000, initVal * 2);
 
     currentTopics[tIdx].items.push({
       id: 'it_' + Date.now(),
       label: label.trim(),
-      val: 0,
+      val: initVal,
       max: maxVal,
-      step: maxVal <= 100 ? 1 : (maxVal <= 500 ? 5 : 10)
+      step: 5
     });
     renderTopics();
     scheduleSave();
@@ -804,10 +1153,22 @@
     renderTopics();
   }
 
-  function resetDefaults() {
-    if (!confirm('Restaurar este mês para os tópicos e valores padrão?')) return;
-    hydrateMonthData(null);
-    document.getElementById('income').value = currentIncome;
+  function copyToAllMonths() {
+    if (!confirm('Copiar o salário e todos os tópicos deste mês para os outros 11 meses de 2027?')) return;
+    ALL_MONTHS.forEach(m => {
+      allMonthsData[m] = {
+        income: currentIncome,
+        topics: JSON.parse(JSON.stringify(currentTopics))
+      };
+    });
+    scheduleSave();
+  }
+
+  function clearMonth() {
+    if (!confirm('Apagar todos os tópicos e zerar o salário deste mês?')) return;
+    currentIncome = 0;
+    currentTopics = [];
+    document.getElementById('income').value = 0;
     renderTopics();
     scheduleSave();
   }
@@ -872,7 +1233,7 @@
   checkAuth();
 
   setInterval(() => {
-    if (localStorage.getItem('stonks_auth') === 'ok' && !saveTimeout) {
+    if (isAuthenticated() && !saveTimeout) {
       loadFromCloud(true);
     }
   }, 6000);
