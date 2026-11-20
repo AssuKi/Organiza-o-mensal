@@ -75,12 +75,12 @@
 
   .sb-bg-image {
     position: fixed;
-    inset: -24px;
+    inset: -16px;
     background-image: url('icon.png');
     background-size: cover;
     background-position: center;
-    filter: blur(18px) brightness(0.78) saturate(1.2);
-    transform: scale(1.06);
+    filter: blur(5px) brightness(0.95) saturate(1.1);
+    transform: scale(1.03);
     z-index: 0;
     pointer-events: none;
   }
@@ -88,7 +88,7 @@
   .sb-bg-overlay {
     position: fixed;
     inset: 0;
-    background: linear-gradient(135deg, rgba(16, 40, 78, 0.58) 0%, rgba(12, 26, 52, 0.65) 100%);
+    background: linear-gradient(180deg, rgba(12, 32, 66, 0.28) 0%, rgba(10, 24, 50, 0.25) 50%, rgba(10, 24, 50, 0.42) 100%);
     z-index: 1;
     pointer-events: none;
   }
@@ -111,12 +111,13 @@
     font-weight: 700;
     color: #ffffff;
     letter-spacing: -0.3px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.35);
   }
 
   .sb-chart-icon {
     width: 26px;
     height: 26px;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.88);
     border-radius: 6px;
     display: inline-flex;
     align-items: center;
@@ -130,16 +131,16 @@
     gap: 22px;
     font-size: 13px;
     font-weight: 500;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.4);
   }
 
   .sb-nav-links a {
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.95);
     text-decoration: none;
     cursor: pointer;
   }
 
   .sb-nav-links a:hover {
-    color: #ffffff;
     text-decoration: underline;
   }
 
@@ -150,7 +151,8 @@
     border-radius: 8px;
     font-weight: 600;
     text-decoration: none !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+    text-shadow: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
   }
 
   .sb-center-wrap {
@@ -166,47 +168,49 @@
 
   .sb-glass-card {
     width: 100%;
-    max-width: 340px;
-    background: rgba(255, 255, 255, 0.13);
-    backdrop-filter: blur(22px);
-    -webkit-backdrop-filter: blur(22px);
-    border: 1px solid rgba(255, 255, 255, 0.28);
+    max-width: 315px;
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.42);
     border-radius: 24px;
-    padding: 28px 24px 24px;
+    padding: 26px 22px 22px;
     text-align: center;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
 
   .sb-card-logo {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     margin: 0 auto 10px;
-    background: rgba(255, 255, 255, 0.88);
-    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #1b3864;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
   }
 
   .sb-card-title {
     margin: 0;
-    font-size: 22px;
+    font-size: 21px;
     font-weight: 700;
     color: #ffffff;
     letter-spacing: -0.3px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.35);
   }
 
   .sb-card-sub {
-    font-size: 12.5px;
-    color: rgba(255, 255, 255, 0.85);
-    margin: 4px 0 20px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.92);
+    margin: 4px 0 18px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.35);
   }
 
   .sb-field-group {
     position: relative;
-    margin-bottom: 12px;
+    margin-bottom: 11px;
     display: flex;
     align-items: center;
   }
@@ -214,7 +218,7 @@
   .sb-field-icon {
     position: absolute;
     left: 14px;
-    color: rgba(255, 255, 255, 0.72);
+    color: rgba(255, 255, 255, 0.78);
     display: flex;
     align-items: center;
     pointer-events: none;
@@ -222,22 +226,22 @@
 
   .sb-input {
     width: 100%;
-    background: rgba(15, 20, 28, 0.82);
+    background: rgba(22, 24, 28, 0.88);
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 12px;
-    padding: 13px 38px 13px 40px;
+    padding: 12px 38px 12px 40px;
     color: #ffffff;
-    font-size: 14px;
+    font-size: 13.5px;
     outline: none;
   }
 
   .sb-input::placeholder {
-    color: rgba(255, 255, 255, 0.65);
+    color: rgba(255, 255, 255, 0.75);
   }
 
   .sb-input:focus {
-    border-color: #81c995;
-    background: rgba(15, 20, 28, 0.94);
+    border-color: #82c896;
+    background: rgba(18, 20, 24, 0.95);
   }
 
   .sb-eye-btn {
@@ -245,42 +249,24 @@
     right: 12px;
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.75);
     cursor: pointer;
     padding: 4px;
     display: flex;
     align-items: center;
   }
 
-  .sb-remember-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    margin: 6px 0 12px;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.9);
-    cursor: pointer;
-    user-select: none;
-  }
-
-  .sb-remember-row input {
-    accent-color: #81c995;
-    width: 14px;
-    height: 14px;
-    cursor: pointer;
-  }
-
   .sb-help-links {
     display: flex;
     flex-direction: column;
     gap: 5px;
-    margin-bottom: 16px;
+    margin: 12px 0 16px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.45);
   }
 
   .sb-help-links a {
-    font-size: 12.5px;
-    color: rgba(255, 255, 255, 0.92);
+    font-size: 12px;
+    color: #ffffff;
     text-decoration: none;
     cursor: pointer;
   }
@@ -291,28 +277,28 @@
 
   .sb-btn-enter {
     width: 100%;
-    background: #82c896;
+    background: #84c997;
     color: #0e1a12;
     border: none;
     border-radius: 999px;
-    padding: 12px;
-    font-size: 15px;
+    padding: 11px;
+    font-size: 14.5px;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 6px 18px rgba(130, 200, 150, 0.35);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
     transition: transform 0.15s, background-color 0.15s;
   }
 
   .sb-btn-enter:hover {
-    background: #93d6a6;
+    background: #96d8a8;
     transform: translateY(-1px);
   }
 
   .sb-btn-secondary {
     width: 100%;
     margin-top: 10px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.45);
     border-radius: 999px;
     padding: 8px 14px;
     color: #ffffff;
@@ -321,20 +307,21 @@
     flex-direction: column;
     align-items: center;
     line-height: 1.2;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.35);
   }
 
   .sb-btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.14);
   }
 
   .sb-btn-secondary strong {
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 600;
   }
 
   .sb-btn-secondary span {
     font-size: 10.5px;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.88);
   }
 
   .sb-qr-link {
@@ -343,10 +330,11 @@
     align-items: center;
     gap: 6px;
     font-size: 12.5px;
-    color: rgba(255, 255, 255, 0.92);
+    color: #ffffff;
     cursor: pointer;
     background: none;
     border: none;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
   }
 
   .sb-qr-link:hover {
@@ -354,10 +342,11 @@
   }
 
   .sb-login-msg {
-    margin-top: 10px;
-    font-size: 12px;
-    min-height: 16px;
+    margin-top: 8px;
+    font-size: 11.5px;
+    min-height: 14px;
     color: #ffd663;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
   }
 
   .sb-footer {
@@ -368,9 +357,10 @@
     align-items: center;
     padding: 16px 32px;
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.92);
     flex-wrap: wrap;
     gap: 12px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.55);
   }
 
   .sb-footer-links {
@@ -379,7 +369,7 @@
   }
 
   .sb-footer-links a {
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.92);
     text-decoration: none;
     cursor: pointer;
   }
@@ -411,7 +401,7 @@
     background: var(--bg-card);
     border-radius: 16px;
     padding: 18px;
-    max-width: 840px;
+    max-width: 860px;
     margin: 0 auto;
     border: 1px solid var(--border-main);
   }
@@ -504,7 +494,7 @@
 
   .top-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 8px;
     margin-bottom: 16px;
   }
@@ -581,16 +571,6 @@
   .seg {
     height: 100%;
     transition: width 0.2s;
-  }
-
-  .empty-state {
-    background: var(--bg-box);
-    border: 1px dashed var(--border-input);
-    border-radius: 12px;
-    padding: 32px 16px;
-    text-align: center;
-    color: var(--text-muted);
-    margin-bottom: 14px;
   }
 
   .section {
@@ -716,7 +696,6 @@
   <div class="sb-bg-image"></div>
   <div class="sb-bg-overlay"></div>
 
-  <!-- Barra Superior -->
   <header class="sb-topbar">
     <div class="sb-logo-top">
       <span class="sb-chart-icon">
@@ -733,7 +712,6 @@
     </nav>
   </header>
 
-  <!-- Cartão Central Glass -->
   <main class="sb-center-wrap">
     <div class="sb-glass-card">
       <div class="sb-card-logo">
@@ -747,27 +725,22 @@
           <span class="sb-field-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
           </span>
-          <input type="text" id="login-user" class="sb-input" placeholder="Usuário" autocomplete="username" required>
+          <input type="text" id="login-user" class="sb-input" placeholder="Usuário (ricardo)" autocomplete="username" required>
         </div>
 
         <div class="sb-field-group">
           <span class="sb-field-icon">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
           </span>
-          <input type="password" id="login-pass" class="sb-input" placeholder="Senha" autocomplete="current-password" required>
+          <input type="password" id="login-pass" class="sb-input" placeholder="Senha (••••)" autocomplete="current-password" required>
           <button type="button" class="sb-eye-btn" onclick="togglePassVisibility()" title="Mostrar/ocultar senha">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
           </button>
         </div>
 
-        <label class="sb-remember-row">
-          <input type="checkbox" id="remember-me" checked>
-          <span>Manter login conectado neste dispositivo</span>
-        </label>
-
         <div class="sb-help-links">
-          <a onclick="demoToast('Senha configurada no código (padrão: 2027)')">Esqueci minha senha</a>
-          <a onclick="demoToast('Usuário configurado no código (padrão: ricardo)')">Esqueci meu usuário</a>
+          <a onclick="demoToast('Senha padrão: 2027')">Esqueci minha senha</a>
+          <a onclick="demoToast('Usuário padrão: ricardo')">Esqueci meu usuário</a>
         </div>
 
         <button type="submit" class="sb-btn-enter">Entrar</button>
@@ -787,7 +760,6 @@
     </button>
   </main>
 
-  <!-- Rodapé -->
   <footer class="sb-footer">
     <div class="sb-footer-links">
       <a onclick="demoToast('Termos de Uso StonksBank')">Termos de Uso</a>
@@ -826,9 +798,9 @@
       </div>
       <div class="actions">
         <button class="btn btn-accent" onclick="addTopic()">+ Novo Tópico</button>
+        <button class="btn" onclick="resetToDefaultStructure()" title="Carrega todas as 5 repartições padrão zeradas">⚡ Restaurar Padrão</button>
         <button class="btn" onclick="copyToAllMonths()" title="Copia os tópicos e valores deste mês para todo o ano">📋 Replicar p/ Ano</button>
         <button class="btn" id="theme-btn" onclick="toggleTheme()">☀️ Claro</button>
-        <button class="btn" onclick="clearMonth()">Zerar mês</button>
         <button class="btn" onclick="logout()" title="Encerrar sessão">🔒 Sair</button>
       </div>
     </div>
@@ -843,7 +815,7 @@
 
     <div id="topics-container"></div>
 
-    <div class="note">💡 <strong>Salvamento automático ativo:</strong> Tudo o que você criar, editar ou alterar fica salvo na nuvem automaticamente. Use <strong>Replicar p/ Ano</strong> depois de montar seu padrão para preencher os outros meses de uma vez.</div>
+    <div class="note">💡 <strong>Dica:</strong> Clique no nome de qualquer tópico ou item para renomear, use <strong>+ Item</strong> para adicionar mais contas dentro de uma repartição ou <strong>+ Novo Tópico</strong> para criar novas categorias. Tudo salva automaticamente na nuvem.</div>
   </div>
 </div>
 
@@ -857,20 +829,79 @@
   // ===================================================================
 
   const SESSION_KEY = 'stonks_persistent_session_v2';
-  const PALETTE = ['#8ab4f8', '#fdd663', '#c58af9', '#81c995', '#ff8bcb', '#f28b82', '#78d9ec', '#fcad70'];
+  const PALETTE = ['#8ab4f8', '#ff8bcb', '#fdd663', '#c58af9', '#81c995', '#f28b82', '#78d9ec', '#fcad70'];
   const ALL_MONTHS = [
     '2027-01', '2027-02', '2027-03', '2027-04', '2027-05', '2027-06',
     '2027-07', '2027-08', '2027-09', '2027-10', '2027-11', '2027-12'
   ];
+
+  // ESTRUTURA COMPLETA COM TODAS AS REPARTIÇÕES ZERADAS (INCLUINDO CABELO)
+  function getDefaultTopics() {
+    return [
+      {
+        id: 'top_fixas',
+        name: '1. Contas Fixas & Assinaturas',
+        shortName: 'Contas Fixas',
+        color: '#8ab4f8',
+        items: [
+          { id: 'it_net', label: 'Internet / Wi-Fi', val: 0, max: 500, step: 5 },
+          { id: 'it_cel', label: 'Plano Celular', val: 0, max: 300, step: 5 },
+          { id: 'it_spot', label: 'Spotify / Assinaturas', val: 0, max: 200, step: 5 },
+          { id: 'it_casa', label: 'Luz / Água / Casa', val: 0, max: 1000, step: 10 }
+        ]
+      },
+      {
+        id: 'top_cabelo',
+        name: '2. Cabelo & Cuidados Pessoais',
+        shortName: 'Cabelo',
+        color: '#ff8bcb',
+        items: [
+          { id: 'it_corte', label: 'Corte de Cabelo / Barbearia', val: 0, max: 300, step: 5 },
+          { id: 'it_prod', label: 'Produtos (Pomada / Shampoo / Creme)', val: 0, max: 300, step: 5 }
+        ]
+      },
+      {
+        id: 'top_lazer',
+        name: '3. Lazer, Delivery & Rolês',
+        shortName: 'Lazer',
+        color: '#fdd663',
+        items: [
+          { id: 'it_ifood', label: 'iFood / Lanches', val: 0, max: 800, step: 10 },
+          { id: 'it_sair', label: 'Saídas / Cinema / Rolês', val: 0, max: 800, step: 10 },
+          { id: 'it_jogos', label: 'Jogos / Compras Pessoais', val: 0, max: 800, step: 10 }
+        ]
+      },
+      {
+        id: 'top_reserva',
+        name: '4. Fundo de Reserva (Emergência)',
+        shortName: 'Fundo Reserva',
+        color: '#c58af9',
+        items: [
+          { id: 'it_emerg', label: 'Reserva de Emergência (Caixinha)', val: 0, max: 2000, step: 10 },
+          { id: 'it_saude', label: 'Imprevistos / Saúde', val: 0, max: 1000, step: 10 }
+        ]
+      },
+      {
+        id: 'top_guardado',
+        name: '5. Dinheiro Guardado & Metas',
+        shortName: 'Guardado',
+        color: '#81c995',
+        items: [
+          { id: 'it_inv', label: 'Investimentos / Cofrinho', val: 0, max: 2000, step: 10 },
+          { id: 'it_meta', label: 'Meta Específica / Viagem / Upgrade', val: 0, max: 2000, step: 10 }
+        ]
+      }
+    ];
+  }
 
   let allMonthsData = {};
   let currentIncome = 0;
   let currentTopics = [];
   let saveTimeout = null;
 
-  // --- AUTENTICAÇÃO PERSISTENTE ---
+  // --- AUTENTICAÇÃO PERSISTENTE AUTOMÁTICA ---
   function isAuthenticated() {
-    return localStorage.getItem(SESSION_KEY) === 'active' || sessionStorage.getItem(SESSION_KEY) === 'active';
+    return localStorage.getItem(SESSION_KEY) === 'active';
   }
 
   function checkAuth() {
@@ -888,14 +919,9 @@
     e.preventDefault();
     const u = document.getElementById('login-user').value.trim().toLowerCase();
     const p = document.getElementById('login-pass').value;
-    const keepLogged = document.getElementById('remember-me').checked;
 
     if (u === AUTH_USER.toLowerCase() && p === AUTH_PASS) {
-      if (keepLogged) {
-        localStorage.setItem(SESSION_KEY, 'active');
-      } else {
-        sessionStorage.setItem(SESSION_KEY, 'active');
-      }
+      localStorage.setItem(SESSION_KEY, 'active');
       document.getElementById('login-error').textContent = '';
       checkAuth();
     } else {
@@ -905,7 +931,6 @@
 
   function logout() {
     localStorage.removeItem(SESSION_KEY);
-    sessionStorage.removeItem(SESSION_KEY);
     checkAuth();
   }
 
@@ -932,15 +957,15 @@
     document.getElementById('theme-btn').textContent = '🌙 Escuro';
   }
 
-  // --- DADOS ZERADOS POR PADRÃO ---
+  // --- CARREGAMENTO DOS DADOS DO MÊS ---
   function getCurrentMonth() {
     return document.getElementById('month-select').value;
   }
 
   function hydrateMonthData(raw) {
-    if (!raw || !Array.isArray(raw.topics)) {
+    if (!raw || !Array.isArray(raw.topics) || raw.topics.length === 0) {
       currentIncome = raw && raw.income !== undefined ? raw.income : 0;
-      currentTopics = [];
+      currentTopics = getDefaultTopics();
       return;
     }
     currentIncome = raw.income !== undefined ? raw.income : 0;
@@ -951,19 +976,6 @@
   function renderTopics() {
     const container = document.getElementById('topics-container');
     container.innerHTML = '';
-
-    if (currentTopics.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <div style="font-size:28px; margin-bottom:8px;">🧾</div>
-          <div style="font-weight:600; color:var(--text-title); margin-bottom:4px;">Nenhuma conta cadastrada neste mês</div>
-          <div style="font-size:13px; margin-bottom:14px;">Comece preenchendo sua entrada acima e clique no botão abaixo para criar seu primeiro tópico.</div>
-          <button class="btn btn-accent" onclick="addTopic()">+ Criar Primeiro Tópico</button>
-        </div>
-      `;
-      updateSummary();
-      return;
-    }
 
     currentTopics.forEach((topic, tIdx) => {
       const sec = document.createElement('div');
@@ -1078,7 +1090,7 @@
   }
 
   function addTopic() {
-    const name = prompt('Nome do novo tópico (ex: Contas Fixas, Cartão, Investimentos):');
+    const name = prompt('Nome do novo tópico (ex: Cartão de Crédito, Moto, Faculdade):');
     if (!name || !name.trim()) return;
     const cleanName = name.trim();
     const shortName = cleanName.replace(/^\d+\.\s*/, '').split('(')[0].trim().slice(0, 14);
@@ -1153,23 +1165,23 @@
     renderTopics();
   }
 
+  function resetToDefaultStructure() {
+    if (!confirm('Restaurar todas as 5 repartições completas (Contas Fixas, Cabelo, Lazer, Fundo de Reserva e Guardado) zeradas neste mês?')) return;
+    currentIncome = 0;
+    currentTopics = getDefaultTopics();
+    document.getElementById('income').value = 0;
+    renderTopics();
+    scheduleSave();
+  }
+
   function copyToAllMonths() {
-    if (!confirm('Copiar o salário e todos os tópicos deste mês para os outros 11 meses de 2027?')) return;
+    if (!confirm('Copiar o salário e todas as repartições deste mês para os outros 11 meses de 2027?')) return;
     ALL_MONTHS.forEach(m => {
       allMonthsData[m] = {
         income: currentIncome,
         topics: JSON.parse(JSON.stringify(currentTopics))
       };
     });
-    scheduleSave();
-  }
-
-  function clearMonth() {
-    if (!confirm('Apagar todos os tópicos e zerar o salário deste mês?')) return;
-    currentIncome = 0;
-    currentTopics = [];
-    document.getElementById('income').value = 0;
-    renderTopics();
     scheduleSave();
   }
 
