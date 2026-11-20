@@ -401,7 +401,7 @@
     background: var(--bg-card);
     border-radius: 16px;
     padding: 18px;
-    max-width: 860px;
+    max-width: 880px;
     margin: 0 auto;
     border: 1px solid var(--border-main);
   }
@@ -427,6 +427,16 @@
     font-size: 16px;
     color: var(--c-guardado);
     letter-spacing: -0.3px;
+  }
+
+  .user-pill {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(138, 180, 248, 0.15);
+    color: var(--c-fixo);
+    border: 1px solid rgba(138, 180, 248, 0.35);
   }
 
   .month-select {
@@ -687,6 +697,73 @@
     margin-top: 12px;
     line-height: 1.4;
   }
+
+  /* ==================== MODAL ALTERAR CONTA ==================== */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    padding: 16px;
+  }
+
+  .modal-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border-main);
+    border-radius: 16px;
+    padding: 22px;
+    width: 100%;
+    max-width: 360px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  }
+
+  .modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-title);
+    margin: 0 0 6px 0;
+  }
+
+  .modal-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .modal-label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-label);
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+
+  .modal-input {
+    width: 100%;
+    background: var(--bg-box);
+    border: 1px solid var(--border-input);
+    color: var(--text-title);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    margin-bottom: 12px;
+    outline: none;
+  }
+
+  .modal-input:focus {
+    border-color: var(--c-guardado);
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+  }
 </style>
 </head>
 <body>
@@ -708,7 +785,7 @@
       <a onclick="demoToast('Menu decorativo')">Para Empresas</a>
       <a onclick="demoToast('Menu decorativo')">Ajuda</a>
       <a onclick="demoToast('Menu decorativo')">Segurança</a>
-      <a class="sb-btn-open-top" onclick="demoToast('Acesso restrito ao titular')">Abra sua conta</a>
+      <a class="sb-btn-open-top" onclick="demoToast('Contas ativas: kirito, asuna, nossa conta, beta tester')">Abra sua conta</a>
     </nav>
   </header>
 
@@ -725,27 +802,27 @@
           <span class="sb-field-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
           </span>
-          <input type="text" id="login-user" class="sb-input" placeholder="Usuário (ricardo)" autocomplete="username" required>
+          <input type="text" id="login-user" class="sb-input" placeholder="Usuário" autocomplete="username" required>
         </div>
 
         <div class="sb-field-group">
           <span class="sb-field-icon">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
           </span>
-          <input type="password" id="login-pass" class="sb-input" placeholder="Senha (••••)" autocomplete="current-password" required>
+          <input type="password" id="login-pass" class="sb-input" placeholder="Senha" autocomplete="current-password" required>
           <button type="button" class="sb-eye-btn" onclick="togglePassVisibility()" title="Mostrar/ocultar senha">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
           </button>
         </div>
 
         <div class="sb-help-links">
-          <a onclick="demoToast('Senha padrão: 2027')">Esqueci minha senha</a>
-          <a onclick="demoToast('Usuário padrão: ricardo')">Esqueci meu usuário</a>
+          <a onclick="demoToast('Senha inicial padrão: 2027')">Esqueci minha senha</a>
+          <a onclick="demoToast('Logins: kirito | asuna | nossa conta | beta tester')">Esqueci meu usuário</a>
         </div>
 
         <button type="submit" class="sb-btn-enter">Entrar</button>
 
-        <button type="button" class="sb-btn-secondary" onclick="demoToast('Conta pessoal já ativada')">
+        <button type="button" class="sb-btn-secondary" onclick="demoToast('4 contas individuais já configuradas')">
           <strong>Abrir minha conta</strong>
           <span>Primeiro acesso</span>
         </button>
@@ -780,6 +857,7 @@
     <div class="header-row">
       <div class="title-group">
         <span class="brand-tag">StonksBank</span>
+        <span class="user-pill" id="active-user-badge">👤 Conta</span>
         <select id="month-select" class="month-select" onchange="changeMonth()">
           <option value="2027-01">Janeiro 2027</option>
           <option value="2027-02">Fevereiro 2027</option>
@@ -798,10 +876,11 @@
       </div>
       <div class="actions">
         <button class="btn btn-accent" onclick="addTopic()">+ Novo Tópico</button>
-        <button class="btn" onclick="resetToDefaultStructure()" title="Carrega todas as 5 repartições padrão zeradas">⚡ Restaurar Padrão</button>
-        <button class="btn" onclick="copyToAllMonths()" title="Copia os tópicos e valores deste mês para todo o ano">📋 Replicar p/ Ano</button>
+        <button class="btn" onclick="resetToDefaultStructure()" title="Carrega as 5 repartições padrão zeradas nesta conta">⚡ Padrão</button>
+        <button class="btn" onclick="copyToAllMonths()" title="Copia os tópicos e valores deste mês para todo o ano desta conta">📋 Replicar p/ Ano</button>
+        <button class="btn" onclick="openAccountModal()" title="Alterar nome de usuário e senha desta conta">⚙️ Conta</button>
         <button class="btn" id="theme-btn" onclick="toggleTheme()">☀️ Claro</button>
-        <button class="btn" onclick="logout()" title="Encerrar sessão">🔒 Sair</button>
+        <button class="btn" onclick="logout()" title="Trocar de conta / Sair">🔒 Sair</button>
       </div>
     </div>
 
@@ -815,27 +894,53 @@
 
     <div id="topics-container"></div>
 
-    <div class="note">💡 <strong>Dica:</strong> Clique no nome de qualquer tópico ou item para renomear, use <strong>+ Item</strong> para adicionar mais contas dentro de uma repartição ou <strong>+ Novo Tópico</strong> para criar novas categorias. Tudo salva automaticamente na nuvem.</div>
+    <div class="note">💡 <strong>Conta individual isolada:</strong> Seus cálculos, tópicos e metas pertencem somente a esta conta. Use <strong>⚙️ Conta</strong> no topo para alterar seu nome de login ou senha a qualquer momento.</div>
+  </div>
+</div>
+
+<!-- ==================== MODAL ALTERAR NOME E SENHA ==================== -->
+<div id="account-modal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this) closeAccountModal()">
+  <div class="modal-box">
+    <h2 class="modal-title">Configurações da Conta</h2>
+    <div class="modal-sub">Altere o usuário de login e a senha exclusivos desta conta.</div>
+    <form onsubmit="saveAccountCredentials(event)">
+      <label class="modal-label">Nome de usuário (para entrar)</label>
+      <input type="text" id="edit-username" class="modal-input" required>
+
+      <label class="modal-label">Nova senha</label>
+      <input type="text" id="edit-password" class="modal-input" required>
+
+      <div id="modal-feedback" style="font-size:12px; color:var(--c-neg); min-height:16px;"></div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn" onclick="closeAccountModal()">Cancelar</button>
+        <button type="submit" class="btn btn-accent">Salvar alterações</button>
+      </div>
+    </form>
   </div>
 </div>
 
 <script>
-  // ================= CONFIGURAÇÃO DE LOGIN E NUVEM =================
-  const AUTH_USER = 'ricardo';
-  const AUTH_PASS = '2027';
-
+  // ================= CONFIGURAÇÃO DE NUVEM =================
   const BIN_ID = '6b002f89ffd5d16053d0ed5b';
   const API_KEY = '$2a$10$AR3I3zDpxSH2Cp9igqh4sO7XrBtKrzKsTKNepTEaTxlYl3SUvLYhi';
-  // ===================================================================
+  // =========================================================
 
-  const SESSION_KEY = 'stonks_persistent_session_v2';
+  const SESSION_KEY = 'stonks_multi_account_id_v1';
   const PALETTE = ['#8ab4f8', '#ff8bcb', '#fdd663', '#c58af9', '#81c995', '#f28b82', '#78d9ec', '#fcad70'];
   const ALL_MONTHS = [
     '2027-01', '2027-02', '2027-03', '2027-04', '2027-05', '2027-06',
     '2027-07', '2027-08', '2027-09', '2027-10', '2027-11', '2027-12'
   ];
 
-  // ESTRUTURA COMPLETA COM TODAS AS REPARTIÇÕES ZERADAS (INCLUINDO CABELO)
+  // 4 CONTAS INDEPENDENTES PADRÃO
+  const DEFAULT_ACCOUNTS = {
+    acc_kirito:      { username: 'kirito',      password: '2027' },
+    acc_asuna:       { username: 'asuna',       password: '2027' },
+    acc_nossa_conta: { username: 'nossa conta', password: '2027' },
+    acc_beta_tester: { username: 'beta tester', password: '2027' }
+  };
+
   function getDefaultTopics() {
     return [
       {
@@ -894,42 +999,106 @@
     ];
   }
 
-  let allMonthsData = {};
+  let cloudRoot = { accounts: {}, data: {} };
+  let activeAccountId = localStorage.getItem(SESSION_KEY) || null;
   let currentIncome = 0;
   let currentTopics = [];
   let saveTimeout = null;
 
-  // --- AUTENTICAÇÃO PERSISTENTE AUTOMÁTICA ---
-  function isAuthenticated() {
-    return localStorage.getItem(SESSION_KEY) === 'active';
+  // Garante que a estrutura multi-usuário exista no objeto da nuvem
+  function normalizeCloudRoot(raw) {
+    const root = (raw && typeof raw === 'object') ? { ...raw } : {};
+    if (!root.accounts || typeof root.accounts !== 'object') {
+      root.accounts = JSON.parse(JSON.stringify(DEFAULT_ACCOUNTS));
+    } else {
+      for (const accId of Object.keys(DEFAULT_ACCOUNTS)) {
+        if (!root.accounts[accId]) {
+          root.accounts[accId] = { ...DEFAULT_ACCOUNTS[accId] };
+        }
+      }
+    }
+    if (!root.data || typeof root.data !== 'object') {
+      root.data = {};
+    }
+    for (const accId of Object.keys(root.accounts)) {
+      if (!root.data[accId] || typeof root.data[accId] !== 'object') {
+        root.data[accId] = {};
+      }
+    }
+    return root;
   }
 
-  function checkAuth() {
-    if (isAuthenticated()) {
+  async function fetchCloudRoot() {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+      headers: { 'X-Master-Key': API_KEY }
+    });
+    if (!res.ok) throw new Error('Falha ao ler JSONBin');
+    const json = await res.json();
+    cloudRoot = normalizeCloudRoot(json.record);
+    return cloudRoot;
+  }
+
+  async function pushCloudRoot() {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': API_KEY
+      },
+      body: JSON.stringify(cloudRoot)
+    });
+    if (!res.ok) throw new Error('Falha ao salvar JSONBin');
+  }
+
+  // --- AUTENTICAÇÃO ---
+  async function checkAuth() {
+    if (activeAccountId && DEFAULT_ACCOUNTS[activeAccountId]) {
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('app-screen').style.display = 'block';
-      loadFromCloud();
+      await loadFromCloud(false);
     } else {
+      activeAccountId = null;
+      localStorage.removeItem(SESSION_KEY);
       document.getElementById('login-screen').style.display = 'flex';
       document.getElementById('app-screen').style.display = 'none';
     }
   }
 
-  function handleLogin(e) {
+  async function handleLogin(e) {
     e.preventDefault();
     const u = document.getElementById('login-user').value.trim().toLowerCase();
     const p = document.getElementById('login-pass').value;
+    const errEl = document.getElementById('login-error');
 
-    if (u === AUTH_USER.toLowerCase() && p === AUTH_PASS) {
-      localStorage.setItem(SESSION_KEY, 'active');
-      document.getElementById('login-error').textContent = '';
+    errEl.textContent = 'Verificando credenciais...';
+
+    try {
+      await fetchCloudRoot();
+    } catch (err) {
+      cloudRoot = normalizeCloudRoot(cloudRoot);
+    }
+
+    let matchedId = null;
+    for (const [accId, creds] of Object.entries(cloudRoot.accounts)) {
+      if (creds.username.trim().toLowerCase() === u && creds.password === p) {
+        matchedId = accId;
+        break;
+      }
+    }
+
+    if (matchedId) {
+      activeAccountId = matchedId;
+      localStorage.setItem(SESSION_KEY, matchedId);
+      errEl.textContent = '';
+      document.getElementById('login-pass').value = '';
       checkAuth();
     } else {
-      document.getElementById('login-error').textContent = 'Usuário ou senha incorretos.';
+      errEl.textContent = 'Usuário ou senha incorretos.';
     }
   }
 
   function logout() {
+    activeAccountId = null;
     localStorage.removeItem(SESSION_KEY);
     checkAuth();
   }
@@ -942,7 +1111,56 @@
   function demoToast(msg) {
     const el = document.getElementById('login-error');
     el.textContent = msg;
-    setTimeout(() => { if (el.textContent === msg) el.textContent = ''; }, 3000);
+    setTimeout(() => { if (el.textContent === msg) el.textContent = ''; }, 3500);
+  }
+
+  // --- MODAL ALTERAR NOME E SENHA ---
+  function openAccountModal() {
+    if (!activeAccountId || !cloudRoot.accounts[activeAccountId]) return;
+    const creds = cloudRoot.accounts[activeAccountId];
+    document.getElementById('edit-username').value = creds.username;
+    document.getElementById('edit-password').value = creds.password;
+    document.getElementById('modal-feedback').textContent = '';
+    document.getElementById('account-modal').style.display = 'flex';
+  }
+
+  function closeAccountModal() {
+    document.getElementById('account-modal').style.display = 'none';
+  }
+
+  async function saveAccountCredentials(e) {
+    e.preventDefault();
+    const newUser = document.getElementById('edit-username').value.trim();
+    const newPass = document.getElementById('edit-password').value;
+    const fb = document.getElementById('modal-feedback');
+
+    if (!newUser || !newPass) {
+      fb.textContent = 'Preencha usuário e senha.';
+      return;
+    }
+
+    // Impede duplicar o mesmo nome de login em duas contas diferentes
+    for (const [accId, creds] of Object.entries(cloudRoot.accounts)) {
+      if (accId !== activeAccountId && creds.username.trim().toLowerCase() === newUser.toLowerCase()) {
+        fb.textContent = 'Este nome de usuário já está em uso em outra conta.';
+        return;
+      }
+    }
+
+    cloudRoot.accounts[activeAccountId] = {
+      username: newUser,
+      password: newPass
+    };
+
+    document.getElementById('active-user-badge').textContent = '👤 ' + newUser;
+    closeAccountModal();
+    setStatus('⏳ Salvando conta...');
+    try {
+      await pushCloudRoot();
+      setStatus('☁️ Conta atualizada');
+    } catch (err) {
+      setStatus('⚠️ Erro ao salvar conta');
+    }
   }
 
   // --- TEMA ---
@@ -957,9 +1175,16 @@
     document.getElementById('theme-btn').textContent = '🌙 Escuro';
   }
 
-  // --- CARREGAMENTO DOS DADOS DO MÊS ---
+  // --- DADOS ISOLADOS DA CONTA ATIVA ---
   function getCurrentMonth() {
     return document.getElementById('month-select').value;
+  }
+
+  function getAccountMonthsMap() {
+    if (!cloudRoot.data[activeAccountId]) {
+      cloudRoot.data[activeAccountId] = {};
+    }
+    return cloudRoot.data[activeAccountId];
   }
 
   function hydrateMonthData(raw) {
@@ -1160,13 +1385,14 @@
   }
 
   function changeMonth() {
-    hydrateMonthData(allMonthsData[getCurrentMonth()]);
+    const userMonths = getAccountMonthsMap();
+    hydrateMonthData(userMonths[getCurrentMonth()]);
     document.getElementById('income').value = currentIncome;
     renderTopics();
   }
 
   function resetToDefaultStructure() {
-    if (!confirm('Restaurar todas as 5 repartições completas (Contas Fixas, Cabelo, Lazer, Fundo de Reserva e Guardado) zeradas neste mês?')) return;
+    if (!confirm('Restaurar todas as 5 repartições padrão zeradas neste mês para esta conta?')) return;
     currentIncome = 0;
     currentTopics = getDefaultTopics();
     document.getElementById('income').value = 0;
@@ -1175,9 +1401,10 @@
   }
 
   function copyToAllMonths() {
-    if (!confirm('Copiar o salário e todas as repartições deste mês para os outros 11 meses de 2027?')) return;
+    if (!confirm('Copiar o salário e todas as repartições deste mês para os outros 11 meses de 2027 (somente nesta conta)?')) return;
+    const userMonths = getAccountMonthsMap();
     ALL_MONTHS.forEach(m => {
-      allMonthsData[m] = {
+      userMonths[m] = {
         income: currentIncome,
         topics: JSON.parse(JSON.stringify(currentTopics))
       };
@@ -1191,15 +1418,15 @@
   }
 
   async function loadFromCloud(silent = false) {
+    if (!activeAccountId) return;
     if (!silent) setStatus('🔄 Sincronizando...');
     try {
-      const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-        headers: { 'X-Master-Key': API_KEY }
-      });
-      if (!res.ok) throw new Error();
-      const json = await res.json();
-      allMonthsData = json.record || {};
-      hydrateMonthData(allMonthsData[getCurrentMonth()]);
+      await fetchCloudRoot();
+      const creds = cloudRoot.accounts[activeAccountId] || DEFAULT_ACCOUNTS[activeAccountId];
+      document.getElementById('active-user-badge').textContent = '👤 ' + creds.username;
+
+      const userMonths = getAccountMonthsMap();
+      hydrateMonthData(userMonths[getCurrentMonth()]);
       document.getElementById('income').value = currentIncome;
       renderTopics();
       setStatus('☁️ Sincronizado');
@@ -1209,7 +1436,9 @@
   }
 
   function scheduleSave() {
-    allMonthsData[getCurrentMonth()] = {
+    if (!activeAccountId) return;
+    const userMonths = getAccountMonthsMap();
+    userMonths[getCurrentMonth()] = {
       income: currentIncome,
       topics: currentTopics
     };
@@ -1218,15 +1447,7 @@
     clearTimeout(saveTimeout);
     saveTimeout = setTimeout(async () => {
       try {
-        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Master-Key': API_KEY
-          },
-          body: JSON.stringify(allMonthsData)
-        });
-        if (!res.ok) throw new Error();
+        await pushCloudRoot();
         saveTimeout = null;
         setStatus('☁️ Salvo na nuvem');
       } catch (e) {
@@ -1245,7 +1466,7 @@
   checkAuth();
 
   setInterval(() => {
-    if (isAuthenticated() && !saveTimeout) {
+    if (activeAccountId && !saveTimeout) {
       loadFromCloud(true);
     }
   }, 6000);
