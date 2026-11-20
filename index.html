@@ -1189,6 +1189,7 @@
         <span class="sync-badge" id="sync-status">● Carregando...</span>
       </div>
       <div class="actions">
+        <button class="btn" onclick="manualSyncNow()" title="Forçar sincronização agora">↻ Sincronizar</button>
         <button class="btn btn-accent" onclick="addTopic()">+ Novo Tópico</button>
         <button class="btn btn-installment" onclick="openInstallmentModal()">💳 Parcelar</button>
         <button class="btn" onclick="openInstallmentsManager()">📑 Parcelas</button>
@@ -1541,16 +1542,18 @@
   }
 
   function ensureCreditCardTopic(topicsList) {
-    if (!Array.isArray(topicsList)) return getDefaultTopics();
-    const hasCard = topicsList.some(t =>
-      t.id === 'top_cartao' ||
-      (t.name && t.name.toLowerCase().includes('cartão')) ||
-      (t.name && t.name.toLowerCase().includes('cartao'))
+    const list = Array.isArray(topicsList) ? topicsList : getDefaultTopics();
+    const hasCard = list.some(t =>
+      t && (
+        t.id === 'top_cartao' ||
+        (t.name && t.name.toLowerCase().includes('cartão')) ||
+        (t.name && t.name.toLowerCase().includes('cartao'))
+      )
     );
     if (!hasCard) {
-      topicsList.unshift(getCreditCardTopicTemplate());
+      list.unshift(getCreditCardTopicTemplate());
     }
-    return topicsList;
+    return list;
   }
 
   let cloudRoot = { accounts: {}, data: {}, installments: {}, fixedCosts: {} };
@@ -1559,7 +1562,19 @@
   let currentTopics = [];
   let editingInstallmentId = null;
   let editingFixedId = null;
-  let saveTimeout = null;
+
+  // Controle anti-bug de sincronização e concorrência
+  let saveTimer = null;
+  let isSaving = false;
+  let hasPendingSave = false;
+  let lastLocalEditAt = 0;
+  let saveQueue = Promise.resolve();
+
+  function markLocalMutation() {
+    lastLocalEditAt = Date.now();
+    hasPendingSave = true;
+    commitCurrentMonthToMemory();
+  }
 
   function normalizeCloudRoot(raw) {
     const root = (raw && typeof raw === 'object') ? { ...raw } : {};
@@ -1596,16 +1611,15 @@
   }
 
   async function fetchCloudRoot() {
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?ts=${Date.now()}`, {
       headers: { 'X-Master-Key': API_KEY }
     });
     if (!res.ok) throw new Error('Falha ao ler JSONBin');
     const json = await res.json();
-    cloudRoot = normalizeCloudRoot(json.record);
-    return cloudRoot;
+    return normalizeCloudRoot(json.record);
   }
 
-  async function pushCloudRoot() {
+  async function pushCloudRootNow() {
     const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
       method: 'PUT',
       headers: {
@@ -1617,20 +1631,76 @@
     if (!res.ok) throw new Error('Falha ao salvar JSONBin');
   }
 
-  // --- SINCRONIZAÇÃO DE RECORRÊNCIAS (PARCELAS + FIXOS) NO MÊS ATIVO ---
-  function syncRecurrencesForSingleMonth(monthKey, topicsList) {
-    const list = ensureCreditCardTopic(topicsList);
+  function enqueueSave(delayMs = 350) {
+    if (!activeAccountId) return Promise.resolve();
+    markLocalMutation();
+    setStatus('● Salvando...');
+    clearTimeout(saveTimer);
+
+    return new Promise((resolve) => {
+      saveTimer = setTimeout(() => {
+        saveQueue = saveQueue.then(async () => {
+          if (!activeAccountId) {
+            resolve();
+            return;
+          }
+          isSaving = true;
+          try {
+            commitCurrentMonthToMemory();
+            await pushCloudRootNow();
+            hasPendingSave = false;
+            setStatus('● Sincronizado');
+          } catch (e) {
+            setStatus('● Erro ao salvar');
+          } finally {
+            isSaving = false;
+            resolve();
+          }
+        });
+      }, delayMs);
+    });
+  }
+
+  // --- RECORRÊNCIAS (PARCELAS + FIXOS) APLICADAS DE FORMA LIMPA ---
+  function getAccountMonthsMap() {
+    if (!cloudRoot.data[activeAccountId]) {
+      cloudRoot.data[activeAccountId] = {};
+    }
+    return cloudRoot.data[activeAccountId];
+  }
+
+  function getAccountInstallments() {
+    if (!Array.isArray(cloudRoot.installments[activeAccountId])) {
+      cloudRoot.installments[activeAccountId] = [];
+    }
+    return cloudRoot.installments[activeAccountId];
+  }
+
+  function getAccountFixedCosts() {
+    if (!Array.isArray(cloudRoot.fixedCosts[activeAccountId])) {
+      cloudRoot.fixedCosts[activeAccountId] = [];
+    }
+    return cloudRoot.fixedCosts[activeAccountId];
+  }
+
+  function buildTopicsForMonth(monthKey, baseTopics) {
+    const list = ensureCreditCardTopic(
+      Array.isArray(baseTopics) && baseTopics.length > 0
+        ? JSON.parse(JSON.stringify(baseTopics))
+        : getDefaultTopics()
+    );
+
+    // Remove itens antigos gerados por planos antes de reconstruir
+    list.forEach(t => {
+      t.items = Array.isArray(t.items)
+        ? t.items.filter(it => !it.installmentId && !it.fixedId)
+        : [];
+    });
+
     const mIdx = ALL_MONTHS.indexOf(monthKey);
     if (mIdx === -1) return list;
 
-    // Remove itens antigos gerados por planos para evitar duplicidade
-    list.forEach(t => {
-      if (Array.isArray(t.items)) {
-        t.items = t.items.filter(it => !it.installmentId && !it.fixedId);
-      }
-    });
-
-    // Reaplica parcelas ativas neste mês
+    // Parcelas ativas no mês
     getAccountInstallments().forEach(plan => {
       const startIdx = ALL_MONTHS.indexOf(plan.startMonth);
       const count = Math.max(1, parseInt(plan.count, 10) || 1);
@@ -1638,7 +1708,7 @@
         const k = mIdx - startIdx;
         const total = parseFloat(plan.total) || 0;
         const installmentVal = Number((total / count).toFixed(2));
-        let topicObj = list.find(t => t.id === plan.topicId || t.name === plan.topicName) || list[0];
+        const topicObj = list.find(t => t.id === plan.topicId || t.name === plan.topicName) || list[0];
         if (topicObj) {
           topicObj.items.push({
             id: `it_${plan.id}_${k + 1}`,
@@ -1654,12 +1724,12 @@
       }
     });
 
-    // Reaplica custos fixos ativos neste mês
+    // Custos fixos ativos no mês
     getAccountFixedCosts().forEach(fixed => {
       const startIdx = ALL_MONTHS.indexOf(fixed.startMonth || '2026-01');
       if (startIdx === -1 || mIdx >= startIdx) {
         const val = Number((parseFloat(fixed.val) || 0).toFixed(2));
-        let topicObj = list.find(t => t.id === fixed.topicId || t.name === fixed.topicName) || list[0];
+        const topicObj = list.find(t => t.id === fixed.topicId || t.name === fixed.topicName) || list[0];
         if (topicObj) {
           topicObj.items.push({
             id: `it_${fixed.id}_${monthKey}`,
@@ -1676,74 +1746,26 @@
     return list;
   }
 
-  // --- SISTEMA DE CUSTOS FIXOS RECORRENTES ---
-  function getAccountFixedCosts() {
-    if (!Array.isArray(cloudRoot.fixedCosts[activeAccountId])) {
-      cloudRoot.fixedCosts[activeAccountId] = [];
-    }
-    return cloudRoot.fixedCosts[activeAccountId];
-  }
-
-  function removeFixedFromAllMonths(fixedId) {
+  function commitCurrentMonthToMemory() {
+    if (!activeAccountId) return;
     const monthsMap = getAccountMonthsMap();
-    for (const m of ALL_MONTHS) {
-      const mData = monthsMap[m];
-      if (!mData || !Array.isArray(mData.topics)) continue;
-      mData.topics.forEach(t => {
-        if (Array.isArray(t.items)) {
-          t.items = t.items.filter(it => it.fixedId !== fixedId);
-        }
-      });
-    }
-    currentTopics.forEach(t => {
-      if (Array.isArray(t.items)) {
-        t.items = t.items.filter(it => it.fixedId !== fixedId);
-      }
-    });
+    const monthKey = getCurrentMonth();
+    monthsMap[monthKey] = {
+      income: parseFloat(document.getElementById('income').value) || 0,
+      topics: JSON.parse(JSON.stringify(currentTopics))
+    };
   }
 
-  function applyFixedToMonths(fixed) {
-    removeFixedFromAllMonths(fixed.id);
+  function loadMonthIntoView(monthKey) {
     const monthsMap = getAccountMonthsMap();
-    const startIdx = ALL_MONTHS.indexOf(fixed.startMonth);
-    if (startIdx === -1) return;
-
-    const val = Number((parseFloat(fixed.val) || 0).toFixed(2));
-
-    for (let mIdx = startIdx; mIdx < ALL_MONTHS.length; mIdx++) {
-      const monthKey = ALL_MONTHS[mIdx];
-
-      if (!monthsMap[monthKey] || !Array.isArray(monthsMap[monthKey].topics) || monthsMap[monthKey].topics.length === 0) {
-        monthsMap[monthKey] = {
-          income: 0,
-          topics: getDefaultTopics()
-        };
-      } else {
-        monthsMap[monthKey].topics = ensureCreditCardTopic(monthsMap[monthKey].topics);
-      }
-
-      const targetMonthTopics = (monthKey === getCurrentMonth()) ? currentTopics : monthsMap[monthKey].topics;
-      let topicObj = targetMonthTopics.find(t => t.id === fixed.topicId || t.name === fixed.topicName);
-
-      if (!topicObj && targetMonthTopics.length > 0) {
-        topicObj = targetMonthTopics[0];
-      }
-
-      if (topicObj) {
-        topicObj.items.push({
-          id: `it_${fixed.id}_${monthKey}`,
-          fixedId: fixed.id,
-          label: fixed.desc,
-          val: val,
-          max: Math.max(1000, val * 2),
-          step: 5
-        });
-      }
-
-      monthsMap[monthKey].topics = targetMonthTopics;
-    }
+    const raw = monthsMap[monthKey];
+    currentIncome = (raw && raw.income !== undefined) ? (parseFloat(raw.income) || 0) : 0;
+    currentTopics = buildTopicsForMonth(monthKey, raw && raw.topics);
+    document.getElementById('income').value = currentIncome;
+    renderTopics();
   }
 
+  // --- CUSTOS FIXOS ---
   function openFixedModal(existingId = null, preselectedTopicId = null) {
     editingFixedId = existingId;
     const topicSelect = document.getElementById('fixed-topic');
@@ -1765,7 +1787,7 @@
       document.getElementById('fixed-desc').value = fixed.desc;
       topicSelect.value = fixed.topicId || (currentTopics[0] && currentTopics[0].id);
       document.getElementById('fixed-val').value = fixed.val;
-      const [sy, sm] = fixed.startMonth.split('-');
+      const [sy, sm] = (fixed.startMonth || '2026-01').split('-');
       document.getElementById('fixed-start-year-only').value = sy;
       document.getElementById('fixed-start-month-only').value = sm;
     } else {
@@ -1795,12 +1817,11 @@
     const val = parseFloat(document.getElementById('fixed-val').value) || 0;
     const sm = document.getElementById('fixed-start-month-only').value;
     const sy = document.getElementById('fixed-start-year-only').value;
-    const startMonth = `${sy}-${sm}`;
     document.getElementById('fixed-preview').textContent =
-      `Fixo mensal: R$ ${val.toFixed(2)} / mês • A partir de ${formatMonthKey(startMonth)} (todos os meses)`;
+      `Fixo mensal: R$ ${val.toFixed(2)} / mês • A partir de ${formatMonthKey(`${sy}-${sm}`)}`;
   }
 
-  function saveFixedCost(e) {
+  async function saveFixedCost(e) {
     e.preventDefault();
     const desc = document.getElementById('fixed-desc').value.trim();
     const topicId = document.getElementById('fixed-topic').value;
@@ -1819,7 +1840,7 @@
     if (editingFixedId) {
       const idx = fixedList.findIndex(f => f.id === editingFixedId);
       if (idx !== -1) {
-        const updatedFixed = {
+        fixedList[idx] = {
           ...fixedList[idx],
           desc,
           topicId: topicObj ? topicObj.id : topicId,
@@ -1827,25 +1848,22 @@
           val,
           startMonth
         };
-        fixedList[idx] = updatedFixed;
-        applyFixedToMonths(updatedFixed);
       }
     } else {
-      const newFixed = {
+      fixedList.push({
         id: 'fix_' + Date.now(),
         desc,
         topicId: topicObj ? topicObj.id : topicId,
         topicName: topicObj ? topicObj.name : '',
         val,
         startMonth
-      };
-      fixedList.push(newFixed);
-      applyFixedToMonths(newFixed);
+      });
     }
 
+    currentTopics = buildTopicsForMonth(getCurrentMonth(), currentTopics);
     closeFixedModal();
     renderTopics();
-    scheduleSave();
+    await enqueueSave(100);
   }
 
   function openFixedManager() {
@@ -1866,30 +1884,188 @@
       return;
     }
 
-    container.innerHTML = fixedList.map(f => {
-      const mLabel = formatMonthKey(f.startMonth);
+    container.innerHTML = fixedList.map(f => `
+      <div class="parcel-list-item">
+        <div>
+          <div class="parcel-list-title">${escapeHtml(f.desc)}</div>
+          <div class="parcel-list-meta num-tabular">R$ ${Number(f.val).toFixed(2)} / mês • ${escapeHtml(f.topicName || 'Tópico')} • Desde ${formatMonthKey(f.startMonth)}</div>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button type="button" class="btn" onclick="closeFixedManager(); openFixedModal('${f.id}')">✎ Editar</button>
+          <button type="button" class="btn btn-danger" onclick="deleteFixedCost('${f.id}')" title="Remover custo fixo">×</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function deleteFixedCost(fixedId) {
+    if (!confirm('Remover este custo fixo de todos os meses?')) return;
+    cloudRoot.fixedCosts[activeAccountId] = getAccountFixedCosts().filter(f => f.id !== fixedId);
+    currentTopics = buildTopicsForMonth(getCurrentMonth(), currentTopics);
+    renderFixedManager();
+    renderTopics();
+    await enqueueSave(100);
+  }
+
+  // --- PARCELAS ---
+  function openInstallmentModal(existingId = null, preselectedTopicId = null) {
+    editingInstallmentId = existingId;
+    const topicSelect = document.getElementById('inst-topic');
+    topicSelect.innerHTML = '';
+
+    currentTopics.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.name;
+      topicSelect.appendChild(opt);
+    });
+
+    document.getElementById('inst-feedback').textContent = '';
+
+    if (existingId) {
+      const plan = getAccountInstallments().find(p => p.id === existingId);
+      if (!plan) return;
+      document.getElementById('inst-modal-title').textContent = 'Editar Compra Parcelada';
+      document.getElementById('inst-desc').value = plan.desc;
+      topicSelect.value = plan.topicId || (currentTopics[0] && currentTopics[0].id);
+      document.getElementById('inst-total').value = plan.total;
+      document.getElementById('inst-count').value = plan.count;
+      const [sy, sm] = (plan.startMonth || '2026-01').split('-');
+      document.getElementById('inst-start-year-only').value = sy;
+      document.getElementById('inst-start-month-only').value = sm;
+    } else {
+      document.getElementById('inst-modal-title').textContent = 'Nova Compra Parcelada';
+      document.getElementById('inst-desc').value = '';
+      if (preselectedTopicId) {
+        topicSelect.value = preselectedTopicId;
+      } else {
+        const cardTopic = currentTopics.find(t => t.id === 'top_cartao');
+        if (cardTopic) topicSelect.value = cardTopic.id;
+      }
+      document.getElementById('inst-total').value = '';
+      document.getElementById('inst-count').value = '3';
+      document.getElementById('inst-start-month-only').value = document.getElementById('month-only-select').value;
+      document.getElementById('inst-start-year-only').value = document.getElementById('year-only-select').value;
+    }
+
+    updateInstallmentPreview();
+    document.getElementById('installment-modal').style.display = 'flex';
+  }
+
+  function closeInstallmentModal() {
+    editingInstallmentId = null;
+    document.getElementById('installment-modal').style.display = 'none';
+  }
+
+  function updateInstallmentPreview() {
+    const total = parseFloat(document.getElementById('inst-total').value) || 0;
+    const count = Math.max(1, parseInt(document.getElementById('inst-count').value, 10) || 1);
+    const sm = document.getElementById('inst-start-month-only').value;
+    const sy = document.getElementById('inst-start-year-only').value;
+    const startMonth = `${sy}-${sm}`;
+    const startIdx = ALL_MONTHS.indexOf(startMonth);
+    const perMonth = total / count;
+
+    let endLabel = '';
+    if (startIdx !== -1) {
+      const endIdx = Math.min(ALL_MONTHS.length - 1, startIdx + count - 1);
+      endLabel = ` • ${formatMonthKey(startMonth)} até ${formatMonthKey(ALL_MONTHS[endIdx])}`;
+    }
+
+    document.getElementById('inst-preview').textContent =
+      `Cada parcela: R$ ${perMonth.toFixed(2)} (${count}x)${endLabel}`;
+  }
+
+  async function saveInstallmentPlan(e) {
+    e.preventDefault();
+    const desc = document.getElementById('inst-desc').value.trim();
+    const topicId = document.getElementById('inst-topic').value;
+    const total = parseFloat(document.getElementById('inst-total').value);
+    const count = parseInt(document.getElementById('inst-count').value, 10);
+    const startMonth = `${document.getElementById('inst-start-year-only').value}-${document.getElementById('inst-start-month-only').value}`;
+    const fb = document.getElementById('inst-feedback');
+
+    if (!desc || isNaN(total) || total <= 0 || isNaN(count) || count < 1) {
+      fb.textContent = 'Preencha descrição, valor maior que zero e parcelas.';
+      return;
+    }
+
+    const topicObj = currentTopics.find(t => t.id === topicId) || currentTopics[0];
+    const plans = getAccountInstallments();
+
+    if (editingInstallmentId) {
+      const idx = plans.findIndex(p => p.id === editingInstallmentId);
+      if (idx !== -1) {
+        plans[idx] = {
+          ...plans[idx],
+          desc,
+          topicId: topicObj ? topicObj.id : topicId,
+          topicName: topicObj ? topicObj.name : '',
+          total,
+          count,
+          startMonth
+        };
+      }
+    } else {
+      plans.push({
+        id: 'inst_' + Date.now(),
+        desc,
+        topicId: topicObj ? topicObj.id : topicId,
+        topicName: topicObj ? topicObj.name : '',
+        total,
+        count,
+        startMonth
+      });
+    }
+
+    currentTopics = buildTopicsForMonth(getCurrentMonth(), currentTopics);
+    closeInstallmentModal();
+    renderTopics();
+    await enqueueSave(100);
+  }
+
+  function openInstallmentsManager() {
+    renderInstallmentsManager();
+    document.getElementById('parcels-list-modal').style.display = 'flex';
+  }
+
+  function closeParcelsManager() {
+    document.getElementById('parcels-list-modal').style.display = 'none';
+  }
+
+  function renderInstallmentsManager() {
+    const container = document.getElementById('parcels-list-container');
+    const plans = getAccountInstallments();
+
+    if (plans.length === 0) {
+      container.innerHTML = `<div style="text-align:center; padding:18px; font-size:12.5px; color:var(--text-muted);">Nenhuma compra parcelada cadastrada nesta conta.</div>`;
+      return;
+    }
+
+    container.innerHTML = plans.map(p => {
+      const perMonth = (parseFloat(p.total) || 0) / Math.max(1, parseInt(p.count, 10) || 1);
       return `
         <div class="parcel-list-item">
           <div>
-            <div class="parcel-list-title">${escapeHtml(f.desc)}</div>
-            <div class="parcel-list-meta num-tabular">R$ ${Number(f.val).toFixed(2)} / mês • ${escapeHtml(f.topicName || 'Tópico')} • Desde ${mLabel}</div>
+            <div class="parcel-list-title">${escapeHtml(p.desc)}</div>
+            <div class="parcel-list-meta num-tabular">Total R$ ${Number(p.total).toFixed(2)} • ${p.count}x de R$ ${perMonth.toFixed(2)} • Início: ${formatMonthKey(p.startMonth)}</div>
           </div>
           <div style="display:flex; gap:6px;">
-            <button type="button" class="btn" onclick="closeFixedManager(); openFixedModal('${f.id}')">✎ Editar</button>
-            <button type="button" class="btn btn-danger" onclick="deleteFixedCost('${f.id}')" title="Remover custo fixo">×</button>
+            <button type="button" class="btn" onclick="closeParcelsManager(); openInstallmentModal('${p.id}')">✎ Editar</button>
+            <button type="button" class="btn btn-danger" onclick="deleteInstallmentPlan('${p.id}')" title="Excluir compra parcelada">×</button>
           </div>
         </div>
       `;
     }).join('');
   }
 
-  function deleteFixedCost(fixedId) {
-    if (!confirm('Remover este custo fixo de todos os meses?')) return;
-    cloudRoot.fixedCosts[activeAccountId] = getAccountFixedCosts().filter(f => f.id !== fixedId);
-    removeFixedFromAllMonths(fixedId);
-    renderFixedManager();
+  async function deleteInstallmentPlan(planId) {
+    if (!confirm('Remover esta compra parcelada de todos os meses e anos?')) return;
+    cloudRoot.installments[activeAccountId] = getAccountInstallments().filter(p => p.id !== planId);
+    currentTopics = buildTopicsForMonth(getCurrentMonth(), currentTopics);
+    renderInstallmentsManager();
     renderTopics();
-    scheduleSave();
+    await enqueueSave(100);
   }
 
   // --- IMPORTAÇÃO POR CÓDIGO & PROMPT ---
@@ -1998,18 +2174,18 @@
     }
   }
 
-  function applyImportedCode() {
+  async function applyImportedCode() {
     const raw = document.getElementById('import-code-input').value;
     const fbEl = document.getElementById('import-feedback');
 
     try {
       const data = extractAndParseImport(raw);
       currentIncome = data.income;
-      currentTopics = syncRecurrencesForSingleMonth(getCurrentMonth(), data.topics);
+      currentTopics = buildTopicsForMonth(getCurrentMonth(), data.topics);
       document.getElementById('income').value = currentIncome;
       renderTopics();
-      scheduleSave();
       closeImportModal();
+      await enqueueSave(100);
     } catch (err) {
       fbEl.textContent = err.message;
     }
@@ -2037,7 +2213,7 @@
     if (activeAccountId && DEFAULT_ACCOUNTS[activeAccountId]) {
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('app-screen').style.display = 'block';
-      await loadFromCloud(false);
+      await loadFromCloud(false, true);
     } else {
       activeAccountId = null;
       localStorage.removeItem(SESSION_KEY);
@@ -2055,7 +2231,7 @@
     errEl.textContent = 'Verificando credenciais...';
 
     try {
-      await fetchCloudRoot();
+      cloudRoot = await fetchCloudRoot();
     } catch (err) {
       cloudRoot = normalizeCloudRoot(cloudRoot);
     }
@@ -2073,13 +2249,14 @@
       localStorage.setItem(SESSION_KEY, matchedId);
       errEl.textContent = '';
       document.getElementById('login-pass').value = '';
-      checkAuth();
+      await checkAuth();
     } else {
       errEl.textContent = 'Usuário ou senha incorretos.';
     }
   }
 
   function logout() {
+    clearTimeout(saveTimer);
     activeAccountId = null;
     localStorage.removeItem(SESSION_KEY);
     checkAuth();
@@ -2135,13 +2312,7 @@
 
     document.getElementById('active-user-badge').textContent = '👤 ' + newUser;
     closeAccountModal();
-    setStatus('● Salvando...');
-    try {
-      await pushCloudRoot();
-      setStatus('● Conta atualizada');
-    } catch (err) {
-      setStatus('● Erro ao salvar');
-    }
+    await enqueueSave(50);
   }
 
   // --- TEMA DUAL ---
@@ -2156,267 +2327,10 @@
     document.getElementById('theme-btn').textContent = '🌙 Escuro';
   }
 
-  // --- DADOS ISOLADOS DA CONTA ATIVA ---
   function getCurrentMonth() {
     const m = document.getElementById('month-only-select').value;
     const y = document.getElementById('year-only-select').value;
     return `${y}-${m}`;
-  }
-
-  function getAccountMonthsMap() {
-    if (!cloudRoot.data[activeAccountId]) {
-      cloudRoot.data[activeAccountId] = {};
-    }
-    return cloudRoot.data[activeAccountId];
-  }
-
-  function getAccountInstallments() {
-    if (!Array.isArray(cloudRoot.installments[activeAccountId])) {
-      cloudRoot.installments[activeAccountId] = [];
-    }
-    return cloudRoot.installments[activeAccountId];
-  }
-
-  function hydrateMonthData(raw) {
-    const monthKey = getCurrentMonth();
-    if (!raw || !Array.isArray(raw.topics) || raw.topics.length === 0) {
-      currentIncome = raw && raw.income !== undefined ? raw.income : 0;
-      currentTopics = syncRecurrencesForSingleMonth(monthKey, getDefaultTopics());
-      return;
-    }
-    currentIncome = raw.income !== undefined ? raw.income : 0;
-    currentTopics = syncRecurrencesForSingleMonth(monthKey, JSON.parse(JSON.stringify(raw.topics)));
-  }
-
-  // --- SISTEMA DE COMPRAS PARCELADAS ---
-  function removePlanFromAllMonths(planId) {
-    const monthsMap = getAccountMonthsMap();
-    for (const m of ALL_MONTHS) {
-      const mData = monthsMap[m];
-      if (!mData || !Array.isArray(mData.topics)) continue;
-      mData.topics.forEach(t => {
-        if (Array.isArray(t.items)) {
-          t.items = t.items.filter(it => it.installmentId !== planId);
-        }
-      });
-    }
-    currentTopics.forEach(t => {
-      if (Array.isArray(t.items)) {
-        t.items = t.items.filter(it => it.installmentId !== planId);
-      }
-    });
-  }
-
-  function applyPlanToMonths(plan) {
-    removePlanFromAllMonths(plan.id);
-    const monthsMap = getAccountMonthsMap();
-    const startIdx = ALL_MONTHS.indexOf(plan.startMonth);
-    if (startIdx === -1) return;
-
-    const count = Math.max(1, parseInt(plan.count, 10) || 1);
-    const total = parseFloat(plan.total) || 0;
-    const installmentVal = Number((total / count).toFixed(2));
-
-    for (let k = 0; k < count; k++) {
-      const mIdx = startIdx + k;
-      if (mIdx >= ALL_MONTHS.length) break;
-      const monthKey = ALL_MONTHS[mIdx];
-
-      if (!monthsMap[monthKey] || !Array.isArray(monthsMap[monthKey].topics) || monthsMap[monthKey].topics.length === 0) {
-        monthsMap[monthKey] = {
-          income: 0,
-          topics: getDefaultTopics()
-        };
-      } else {
-        monthsMap[monthKey].topics = ensureCreditCardTopic(monthsMap[monthKey].topics);
-      }
-
-      const targetMonthTopics = (monthKey === getCurrentMonth()) ? currentTopics : monthsMap[monthKey].topics;
-      let topicObj = targetMonthTopics.find(t => t.id === plan.topicId || t.name === plan.topicName);
-
-      if (!topicObj && targetMonthTopics.length > 0) {
-        topicObj = targetMonthTopics[0];
-      }
-
-      if (topicObj) {
-        topicObj.items.push({
-          id: `it_${plan.id}_${k + 1}`,
-          installmentId: plan.id,
-          parcelIndex: k + 1,
-          parcelCount: count,
-          label: `${plan.desc} (${k + 1}/${count})`,
-          val: installmentVal,
-          max: Math.max(1000, installmentVal * 2),
-          step: 5
-        });
-      }
-
-      monthsMap[monthKey].topics = targetMonthTopics;
-    }
-  }
-
-  function openInstallmentModal(existingId = null, preselectedTopicId = null) {
-    editingInstallmentId = existingId;
-    const topicSelect = document.getElementById('inst-topic');
-    topicSelect.innerHTML = '';
-
-    currentTopics.forEach(t => {
-      const opt = document.createElement('option');
-      opt.value = t.id;
-      opt.textContent = t.name;
-      topicSelect.appendChild(opt);
-    });
-
-    document.getElementById('inst-feedback').textContent = '';
-
-    if (existingId) {
-      const plan = getAccountInstallments().find(p => p.id === existingId);
-      if (!plan) return;
-      document.getElementById('inst-modal-title').textContent = 'Editar Compra Parcelada';
-      document.getElementById('inst-desc').value = plan.desc;
-      topicSelect.value = plan.topicId || (currentTopics[0] && currentTopics[0].id);
-      document.getElementById('inst-total').value = plan.total;
-      document.getElementById('inst-count').value = plan.count;
-      const [sy, sm] = plan.startMonth.split('-');
-      document.getElementById('inst-start-year-only').value = sy;
-      document.getElementById('inst-start-month-only').value = sm;
-    } else {
-      document.getElementById('inst-modal-title').textContent = 'Nova Compra Parcelada';
-      document.getElementById('inst-desc').value = '';
-      if (preselectedTopicId) {
-        topicSelect.value = preselectedTopicId;
-      } else {
-        const cardTopic = currentTopics.find(t => t.id === 'top_cartao');
-        if (cardTopic) topicSelect.value = cardTopic.id;
-      }
-      document.getElementById('inst-total').value = '';
-      document.getElementById('inst-count').value = '3';
-      document.getElementById('inst-start-month-only').value = document.getElementById('month-only-select').value;
-      document.getElementById('inst-start-year-only').value = document.getElementById('year-only-select').value;
-    }
-
-    updateInstallmentPreview();
-    document.getElementById('installment-modal').style.display = 'flex';
-  }
-
-  function closeInstallmentModal() {
-    editingInstallmentId = null;
-    document.getElementById('installment-modal').style.display = 'none';
-  }
-
-  function updateInstallmentPreview() {
-    const total = parseFloat(document.getElementById('inst-total').value) || 0;
-    const count = Math.max(1, parseInt(document.getElementById('inst-count').value, 10) || 1);
-    const sm = document.getElementById('inst-start-month-only').value;
-    const sy = document.getElementById('inst-start-year-only').value;
-    const startMonth = `${sy}-${sm}`;
-    const startIdx = ALL_MONTHS.indexOf(startMonth);
-    const perMonth = total / count;
-
-    let endLabel = '';
-    if (startIdx !== -1) {
-      const endIdx = Math.min(ALL_MONTHS.length - 1, startIdx + count - 1);
-      endLabel = ` • ${formatMonthKey(startMonth)} até ${formatMonthKey(ALL_MONTHS[endIdx])}`;
-    }
-
-    document.getElementById('inst-preview').textContent =
-      `Cada parcela: R$ ${perMonth.toFixed(2)} (${count}x)${endLabel}`;
-  }
-
-  function saveInstallmentPlan(e) {
-    e.preventDefault();
-    const desc = document.getElementById('inst-desc').value.trim();
-    const topicId = document.getElementById('inst-topic').value;
-    const total = parseFloat(document.getElementById('inst-total').value);
-    const count = parseInt(document.getElementById('inst-count').value, 10);
-    const startMonth = `${document.getElementById('inst-start-year-only').value}-${document.getElementById('inst-start-month-only').value}`;
-    const fb = document.getElementById('inst-feedback');
-
-    if (!desc || isNaN(total) || total <= 0 || isNaN(count) || count < 1) {
-      fb.textContent = 'Preencha descrição, valor maior que zero e parcelas.';
-      return;
-    }
-
-    const topicObj = currentTopics.find(t => t.id === topicId) || currentTopics[0];
-    const plans = getAccountInstallments();
-
-    if (editingInstallmentId) {
-      const idx = plans.findIndex(p => p.id === editingInstallmentId);
-      if (idx !== -1) {
-        const updatedPlan = {
-          ...plans[idx],
-          desc,
-          topicId: topicObj ? topicObj.id : topicId,
-          topicName: topicObj ? topicObj.name : '',
-          total,
-          count,
-          startMonth
-        };
-        plans[idx] = updatedPlan;
-        applyPlanToMonths(updatedPlan);
-      }
-    } else {
-      const newPlan = {
-        id: 'inst_' + Date.now(),
-        desc,
-        topicId: topicObj ? topicObj.id : topicId,
-        topicName: topicObj ? topicObj.name : '',
-        total,
-        count,
-        startMonth
-      };
-      plans.push(newPlan);
-      applyPlanToMonths(newPlan);
-    }
-
-    closeInstallmentModal();
-    renderTopics();
-    scheduleSave();
-  }
-
-  function openInstallmentsManager() {
-    renderInstallmentsManager();
-    document.getElementById('parcels-list-modal').style.display = 'flex';
-  }
-
-  function closeParcelsManager() {
-    document.getElementById('parcels-list-modal').style.display = 'none';
-  }
-
-  function renderInstallmentsManager() {
-    const container = document.getElementById('parcels-list-container');
-    const plans = getAccountInstallments();
-
-    if (plans.length === 0) {
-      container.innerHTML = `<div style="text-align:center; padding:18px; font-size:12.5px; color:var(--text-muted);">Nenhuma compra parcelada cadastrada nesta conta.</div>`;
-      return;
-    }
-
-    container.innerHTML = plans.map(p => {
-      const perMonth = (parseFloat(p.total) || 0) / Math.max(1, parseInt(p.count, 10) || 1);
-      const mLabel = formatMonthKey(p.startMonth);
-      return `
-        <div class="parcel-list-item">
-          <div>
-            <div class="parcel-list-title">${escapeHtml(p.desc)}</div>
-            <div class="parcel-list-meta num-tabular">Total R$ ${Number(p.total).toFixed(2)} • ${p.count}x de R$ ${perMonth.toFixed(2)} • Início: ${mLabel}</div>
-          </div>
-          <div style="display:flex; gap:6px;">
-            <button type="button" class="btn" onclick="closeParcelsManager(); openInstallmentModal('${p.id}')">✎ Editar</button>
-            <button type="button" class="btn btn-danger" onclick="deleteInstallmentPlan('${p.id}')" title="Excluir compra parcelada">×</button>
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
-
-  function deleteInstallmentPlan(planId) {
-    if (!confirm('Remover esta compra parcelada de todos os meses e anos?')) return;
-    cloudRoot.installments[activeAccountId] = getAccountInstallments().filter(p => p.id !== planId);
-    removePlanFromAllMonths(planId);
-    renderInstallmentsManager();
-    renderTopics();
-    scheduleSave();
   }
 
   // --- RENDERIZAÇÃO DINÂMICA ---
@@ -2445,10 +2359,10 @@
           </div>
           <div class="sec-controls">
             <span id="sub-topic-${tIdx}" class="num-tabular" style="color:${topic.color}; font-weight:700;">R$ ${totalTopic.toFixed(0)}</span>
-            <button class="btn" onclick="openFixedModal(null, '${topic.id}')" title="Fixar custo recorrente neste tópico">📌 Fixar</button>
-            <button class="btn" onclick="openInstallmentModal(null, '${topic.id}')" title="Parcelar compra neste tópico">💳 Parcelar</button>
-            <button class="btn" onclick="addItem(${tIdx})">+ Item</button>
-            <button class="btn btn-danger" onclick="deleteTopic(${tIdx})" title="Excluir tópico">×</button>
+            <button type="button" class="btn" onclick="openFixedModal(null, '${topic.id}')" title="Fixar custo recorrente neste tópico">📌 Fixar</button>
+            <button type="button" class="btn" onclick="openInstallmentModal(null, '${topic.id}')" title="Parcelar compra neste tópico">💳 Parcelar</button>
+            <button type="button" class="btn" onclick="addItem(${tIdx})">+ Item</button>
+            <button type="button" class="btn btn-danger" onclick="deleteTopic(${tIdx})" title="Excluir tópico">×</button>
           </div>
         </div>
       `;
@@ -2476,7 +2390,7 @@
           <span class="item-label" ${editClickAttr}>${escapeHtml(item.label)}${badgeHtml}</span>
           <input type="range" class="sb-slider" style="--topic-color:${topic.color}; --pct:${pct}%" min="0" max="${maxVal}" step="${item.step || 5}" value="${val}" oninput="onSliderChange(${tIdx}, ${iIdx}, this)">
           <input type="number" class="num-input num-tabular" value="${val}" oninput="onNumberChange(${tIdx}, ${iIdx}, this)">
-          <button class="btn btn-danger" onclick="deleteItem(${tIdx}, ${iIdx})" title="Excluir item">×</button>
+          <button type="button" class="btn btn-danger" onclick="deleteItem(${tIdx}, ${iIdx})" title="Excluir item">×</button>
         `;
         sec.appendChild(row);
       });
@@ -2539,7 +2453,7 @@
   // --- INTERAÇÕES E CRUD ---
   function onIncomeChange() {
     updateSummary();
-    scheduleSave();
+    enqueueSave(450);
   }
 
   function onSliderChange(tIdx, iIdx, el) {
@@ -2550,7 +2464,7 @@
     if (numInput) numInput.value = val;
     syncSliderVisual(el, val, el.max);
     updateSummary();
-    scheduleSave();
+    enqueueSave(450);
   }
 
   function onNumberChange(tIdx, iIdx, el) {
@@ -2567,10 +2481,10 @@
       syncSliderVisual(slider, val, slider.max);
     }
     updateSummary();
-    scheduleSave();
+    enqueueSave(450);
   }
 
-  function addTopic() {
+  async function addTopic() {
     const nextNum = currentTopics.length + 1;
     const name = prompt(`Nome do novo tópico (ex: ${nextNum}. Transporte, Faculdade, Moto):`);
     if (!name || !name.trim()) return;
@@ -2601,10 +2515,10 @@
 
     currentTopics.push(newTopic);
     renderTopics();
-    scheduleSave();
+    await enqueueSave(100);
   }
 
-  function editTopic(tIdx) {
+  async function editTopic(tIdx) {
     const current = currentTopics[tIdx].name;
     const updated = prompt('Editar nome do tópico:', current);
     if (!updated || !updated.trim()) return;
@@ -2612,17 +2526,18 @@
     currentTopics[tIdx].name = cleanName;
     currentTopics[tIdx].shortName = cleanName.replace(/^\d+\.\s*/, '').split('(')[0].trim().slice(0, 14);
     renderTopics();
-    scheduleSave();
+    await enqueueSave(100);
   }
 
-  function deleteTopic(tIdx) {
+  async function deleteTopic(tIdx) {
     if (!confirm(`Excluir o tópico "${currentTopics[tIdx].name}"?`)) return;
     currentTopics.splice(tIdx, 1);
+    currentTopics = ensureCreditCardTopic(currentTopics);
     renderTopics();
-    scheduleSave();
+    await enqueueSave(100);
   }
 
-  function addItem(tIdx) {
+  async function addItem(tIdx) {
     const label = prompt('Nome do gasto/item:');
     if (!label || !label.trim()) return;
     const valInput = prompt('Valor inicial em R$ (pode deixar 0):', '0');
@@ -2637,59 +2552,65 @@
       step: 5
     });
     renderTopics();
-    scheduleSave();
+    await enqueueSave(100);
   }
 
-  function editItem(tIdx, iIdx) {
+  async function editItem(tIdx, iIdx) {
     const current = currentTopics[tIdx].items[iIdx].label;
     const updated = prompt('Editar nome do item:', current);
     if (!updated || !updated.trim()) return;
     currentTopics[tIdx].items[iIdx].label = updated.trim();
     renderTopics();
-    scheduleSave();
+    await enqueueSave(100);
   }
 
-  function deleteItem(tIdx, iIdx) {
+  async function deleteItem(tIdx, iIdx) {
     const item = currentTopics[tIdx].items[iIdx];
+    if (!item) return;
+
     if (item.fixedId) {
       if (!confirm(`"${item.label}" é um custo fixo recorrente. Deseja remover ele de TODOS os meses?`)) return;
       cloudRoot.fixedCosts[activeAccountId] = getAccountFixedCosts().filter(f => f.id !== item.fixedId);
-      removeFixedFromAllMonths(item.fixedId);
+      currentTopics = buildTopicsForMonth(getCurrentMonth(), currentTopics);
       renderTopics();
-      scheduleSave();
+      await enqueueSave(100);
       return;
     }
+
     if (item.installmentId) {
       if (!confirm(`"${item.label}" faz parte de uma compra parcelada. Deseja remover TODAS as parcelas desta compra?`)) return;
       cloudRoot.installments[activeAccountId] = getAccountInstallments().filter(p => p.id !== item.installmentId);
-      removePlanFromAllMonths(item.installmentId);
+      currentTopics = buildTopicsForMonth(getCurrentMonth(), currentTopics);
       renderTopics();
-      scheduleSave();
+      await enqueueSave(100);
       return;
     }
+
     if (!confirm(`Excluir "${item.label}"?`)) return;
     currentTopics[tIdx].items.splice(iIdx, 1);
     renderTopics();
-    scheduleSave();
+    await enqueueSave(100);
   }
 
-  function changeMonth() {
-    const userMonths = getAccountMonthsMap();
-    hydrateMonthData(userMonths[getCurrentMonth()]);
-    document.getElementById('income').value = currentIncome;
-    renderTopics();
+  async function changeMonth() {
+    commitCurrentMonthToMemory();
+    loadMonthIntoView(getCurrentMonth());
+    if (hasPendingSave) {
+      await enqueueSave(100);
+    }
   }
 
-  function resetToDefaultStructure() {
+  async function resetToDefaultStructure() {
     if (!confirm('Restaurar todas as 6 repartições padrão zeradas neste mês (mantendo suas parcelas e custos fixos ativos)?')) return;
     currentIncome = 0;
-    currentTopics = syncRecurrencesForSingleMonth(getCurrentMonth(), getDefaultTopics());
+    currentTopics = buildTopicsForMonth(getCurrentMonth(), getDefaultTopics());
     document.getElementById('income').value = 0;
     renderTopics();
-    scheduleSave();
+    await enqueueSave(100);
   }
 
-  function copyToAllMonths() {
+  async function copyToAllMonths() {
+    commitCurrentMonthToMemory();
     const selectedYear = document.getElementById('year-only-select').value;
     if (!confirm(`Copiar o salário e todas as repartições deste mês para os 12 meses de ${selectedYear} (somente nesta conta)?`)) return;
     const userMonths = getAccountMonthsMap();
@@ -2697,10 +2618,10 @@
       const key = `${selectedYear}-${m}`;
       userMonths[key] = {
         income: currentIncome,
-        topics: syncRecurrencesForSingleMonth(key, JSON.parse(JSON.stringify(currentTopics)))
+        topics: JSON.parse(JSON.stringify(currentTopics))
       };
     });
-    scheduleSave();
+    await enqueueSave(100);
   }
 
   // --- SINCRONIZAÇÃO NUVEM ---
@@ -2708,44 +2629,40 @@
     document.getElementById('sync-status').textContent = text;
   }
 
-  async function loadFromCloud(silent = false) {
+  async function manualSyncNow() {
     if (!activeAccountId) return;
+    if (hasPendingSave) {
+      await enqueueSave(50);
+    }
+    await loadFromCloud(false, true);
+  }
+
+  async function loadFromCloud(silent = false, forceApply = false) {
+    if (!activeAccountId) return;
+
+    // Nunca sobrescreve alterações locais recentes ou salvamentos em andamento durante polling silencioso
+    if (!forceApply) {
+      if (isSaving || hasPendingSave || (Date.now() - lastLocalEditAt < 5000)) {
+        return;
+      }
+    }
+
     if (!silent) setStatus('● Sincronizando...');
     try {
-      await fetchCloudRoot();
+      const fresh = await fetchCloudRoot();
+      if (!forceApply && (isSaving || hasPendingSave || (Date.now() - lastLocalEditAt < 5000))) {
+        return;
+      }
+
+      cloudRoot = fresh;
       const creds = cloudRoot.accounts[activeAccountId] || DEFAULT_ACCOUNTS[activeAccountId];
       document.getElementById('active-user-badge').textContent = '👤 ' + creds.username;
 
-      const userMonths = getAccountMonthsMap();
-      hydrateMonthData(userMonths[getCurrentMonth()]);
-      document.getElementById('income').value = currentIncome;
-      renderTopics();
+      loadMonthIntoView(getCurrentMonth());
       setStatus('● Sincronizado');
     } catch (e) {
-      setStatus('● Erro de conexão');
+      if (!silent) setStatus('● Erro de conexão');
     }
-  }
-
-  function scheduleSave() {
-    if (!activeAccountId) return;
-    const userMonths = getAccountMonthsMap();
-    userMonths[getCurrentMonth()] = {
-      income: currentIncome,
-      topics: currentTopics
-    };
-
-    setStatus('● Salvando...');
-    clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(async () => {
-      try {
-        await pushCloudRoot();
-        saveTimeout = null;
-        setStatus('● Sincronizado');
-      } catch (e) {
-        saveTimeout = null;
-        setStatus('● Erro ao salvar');
-      }
-    }, 600);
   }
 
   function escapeHtml(str) {
@@ -2756,11 +2673,12 @@
 
   checkAuth();
 
+  // Polling a cada 20s com proteção contra sobrescrita de edições recentes
   setInterval(() => {
-    if (activeAccountId && !saveTimeout) {
-      loadFromCloud(true);
+    if (activeAccountId && !isSaving && !hasPendingSave) {
+      loadFromCloud(true, false);
     }
-  }, 6000);
+  }, 20000);
 </script>
 </body>
 </html>
