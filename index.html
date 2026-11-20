@@ -676,6 +676,19 @@
     background: rgba(255, 69, 58, 0.14);
   }
 
+  .btn-reset-override {
+    min-width: 28px;
+    min-height: 28px;
+    padding: 2px 6px;
+    font-size: 12px;
+    border-radius: 8px;
+    background: rgba(48, 209, 88, 0.14);
+    border: 1px solid rgba(48, 209, 88, 0.35);
+    color: var(--c-guardado);
+    cursor: pointer;
+    font-weight: 700;
+  }
+
   /* ==================== FAIXA DE KPIs ==================== */
   .top-grid {
     display: grid;
@@ -774,7 +787,7 @@
     border-color: var(--c-guardado);
   }
 
-  /* ==================== GRID DE CATEGORIAS (2 COLUNAS NO PC) ==================== */
+  /* ==================== GRID DE CATEGORIAS + ARRASTAR E SOLTAR ==================== */
   .topics-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -803,6 +816,17 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .section.dragging {
+    opacity: 0.45;
+    transform: scale(0.985);
+  }
+
+  .section.drag-over {
+    outline: 2px dashed var(--topic-color, var(--c-guardado));
+    outline-offset: 2px;
   }
 
   .sec-header {
@@ -829,6 +853,29 @@
     text-decoration: underline;
   }
 
+  .drag-handle {
+    cursor: grab;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 800;
+    padding: 4px 6px;
+    border-radius: 8px;
+    user-select: none;
+    touch-action: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .drag-handle:hover {
+    background: var(--bg-btn-hover);
+    color: var(--text-title);
+  }
+
+  .drag-handle:active {
+    cursor: grabbing;
+  }
+
   .sec-controls {
     display: flex;
     align-items: center;
@@ -836,14 +883,29 @@
     flex-wrap: wrap;
   }
 
+  .items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
   .row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 92px 88px 34px;
-    gap: 8px;
+    grid-template-columns: 20px minmax(0, 1fr) 88px 88px 34px;
+    gap: 6px;
     align-items: center;
     padding: 6px 8px;
     border-radius: 12px;
     background: rgba(255, 255, 255, 0.015);
+    transition: background-color 0.12s ease, transform 0.12s ease;
+  }
+
+  .row.dragging {
+    opacity: 0.45;
+  }
+
+  .row.drag-over {
+    border-top: 2px solid var(--topic-color, var(--c-guardado));
   }
 
   .item-label {
@@ -882,6 +944,19 @@
     color: var(--c-cartao);
     border: 1px solid rgba(255, 159, 10, 0.35);
     margin-left: 5px;
+    vertical-align: middle;
+  }
+
+  .custom-month-tag {
+    display: inline-block;
+    font-size: 9.5px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: rgba(48, 209, 88, 0.14);
+    color: var(--c-guardado);
+    border: 1px solid rgba(48, 209, 88, 0.35);
+    margin-left: 4px;
     vertical-align: middle;
   }
 
@@ -972,32 +1047,36 @@
     }
 
     .row {
-      grid-template-columns: 1fr 92px 40px;
+      grid-template-columns: 20px 1fr 90px 40px;
       grid-template-rows: auto auto;
       background: var(--bg-card);
       padding: 10px;
       border-radius: 12px;
       border: 1px solid var(--border-sub);
     }
-    .item-label {
+    .row .drag-handle {
       grid-column: 1 / 2;
+      grid-row: 1 / 2;
+    }
+    .item-label {
+      grid-column: 2 / 3;
       grid-row: 1 / 2;
       font-weight: 600;
       padding-right: 4px;
     }
     .num-input {
-      grid-column: 2 / 3;
+      grid-column: 3 / 4;
       grid-row: 1 / 2;
       min-height: 44px;
     }
     .row .btn-danger {
-      grid-column: 3 / 4;
+      grid-column: 4 / 5;
       grid-row: 1 / 2;
-      min-width: 40px;
+      min-width: 38px;
       min-height: 44px;
     }
     .row input[type=range].sb-slider {
-      grid-column: 1 / 4;
+      grid-column: 1 / 5;
       grid-row: 2 / 3;
       height: 8px;
       margin-top: 6px;
@@ -1331,7 +1410,7 @@
 
     <button type="button" class="btn btn-accent btn-add-bottom" onclick="addTopic()">+ Criar Novo Tópico / Categoria</button>
 
-    <div class="note">💡 <strong>Caderno Mensal & Centavos (2026–2035):</strong> Tópicos mantêm sempre a mesma ordem e cor em todos os meses. Folheie com <strong>◀ Anterior / Próxima ▶</strong>, abas mensais ou <strong>Alt + ← / →</strong>, e defina períodos de <strong>A partir de ... até ...</strong> nos seus custos fixos e parcelas.</div>
+    <div class="note">💡 <strong>Prioridade & Flexibilidade Mensal (2026–2035):</strong> Clique e segure <strong>⋮⋮</strong> para arrastar e reordenar tópicos ou itens por prioridade. Alterar um item <strong>FIXO</strong> em um mês específico salva a alteração apenas naquele mês sem voltar atrás ao recarregar.</div>
   </div>
 </div>
 
@@ -1339,7 +1418,7 @@
 <div id="fixed-modal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this) closeFixedModal()">
   <div class="modal-box">
     <h2 class="modal-title" id="fixed-modal-title">Fixar Custo Mensal</h2>
-    <div class="modal-sub">Defina o tópico, valor mensal e o período de vigência (a partir de até quando).</div>
+    <div class="modal-sub">Defina o tópico, valor mensal base e o período de vigência (a partir de até quando).</div>
     <form onsubmit="saveFixedCost(event)">
       <label class="modal-label">Descrição do custo fixo</label>
       <input type="text" id="fixed-desc" class="modal-input" placeholder="Ex: Internet Wi-Fi, Seguro iPhone" required>
@@ -1347,7 +1426,7 @@
       <label class="modal-label">Tópico / Categoria</label>
       <select id="fixed-topic" class="modal-select"></select>
 
-      <label class="modal-label">Valor mensal (R$)</label>
+      <label class="modal-label">Valor mensal base (R$)</label>
       <input type="number" id="fixed-val" class="modal-input num-tabular" min="0.01" step="0.01" placeholder="34.90" oninput="updateFixedPreview()" required>
 
       <div class="modal-grid-2">
@@ -1417,7 +1496,7 @@
 <div id="fixed-list-modal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this) closeFixedManager()">
   <div class="modal-box">
     <h2 class="modal-title">Custos Fixos Ativos</h2>
-    <div class="modal-sub">Edite o valor, tópico, período ou remova custos fixos quando quiser.</div>
+    <div class="modal-sub">Edite o valor base, tópico, período ou remova custos fixos quando quiser.</div>
     <div id="fixed-list-container"></div>
     <div class="modal-actions">
       <button type="button" class="btn btn-fixed" onclick="closeFixedManager(); openFixedModal();">+ Novo Custo Fixo</button>
@@ -1815,26 +1894,15 @@
     ];
   }
 
-  function getCanonicalOrderRank(topic) {
+  function getDefaultTopicColor(topic, fallbackIdx) {
     const id = String(topic.id || '');
     const norm = normalizeTopicKey(topic.name);
-    if (id === 'top_cartao' || norm.includes('cartao')) return 1;
-    if (id === 'top_fixas' || norm.includes('contas fixas')) return 2;
-    if (id === 'top_cabelo' || norm.includes('cabelo')) return 3;
-    if (id === 'top_lazer' || norm.includes('lazer')) return 4;
-    if (id === 'top_reserva' || norm.includes('reserva')) return 5;
-    if (id === 'top_guardado' || norm.includes('guardado')) return 6;
-    return 100;
-  }
-
-  function getCanonicalColor(topic, fallbackIdx) {
-    const rank = getCanonicalOrderRank(topic);
-    if (rank === 1) return '#FF9F0A';
-    if (rank === 2) return '#0A84FF';
-    if (rank === 3) return '#FF375F';
-    if (rank === 4) return '#FFD60A';
-    if (rank === 5) return '#BF5AF2';
-    if (rank === 6) return '#30D158';
+    if (id === 'top_cartao' || norm.includes('cartao')) return '#FF9F0A';
+    if (id === 'top_fixas' || norm.includes('contas fixas')) return '#0A84FF';
+    if (id === 'top_cabelo' || norm.includes('cabelo')) return '#FF375F';
+    if (id === 'top_lazer' || norm.includes('lazer')) return '#FFD60A';
+    if (id === 'top_reserva' || norm.includes('reserva')) return '#BF5AF2';
+    if (id === 'top_guardado' || norm.includes('guardado')) return '#30D158';
     return topic.color || PALETTE[fallbackIdx % PALETTE.length];
   }
 
@@ -1850,6 +1918,9 @@
   let isFetching = false;
   let hasPendingSave = false;
   let lastLocalEditAt = 0;
+
+  // Estado de arrastar e soltar (mouse e touch)
+  let dragState = null;
 
   function normalizeCloudRoot(raw) {
     const root = (raw && typeof raw === 'object') ? { ...raw } : {};
@@ -1871,6 +1942,10 @@
       if (!root.data[accId] || typeof root.data[accId] !== 'object') root.data[accId] = {};
       if (!Array.isArray(root.installments[accId])) root.installments[accId] = [];
       if (!Array.isArray(root.fixedCosts[accId])) root.fixedCosts[accId] = [];
+      root.fixedCosts[accId] = root.fixedCosts[accId].map(f => ({
+        ...f,
+        monthOverrides: (f.monthOverrides && typeof f.monthOverrides === 'object') ? f.monthOverrides : {}
+      }));
     }
     return root;
   }
@@ -2021,16 +2096,10 @@
     return topicObj;
   }
 
-  function orderAndColorTopics(list) {
-    const sorted = [...list].sort((a, b) => {
-      const ra = getCanonicalOrderRank(a);
-      const rb = getCanonicalOrderRank(b);
-      if (ra !== rb) return ra - rb;
-      return String(a.name || '').localeCompare(String(b.name || ''), 'pt-BR');
-    });
-    return sorted.map((t, idx) => ({
+  function applyTopicColors(list) {
+    return list.map((t, idx) => ({
       ...t,
-      color: getCanonicalColor(t, idx)
+      color: getDefaultTopicColor(t, idx)
     }));
   }
 
@@ -2050,7 +2119,7 @@
     }));
 
     const mIdx = ALL_MONTHS.indexOf(monthKey);
-    if (mIdx === -1) return orderAndColorTopics(list);
+    if (mIdx === -1) return applyTopicColors(list);
 
     getAccountInstallments().forEach(plan => {
       const startIdx = ALL_MONTHS.indexOf(plan.startMonth);
@@ -2080,11 +2149,14 @@
       const afterStart = (startIdx === -1 || mIdx >= startIdx);
       const beforeEnd = (endIdx === -1 || mIdx <= endIdx);
       if (afterStart && beforeEnd) {
-        const val = roundMoney(fixed.val);
+        const overrides = (fixed.monthOverrides && typeof fixed.monthOverrides === 'object') ? fixed.monthOverrides : {};
+        const hasOverride = Object.prototype.hasOwnProperty.call(overrides, monthKey);
+        const val = hasOverride ? roundMoney(overrides[monthKey]) : roundMoney(fixed.val);
         const topicObj = resolveTargetTopic(list, fixed.topicId, fixed.topicName);
         topicObj.items.push({
           id: `it_${fixed.id}_${monthKey}`,
           fixedId: fixed.id,
+          isMonthOverride: hasOverride,
           label: fixed.desc,
           val: val,
           max: Math.max(1000, roundMoney(val * 2)),
@@ -2093,7 +2165,7 @@
       }
     });
 
-    return orderAndColorTopics(list);
+    return applyTopicColors(list);
   }
 
   function loadMonthIntoView(monthKey) {
@@ -2159,12 +2231,206 @@
     }, delayMs);
   }
 
+  function setItemValueWithPersistence(tIdx, iIdx, newVal) {
+    const item = currentTopics[tIdx]?.items?.[iIdx];
+    if (!item) return;
+    const val = roundMoney(newVal);
+    item.val = val;
+
+    if (item.fixedId) {
+      const fixedObj = getAccountFixedCosts().find(f => f.id === item.fixedId);
+      if (fixedObj) {
+        if (!fixedObj.monthOverrides || typeof fixedObj.monthOverrides !== 'object') {
+          fixedObj.monthOverrides = {};
+        }
+        fixedObj.monthOverrides[getCurrentMonth()] = val;
+        item.isMonthOverride = true;
+      }
+    }
+  }
+
+  function resetFixedOverrideForCurrentMonth(tIdx, iIdx) {
+    const item = currentTopics[tIdx]?.items?.[iIdx];
+    if (!item || !item.fixedId) return;
+    const fixedObj = getAccountFixedCosts().find(f => f.id === item.fixedId);
+    if (!fixedObj || !fixedObj.monthOverrides) return;
+    delete fixedObj.monthOverrides[getCurrentMonth()];
+    currentTopics = buildTopicsForMonth(getCurrentMonth(), { initialized: true, topics: currentTopics });
+    renderTopics();
+    scheduleBackgroundSave(250);
+  }
+
+  // --- ARRASTAR E SOLTAR POR PRIORIDADE (TÓPICOS E ITENS) ---
+  function handleTopicDragStart(e, tIdx) {
+    e.stopPropagation();
+    dragState = { type: 'topic', fromT: tIdx, toT: tIdx };
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', String(tIdx));
+    }
+    const card = document.querySelector(`.section[data-tidx="${tIdx}"]`);
+    if (card) card.classList.add('dragging');
+  }
+
+  function handleTopicDragOver(e, tIdx) {
+    if (!dragState || dragState.type !== 'topic') return;
+    e.preventDefault();
+    dragState.toT = tIdx;
+    document.querySelectorAll('.section.drag-over').forEach(el => el.classList.remove('drag-over'));
+    const card = document.querySelector(`.section[data-tidx="${tIdx}"]`);
+    if (card && dragState.fromT !== tIdx) card.classList.add('drag-over');
+  }
+
+  function handleTopicDrop(e, tIdx) {
+    if (!dragState || dragState.type !== 'topic') return;
+    e.preventDefault();
+    const from = dragState.fromT;
+    const to = tIdx;
+    clearDragClasses();
+    dragState = null;
+    if (from === to) return;
+
+    const [moved] = currentTopics.splice(from, 1);
+    currentTopics.splice(to, 0, moved);
+    renderTopics();
+    scheduleBackgroundSave(250);
+  }
+
+  function handleItemDragStart(e, tIdx, iIdx) {
+    e.stopPropagation();
+    dragState = { type: 'item', fromT: tIdx, fromI: iIdx, toT: tIdx, toI: iIdx };
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', `${tIdx}:${iIdx}`);
+    }
+    const row = document.querySelector(`.row[data-tidx="${tIdx}"][data-iidx="${iIdx}"]`);
+    if (row) row.classList.add('dragging');
+  }
+
+  function handleItemDragOver(e, tIdx, iIdx) {
+    if (!dragState || dragState.type !== 'item') return;
+    e.preventDefault();
+    e.stopPropagation();
+    dragState.toT = tIdx;
+    dragState.toI = iIdx;
+    document.querySelectorAll('.row.drag-over').forEach(el => el.classList.remove('drag-over'));
+    const row = document.querySelector(`.row[data-tidx="${tIdx}"][data-iidx="${iIdx}"]`);
+    if (row) row.classList.add('drag-over');
+  }
+
+  function handleItemDrop(e, tIdx, iIdx) {
+    if (!dragState || dragState.type !== 'item') return;
+    e.preventDefault();
+    e.stopPropagation();
+    const { fromT, fromI } = dragState;
+    clearDragClasses();
+    dragState = null;
+
+    if (fromT === tIdx && fromI === iIdx) return;
+    const sourceItems = currentTopics[fromT]?.items;
+    const targetItems = currentTopics[tIdx]?.items;
+    if (!sourceItems || !targetItems) return;
+
+    const [movedItem] = sourceItems.splice(fromI, 1);
+    targetItems.splice(iIdx, 0, movedItem);
+    renderTopics();
+    scheduleBackgroundSave(250);
+  }
+
+  function handleTouchDragStart(e, mode, tIdx, iIdx = null) {
+    if (!e.touches || e.touches.length === 0) return;
+    e.stopPropagation();
+    dragState = mode === 'topic'
+      ? { type: 'topic', fromT: tIdx, toT: tIdx, touch: true }
+      : { type: 'item', fromT: tIdx, fromI: iIdx, toT: tIdx, toI: iIdx, touch: true };
+
+    const targetEl = mode === 'topic'
+      ? document.querySelector(`.section[data-tidx="${tIdx}"]`)
+      : document.querySelector(`.row[data-tidx="${tIdx}"][data-iidx="${iIdx}"]`);
+    if (targetEl) targetEl.classList.add('dragging');
+
+    const onTouchMove = moveEv => {
+      if (!dragState || !moveEv.touches || moveEv.touches.length === 0) return;
+      moveEv.preventDefault();
+      const touch = moveEv.touches[0];
+      const hit = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (!hit) return;
+
+      document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+
+      if (dragState.type === 'topic') {
+        const secEl = hit.closest('.section');
+        if (secEl) {
+          const targetT = parseInt(secEl.dataset.tidx, 10);
+          if (!isNaN(targetT)) {
+            dragState.toT = targetT;
+            if (targetT !== dragState.fromT) secEl.classList.add('drag-over');
+          }
+        }
+      } else {
+        const rowEl = hit.closest('.row');
+        const secEl = hit.closest('.section');
+        if (rowEl) {
+          const targetT = parseInt(rowEl.dataset.tidx, 10);
+          const targetI = parseInt(rowEl.dataset.iidx, 10);
+          if (!isNaN(targetT) && !isNaN(targetI)) {
+            dragState.toT = targetT;
+            dragState.toI = targetI;
+            rowEl.classList.add('drag-over');
+          }
+        } else if (secEl) {
+          const targetT = parseInt(secEl.dataset.tidx, 10);
+          if (!isNaN(targetT) && currentTopics[targetT]) {
+            dragState.toT = targetT;
+            dragState.toI = currentTopics[targetT].items.length;
+          }
+        }
+      }
+    };
+
+    const onTouchEnd = () => {
+      document.removeEventListener('touchmove', onTouchMove);
+      document.removeEventListener('touchend', onTouchEnd);
+      if (!dragState) return;
+
+      const st = dragState;
+      clearDragClasses();
+      dragState = null;
+
+      if (st.type === 'topic' && st.fromT !== st.toT) {
+        const [moved] = currentTopics.splice(st.fromT, 1);
+        currentTopics.splice(st.toT, 0, moved);
+        renderTopics();
+        scheduleBackgroundSave(250);
+      } else if (st.type === 'item' && (st.fromT !== st.toT || st.fromI !== st.toI)) {
+        const sourceItems = currentTopics[st.fromT]?.items;
+        const targetItems = currentTopics[st.toT]?.items;
+        if (sourceItems && targetItems) {
+          const [movedItem] = sourceItems.splice(st.fromI, 1);
+          const insertAt = Math.min(targetItems.length, st.toI);
+          targetItems.splice(insertAt, 0, movedItem);
+          renderTopics();
+          scheduleBackgroundSave(250);
+        }
+      }
+    };
+
+    document.addEventListener('touchmove', onTouchMove, { passive: false });
+    document.addEventListener('touchend', onTouchEnd);
+  }
+
+  function clearDragClasses() {
+    document.querySelectorAll('.dragging, .drag-over').forEach(el => {
+      el.classList.remove('dragging', 'drag-over');
+    });
+  }
+
   // --- CUSTOS FIXOS ---
   function populateTopicSelectWithKnownTopics(selectEl, preselectedId = null) {
     selectEl.innerHTML = '';
     const mapById = new Map();
 
-    orderAndColorTopics([...getDefaultTopics(), ...currentTopics]).forEach(t => {
+    applyTopicColors([...getDefaultTopics(), ...currentTopics]).forEach(t => {
       mapById.set(t.id, t);
     });
 
@@ -2245,7 +2511,7 @@
       ? `${formatMonthKey(startKey)} até ${formatMonthKey(endKey)}`
       : `A partir de ${formatMonthKey(startKey)} (sem fim)`;
     document.getElementById('fixed-preview').textContent =
-      `Fixo mensal: ${formatBRL(val)} / mês • ${periodo}`;
+      `Fixo mensal base: ${formatBRL(val)} / mês • ${periodo}`;
   }
 
   function saveFixedCost(e) {
@@ -2293,7 +2559,8 @@
         topicName: topicObj ? topicObj.name : selectedOptionText,
         val,
         startMonth,
-        endMonth
+        endMonth,
+        monthOverrides: {}
       });
     }
 
@@ -2325,11 +2592,13 @@
       const rangeText = f.endMonth
         ? `${formatMonthKey(f.startMonth)} até ${formatMonthKey(f.endMonth)}`
         : `Desde ${formatMonthKey(f.startMonth)}`;
+      const overridesCount = f.monthOverrides ? Object.keys(f.monthOverrides).length : 0;
+      const extraInfo = overridesCount > 0 ? ` • ${overridesCount} mês(es) editado(s)` : '';
       return `
         <div class="parcel-list-item">
           <div>
             <div class="parcel-list-title">${escapeHtml(f.desc)}</div>
-            <div class="parcel-list-meta num-tabular">${formatBRL(f.val)} / mês • ${escapeHtml(f.topicName || 'Tópico')} • ${rangeText}</div>
+            <div class="parcel-list-meta num-tabular">Base ${formatBRL(f.val)} / mês • ${escapeHtml(f.topicName || 'Tópico')} • ${rangeText}${extraInfo}</div>
           </div>
           <div style="display:flex; gap:6px;">
             <button type="button" class="btn" onclick="closeFixedManager(); openFixedModal('${f.id}')">✎ Editar</button>
@@ -2783,7 +3052,7 @@
     document.getElementById('theme-btn').textContent = '🌙 Escuro';
   }
 
-  // --- RENDERIZAÇÃO DINÂMICA COM CENTAVOS ---
+  // --- RENDERIZAÇÃO DINÂMICA COM CENTAVOS E ARRASTAR ---
   function syncSliderVisual(slider, val, maxVal) {
     const safeMax = Math.max(0.01, parseFloat(maxVal) || 1);
     const pct = Math.max(0, Math.min(100, (val / safeMax) * 100));
@@ -2807,26 +3076,56 @@
     currentTopics.forEach((topic, tIdx) => {
       const sec = document.createElement('div');
       sec.className = 'section';
+      sec.dataset.tidx = String(tIdx);
       sec.style.setProperty('--topic-color', topic.color);
+      sec.addEventListener('dragover', e => handleTopicDragOver(e, tIdx));
+      sec.addEventListener('drop', e => handleTopicDrop(e, tIdx));
 
       const totalTopic = roundMoney(topic.items.reduce((acc, it) => acc + roundMoney(it.val || 0), 0));
 
       const header = document.createElement('div');
       header.className = 'sec-header';
-      header.innerHTML = `
-        <div class="sec-title-area" style="color:${topic.color}" onclick="editTopic(${tIdx})" title="Clique para renomear tópico">
-          <span>${escapeHtml(topic.name)}</span>
-          <span style="font-size:11px; opacity:0.75;">✎</span>
-        </div>
-        <div class="sec-controls">
-          <span id="sub-topic-${tIdx}" class="num-tabular" style="color:${topic.color}; font-weight:700;">${formatBRL(totalTopic)}</span>
-          <button type="button" class="btn" onclick="openFixedModal(null, '${topic.id}')" title="Fixar custo recorrente neste tópico">📌 Fixar</button>
-          <button type="button" class="btn" onclick="openInstallmentModal(null, '${topic.id}')" title="Parcelar compra neste tópico">💳 Parcelar</button>
-          <button type="button" class="btn" onclick="addItem(${tIdx})">+ Item</button>
-          <button type="button" class="btn btn-danger" onclick="deleteTopic(${tIdx})" title="Excluir tópico">×</button>
-        </div>
+
+      const leftGroup = document.createElement('div');
+      leftGroup.style.display = 'flex';
+      leftGroup.style.alignItems = 'center';
+      leftGroup.style.gap = '4px';
+
+      const topicHandle = document.createElement('span');
+      topicHandle.className = 'drag-handle';
+      topicHandle.textContent = '⋮⋮';
+      topicHandle.draggable = true;
+      topicHandle.title = 'Clique e segure para reordenar tópico por prioridade';
+      topicHandle.addEventListener('dragstart', e => handleTopicDragStart(e, tIdx));
+      topicHandle.addEventListener('dragend', () => { clearDragClasses(); dragState = null; });
+      topicHandle.addEventListener('touchstart', e => handleTouchDragStart(e, 'topic', tIdx), { passive: false });
+
+      const titleArea = document.createElement('div');
+      titleArea.className = 'sec-title-area';
+      titleArea.style.color = topic.color;
+      titleArea.title = 'Clique para renomear tópico';
+      titleArea.onclick = () => editTopic(tIdx);
+      titleArea.innerHTML = `<span>${escapeHtml(topic.name)}</span><span style="font-size:11px; opacity:0.75;">✎</span>`;
+
+      leftGroup.appendChild(topicHandle);
+      leftGroup.appendChild(titleArea);
+
+      const controls = document.createElement('div');
+      controls.className = 'sec-controls';
+      controls.innerHTML = `
+        <span id="sub-topic-${tIdx}" class="num-tabular" style="color:${topic.color}; font-weight:700;">${formatBRL(totalTopic)}</span>
+        <button type="button" class="btn" onclick="openFixedModal(null, '${topic.id}')" title="Fixar custo recorrente neste tópico">📌 Fixar</button>
+        <button type="button" class="btn" onclick="openInstallmentModal(null, '${topic.id}')" title="Parcelar compra neste tópico">💳 Parcelar</button>
+        <button type="button" class="btn" onclick="addItem(${tIdx})">+ Item</button>
+        <button type="button" class="btn btn-danger" onclick="deleteTopic(${tIdx})" title="Excluir tópico">×</button>
       `;
+
+      header.appendChild(leftGroup);
+      header.appendChild(controls);
       sec.appendChild(header);
+
+      const itemsListEl = document.createElement('div');
+      itemsListEl.className = 'items-list';
 
       topic.items.forEach((item, iIdx) => {
         const val = roundMoney(parseFloat(item.val) || 0);
@@ -2835,6 +3134,19 @@
 
         const row = document.createElement('div');
         row.className = 'row';
+        row.dataset.tidx = String(tIdx);
+        row.dataset.iidx = String(iIdx);
+        row.addEventListener('dragover', e => handleItemDragOver(e, tIdx, iIdx));
+        row.addEventListener('drop', e => handleItemDrop(e, tIdx, iIdx));
+
+        const itemHandle = document.createElement('span');
+        itemHandle.className = 'drag-handle';
+        itemHandle.textContent = '⋮⋮';
+        itemHandle.draggable = true;
+        itemHandle.title = 'Clique e segure para reordenar item por prioridade';
+        itemHandle.addEventListener('dragstart', e => handleItemDragStart(e, tIdx, iIdx));
+        itemHandle.addEventListener('dragend', () => { clearDragClasses(); dragState = null; });
+        itemHandle.addEventListener('touchstart', e => handleTouchDragStart(e, 'item', tIdx, iIdx), { passive: false });
 
         let editClickAttr = `onclick="editItem(${tIdx}, ${iIdx})" title="Clique para editar nome"`;
         let badgeHtml = '';
@@ -2843,19 +3155,60 @@
           editClickAttr = `onclick="openInstallmentModal('${item.installmentId}')" title="Clique para editar esta compra parcelada"`;
           badgeHtml = `<span class="parcel-tag">PARCELA</span>`;
         } else if (item.fixedId) {
-          editClickAttr = `onclick="openFixedModal('${item.fixedId}')" title="Clique para editar este custo fixo"`;
+          editClickAttr = `onclick="openFixedModal('${item.fixedId}')" title="Clique para editar valor base/período do fixo"`;
           badgeHtml = `<span class="fixed-tag">FIXO</span>`;
+          if (item.isMonthOverride) {
+            badgeHtml += `<span class="custom-month-tag">MÊS</span> <button type="button" class="btn-reset-override" onclick="event.stopPropagation(); resetFixedOverrideForCurrentMonth(${tIdx}, ${iIdx})" title="Voltar ao valor base do custo fixo neste mês">↺</button>`;
+          }
         }
 
-        row.innerHTML = `
-          <span class="item-label" ${editClickAttr}>${escapeHtml(item.label)}${badgeHtml}</span>
-          <input type="range" class="sb-slider" style="--topic-color:${topic.color}; --pct:${pct}%" min="0" max="${maxVal}" step="0.01" value="${val}" oninput="onSliderChange(${tIdx}, ${iIdx}, this)">
-          <input type="number" class="num-input num-tabular" step="0.01" value="${val}" oninput="onNumberChange(${tIdx}, ${iIdx}, this)">
-          <button type="button" class="btn btn-danger" onclick="deleteItem(${tIdx}, ${iIdx})" title="Excluir item">×</button>
-        `;
-        sec.appendChild(row);
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'item-label';
+        labelSpan.setAttribute('title', item.fixedId ? 'Clique para editar fixo; altere o campo ao lado para ajustar só este mês' : 'Clique para editar nome');
+        labelSpan.innerHTML = `${escapeHtml(item.label)}${badgeHtml}`;
+        if (item.installmentId) {
+          labelSpan.onclick = () => openInstallmentModal(item.installmentId);
+        } else if (item.fixedId) {
+          labelSpan.onclick = () => openFixedModal(item.fixedId);
+        } else {
+          labelSpan.onclick = () => editItem(tIdx, iIdx);
+        }
+
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.className = 'sb-slider';
+        slider.style.setProperty('--topic-color', topic.color);
+        slider.style.setProperty('--pct', `${pct}%`);
+        slider.min = '0';
+        slider.max = String(maxVal);
+        slider.step = '0.01';
+        slider.value = String(val);
+
+        const numInput = document.createElement('input');
+        numInput.type = 'number';
+        numInput.className = 'num-input num-tabular';
+        numInput.step = '0.01';
+        numInput.value = String(val);
+
+        slider.oninput = () => onSliderChange(tIdx, iIdx, slider, numInput);
+        numInput.oninput = () => onNumberChange(tIdx, iIdx, numInput, slider);
+
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'btn btn-danger';
+        delBtn.title = 'Excluir item';
+        delBtn.textContent = '×';
+        delBtn.onclick = () => deleteItem(tIdx, iIdx);
+
+        row.appendChild(itemHandle);
+        row.appendChild(labelSpan);
+        row.appendChild(slider);
+        row.appendChild(numInput);
+        row.appendChild(delBtn);
+        itemsListEl.appendChild(row);
       });
 
+      sec.appendChild(itemsListEl);
       frag.appendChild(sec);
     });
 
@@ -2924,34 +3277,32 @@
   // --- INTERAÇÕES E CRUD INSTANTÂNEOS ---
   function onIncomeChange() {
     updateSummary();
-    scheduleBackgroundSave(500, true);
+    scheduleBackgroundSave(450, true);
   }
 
-  function onSliderChange(tIdx, iIdx, el) {
-    const val = roundMoney(parseFloat(el.value) || 0);
-    currentTopics[tIdx].items[iIdx].val = val;
-    const numInput = el.parentElement.querySelector('.num-input');
-    if (numInput) numInput.value = val;
-    syncSliderVisual(el, val, el.max);
+  function onSliderChange(tIdx, iIdx, sliderEl, numInputEl) {
+    const val = roundMoney(parseFloat(sliderEl.value) || 0);
+    setItemValueWithPersistence(tIdx, iIdx, val);
+    if (numInputEl) numInputEl.value = val;
+    syncSliderVisual(sliderEl, val, sliderEl.max);
     updateSummary();
-    scheduleBackgroundSave(500);
+    scheduleBackgroundSave(400);
   }
 
-  function onNumberChange(tIdx, iIdx, el) {
-    const val = roundMoney(parseFloat(el.value) || 0);
+  function onNumberChange(tIdx, iIdx, numInputEl, sliderEl) {
+    const val = roundMoney(parseFloat(numInputEl.value) || 0);
     const item = currentTopics[tIdx].items[iIdx];
-    item.val = val;
-    const slider = el.parentElement.querySelector('.sb-slider');
-    if (slider) {
-      if (val > parseFloat(slider.max)) {
-        slider.max = val;
+    setItemValueWithPersistence(tIdx, iIdx, val);
+    if (sliderEl) {
+      if (val > parseFloat(sliderEl.max)) {
+        sliderEl.max = val;
         item.max = val;
       }
-      slider.value = val;
-      syncSliderVisual(slider, val, slider.max);
+      sliderEl.value = val;
+      syncSliderVisual(sliderEl, val, sliderEl.max);
     }
     updateSummary();
-    scheduleBackgroundSave(500);
+    scheduleBackgroundSave(400);
   }
 
   function addTopic() {
@@ -2984,7 +3335,7 @@
     }
 
     currentTopics.push(newTopic);
-    currentTopics = orderAndColorTopics(currentTopics);
+    currentTopics = applyTopicColors(currentTopics);
     renderTopics();
     scheduleBackgroundSave(250);
   }
@@ -2996,7 +3347,7 @@
     const cleanName = updated.trim();
     currentTopics[tIdx].name = cleanName;
     currentTopics[tIdx].shortName = cleanName.replace(/^\d+\.\s*/, '').split('(')[0].trim().slice(0, 14);
-    currentTopics = orderAndColorTopics(currentTopics);
+    currentTopics = applyTopicColors(currentTopics);
     renderTopics();
     scheduleBackgroundSave(250);
   }
