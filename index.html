@@ -510,7 +510,7 @@
     color: var(--text-main);
     border: 1px solid var(--border-input);
     border-radius: 12px;
-    padding: 7px 12px;
+    padding: 7px 11px;
     font-size: 12.5px;
     cursor: pointer;
     font-weight: 600;
@@ -539,6 +539,12 @@
     background: rgba(100, 210, 255, 0.14);
     border-color: rgba(100, 210, 255, 0.35);
     color: var(--c-sobra);
+  }
+
+  .btn-fixed {
+    background: rgba(255, 159, 10, 0.14);
+    border-color: rgba(255, 159, 10, 0.35);
+    color: var(--c-cartao);
   }
 
   .btn-import {
@@ -713,7 +719,7 @@
   .sec-controls {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     flex-wrap: wrap;
   }
 
@@ -749,6 +755,19 @@
     background: rgba(100, 210, 255, 0.14);
     color: var(--c-sobra);
     border: 1px solid rgba(100, 210, 255, 0.3);
+    margin-left: 5px;
+    vertical-align: middle;
+  }
+
+  .fixed-tag {
+    display: inline-block;
+    font-size: 9.5px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: rgba(255, 159, 10, 0.14);
+    color: var(--c-cartao);
+    border: 1px solid rgba(255, 159, 10, 0.35);
     margin-left: 5px;
     vertical-align: middle;
   }
@@ -1014,6 +1033,17 @@
     font-weight: 600;
   }
 
+  .fixed-preview {
+    background: var(--bg-box);
+    border: 1px solid var(--border-sub);
+    border-radius: 12px;
+    padding: 11px 12px;
+    font-size: 12.5px;
+    color: var(--c-cartao);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
   .parcel-list-item {
     background: var(--bg-box);
     border: 1px solid var(--border-sub);
@@ -1162,9 +1192,11 @@
         <button class="btn btn-accent" onclick="addTopic()">+ Novo Tópico</button>
         <button class="btn btn-installment" onclick="openInstallmentModal()">💳 Parcelar</button>
         <button class="btn" onclick="openInstallmentsManager()">📑 Parcelas</button>
-        <button class="btn btn-import" onclick="openImportModal()">📋 Código</button>
-        <button class="btn" onclick="resetToDefaultStructure()" title="Carrega as 6 repartições padrão (incluindo Cartão de Crédito) zeradas neste mês">⚡ Padrão</button>
-        <button class="btn" onclick="copyToAllMonths()" title="Copia os tópicos e valores deste mês para todos os 12 meses do ano selecionado">📋 Replicar p/ Ano</button>
+        <button class="btn btn-fixed" onclick="openFixedModal()">📌 Fixar</button>
+        <button class="btn" onclick="openFixedManager()">📋 Fixos</button>
+        <button class="btn btn-import" onclick="openImportModal()">🤖 Código</button>
+        <button class="btn" onclick="resetToDefaultStructure()" title="Carrega as 6 repartições padrão (mantendo parcelas e fixos ativos)">⚡ Padrão</button>
+        <button class="btn" onclick="copyToAllMonths()" title="Copia os tópicos e valores deste mês para todos os 12 meses do ano selecionado">🔁 Replicar p/ Ano</button>
         <button class="btn" onclick="openAccountModal()" title="Alterar nome de usuário e senha desta conta">⚙️ Conta</button>
         <button class="btn" id="theme-btn" onclick="toggleTheme()">☀️ Claro</button>
         <button class="btn" onclick="logout()" title="Trocar de conta / Sair">🔒 Sair</button>
@@ -1183,7 +1215,71 @@
 
     <button type="button" class="btn btn-accent btn-add-bottom" onclick="addTopic()">+ Criar Novo Tópico / Categoria</button>
 
-    <div class="note">💡 <strong>Multi-ano (2026–2035) & Importação por Código:</strong> Use <strong>📋 Código</strong> para colar o código de cálculo gerado no chat ou copiar o prompt pronto para resumir seus gastos.</div>
+    <div class="note">💡 <strong>Parcelas & Custos Fixos (2026–2035):</strong> Use <strong>💳 Parcelar</strong> para compras divididas e <strong>📌 Fixar</strong> para custos recorrentes mensais (ex.: Wi-Fi no Cartão de Crédito). Gerencie ou remova quando quiser em <strong>📑 Parcelas</strong> e <strong>📋 Fixos</strong>.</div>
+  </div>
+</div>
+
+<!-- ==================== MODAL CRIAR / EDITAR CUSTO FIXO ==================== -->
+<div id="fixed-modal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this) closeFixedModal()">
+  <div class="modal-box">
+    <h2 class="modal-title" id="fixed-modal-title">Fixar Custo Mensal</h2>
+    <div class="modal-sub">O custo fixo se repete automaticamente todos os meses a partir do início escolhido até você remover.</div>
+    <form onsubmit="saveFixedCost(event)">
+      <label class="modal-label">Descrição do custo fixo</label>
+      <input type="text" id="fixed-desc" class="modal-input" placeholder="Ex: Wi-Fi, Spotify, Academia" required>
+
+      <label class="modal-label">Tópico / Categoria</label>
+      <select id="fixed-topic" class="modal-select"></select>
+
+      <label class="modal-label">Valor mensal (R$)</label>
+      <input type="number" id="fixed-val" class="modal-input num-tabular" min="0.01" step="0.01" placeholder="100" oninput="updateFixedPreview()" required>
+
+      <div class="modal-grid-2">
+        <div>
+          <label class="modal-label">Mês de início</label>
+          <select id="fixed-start-month-only" class="modal-select" onchange="updateFixedPreview()">
+            <option value="01">Janeiro</option>
+            <option value="02">Fevereiro</option>
+            <option value="03">Março</option>
+            <option value="04">Abril</option>
+            <option value="05">Maio</option>
+            <option value="06">Junho</option>
+            <option value="07">Julho</option>
+            <option value="08">Agosto</option>
+            <option value="09">Setembro</option>
+            <option value="10">Outubro</option>
+            <option value="11">Novembro</option>
+            <option value="12">Dezembro</option>
+          </select>
+        </div>
+        <div>
+          <label class="modal-label">Ano de início</label>
+          <select id="fixed-start-year-only" class="modal-select" onchange="updateFixedPreview()"></select>
+        </div>
+      </div>
+
+      <div class="fixed-preview num-tabular" id="fixed-preview">Fixo mensal: R$ 0,00 / mês</div>
+
+      <div id="fixed-feedback" style="font-size:12px; color:var(--c-neg); min-height:16px;"></div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn" onclick="closeFixedModal()">Cancelar</button>
+        <button type="submit" class="btn btn-fixed">Salvar Custo Fixo</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ==================== MODAL GERENCIAR CUSTOS FIXOS ==================== -->
+<div id="fixed-list-modal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this) closeFixedManager()">
+  <div class="modal-box">
+    <h2 class="modal-title">Custos Fixos Ativos</h2>
+    <div class="modal-sub">Edite o valor, troque o tópico ou remova custos fixos quando quiser.</div>
+    <div id="fixed-list-container"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-fixed" onclick="closeFixedManager(); openFixedModal();">+ Novo Custo Fixo</button>
+      <button type="button" class="btn" onclick="closeFixedManager()">Fechar</button>
+    </div>
   </div>
 </div>
 
@@ -1351,20 +1447,17 @@
   }
 
   (function initYearSelectors() {
-    const mainYearSel = document.getElementById('year-only-select');
-    const instYearSel = document.getElementById('inst-start-year-only');
-    YEARS_LIST.forEach(y => {
-      const opt1 = document.createElement('option');
-      opt1.value = y;
-      opt1.textContent = y;
-      if (y === '2026') opt1.selected = true;
-      mainYearSel.appendChild(opt1);
-
-      const opt2 = document.createElement('option');
-      opt2.value = y;
-      opt2.textContent = y;
-      if (y === '2026') opt2.selected = true;
-      instYearSel.appendChild(opt2);
+    const yearSelectIds = ['year-only-select', 'inst-start-year-only', 'fixed-start-year-only'];
+    yearSelectIds.forEach(id => {
+      const sel = document.getElementById(id);
+      if (!sel) return;
+      YEARS_LIST.forEach(y => {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        if (y === '2026') opt.selected = true;
+        sel.appendChild(opt);
+      });
     });
   })();
 
@@ -1460,11 +1553,12 @@
     return topicsList;
   }
 
-  let cloudRoot = { accounts: {}, data: {}, installments: {} };
+  let cloudRoot = { accounts: {}, data: {}, installments: {}, fixedCosts: {} };
   let activeAccountId = localStorage.getItem(SESSION_KEY) || null;
   let currentIncome = 0;
   let currentTopics = [];
   let editingInstallmentId = null;
+  let editingFixedId = null;
   let saveTimeout = null;
 
   function normalizeCloudRoot(raw) {
@@ -1484,12 +1578,18 @@
     if (!root.installments || typeof root.installments !== 'object') {
       root.installments = {};
     }
+    if (!root.fixedCosts || typeof root.fixedCosts !== 'object') {
+      root.fixedCosts = {};
+    }
     for (const accId of Object.keys(root.accounts)) {
       if (!root.data[accId] || typeof root.data[accId] !== 'object') {
         root.data[accId] = {};
       }
       if (!Array.isArray(root.installments[accId])) {
         root.installments[accId] = [];
+      }
+      if (!Array.isArray(root.fixedCosts[accId])) {
+        root.fixedCosts[accId] = [];
       }
     }
     return root;
@@ -1515,6 +1615,281 @@
       body: JSON.stringify(cloudRoot)
     });
     if (!res.ok) throw new Error('Falha ao salvar JSONBin');
+  }
+
+  // --- SINCRONIZAÇÃO DE RECORRÊNCIAS (PARCELAS + FIXOS) NO MÊS ATIVO ---
+  function syncRecurrencesForSingleMonth(monthKey, topicsList) {
+    const list = ensureCreditCardTopic(topicsList);
+    const mIdx = ALL_MONTHS.indexOf(monthKey);
+    if (mIdx === -1) return list;
+
+    // Remove itens antigos gerados por planos para evitar duplicidade
+    list.forEach(t => {
+      if (Array.isArray(t.items)) {
+        t.items = t.items.filter(it => !it.installmentId && !it.fixedId);
+      }
+    });
+
+    // Reaplica parcelas ativas neste mês
+    getAccountInstallments().forEach(plan => {
+      const startIdx = ALL_MONTHS.indexOf(plan.startMonth);
+      const count = Math.max(1, parseInt(plan.count, 10) || 1);
+      if (startIdx !== -1 && mIdx >= startIdx && mIdx < startIdx + count) {
+        const k = mIdx - startIdx;
+        const total = parseFloat(plan.total) || 0;
+        const installmentVal = Number((total / count).toFixed(2));
+        let topicObj = list.find(t => t.id === plan.topicId || t.name === plan.topicName) || list[0];
+        if (topicObj) {
+          topicObj.items.push({
+            id: `it_${plan.id}_${k + 1}`,
+            installmentId: plan.id,
+            parcelIndex: k + 1,
+            parcelCount: count,
+            label: `${plan.desc} (${k + 1}/${count})`,
+            val: installmentVal,
+            max: Math.max(1000, installmentVal * 2),
+            step: 5
+          });
+        }
+      }
+    });
+
+    // Reaplica custos fixos ativos neste mês
+    getAccountFixedCosts().forEach(fixed => {
+      const startIdx = ALL_MONTHS.indexOf(fixed.startMonth || '2026-01');
+      if (startIdx === -1 || mIdx >= startIdx) {
+        const val = Number((parseFloat(fixed.val) || 0).toFixed(2));
+        let topicObj = list.find(t => t.id === fixed.topicId || t.name === fixed.topicName) || list[0];
+        if (topicObj) {
+          topicObj.items.push({
+            id: `it_${fixed.id}_${monthKey}`,
+            fixedId: fixed.id,
+            label: fixed.desc,
+            val: val,
+            max: Math.max(1000, val * 2),
+            step: 5
+          });
+        }
+      }
+    });
+
+    return list;
+  }
+
+  // --- SISTEMA DE CUSTOS FIXOS RECORRENTES ---
+  function getAccountFixedCosts() {
+    if (!Array.isArray(cloudRoot.fixedCosts[activeAccountId])) {
+      cloudRoot.fixedCosts[activeAccountId] = [];
+    }
+    return cloudRoot.fixedCosts[activeAccountId];
+  }
+
+  function removeFixedFromAllMonths(fixedId) {
+    const monthsMap = getAccountMonthsMap();
+    for (const m of ALL_MONTHS) {
+      const mData = monthsMap[m];
+      if (!mData || !Array.isArray(mData.topics)) continue;
+      mData.topics.forEach(t => {
+        if (Array.isArray(t.items)) {
+          t.items = t.items.filter(it => it.fixedId !== fixedId);
+        }
+      });
+    }
+    currentTopics.forEach(t => {
+      if (Array.isArray(t.items)) {
+        t.items = t.items.filter(it => it.fixedId !== fixedId);
+      }
+    });
+  }
+
+  function applyFixedToMonths(fixed) {
+    removeFixedFromAllMonths(fixed.id);
+    const monthsMap = getAccountMonthsMap();
+    const startIdx = ALL_MONTHS.indexOf(fixed.startMonth);
+    if (startIdx === -1) return;
+
+    const val = Number((parseFloat(fixed.val) || 0).toFixed(2));
+
+    for (let mIdx = startIdx; mIdx < ALL_MONTHS.length; mIdx++) {
+      const monthKey = ALL_MONTHS[mIdx];
+
+      if (!monthsMap[monthKey] || !Array.isArray(monthsMap[monthKey].topics) || monthsMap[monthKey].topics.length === 0) {
+        monthsMap[monthKey] = {
+          income: 0,
+          topics: getDefaultTopics()
+        };
+      } else {
+        monthsMap[monthKey].topics = ensureCreditCardTopic(monthsMap[monthKey].topics);
+      }
+
+      const targetMonthTopics = (monthKey === getCurrentMonth()) ? currentTopics : monthsMap[monthKey].topics;
+      let topicObj = targetMonthTopics.find(t => t.id === fixed.topicId || t.name === fixed.topicName);
+
+      if (!topicObj && targetMonthTopics.length > 0) {
+        topicObj = targetMonthTopics[0];
+      }
+
+      if (topicObj) {
+        topicObj.items.push({
+          id: `it_${fixed.id}_${monthKey}`,
+          fixedId: fixed.id,
+          label: fixed.desc,
+          val: val,
+          max: Math.max(1000, val * 2),
+          step: 5
+        });
+      }
+
+      monthsMap[monthKey].topics = targetMonthTopics;
+    }
+  }
+
+  function openFixedModal(existingId = null, preselectedTopicId = null) {
+    editingFixedId = existingId;
+    const topicSelect = document.getElementById('fixed-topic');
+    topicSelect.innerHTML = '';
+
+    currentTopics.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.name;
+      topicSelect.appendChild(opt);
+    });
+
+    document.getElementById('fixed-feedback').textContent = '';
+
+    if (existingId) {
+      const fixed = getAccountFixedCosts().find(f => f.id === existingId);
+      if (!fixed) return;
+      document.getElementById('fixed-modal-title').textContent = 'Editar Custo Fixo';
+      document.getElementById('fixed-desc').value = fixed.desc;
+      topicSelect.value = fixed.topicId || (currentTopics[0] && currentTopics[0].id);
+      document.getElementById('fixed-val').value = fixed.val;
+      const [sy, sm] = fixed.startMonth.split('-');
+      document.getElementById('fixed-start-year-only').value = sy;
+      document.getElementById('fixed-start-month-only').value = sm;
+    } else {
+      document.getElementById('fixed-modal-title').textContent = 'Fixar Custo Mensal';
+      document.getElementById('fixed-desc').value = '';
+      if (preselectedTopicId) {
+        topicSelect.value = preselectedTopicId;
+      } else {
+        const cardTopic = currentTopics.find(t => t.id === 'top_cartao');
+        if (cardTopic) topicSelect.value = cardTopic.id;
+      }
+      document.getElementById('fixed-val').value = '';
+      document.getElementById('fixed-start-month-only').value = document.getElementById('month-only-select').value;
+      document.getElementById('fixed-start-year-only').value = document.getElementById('year-only-select').value;
+    }
+
+    updateFixedPreview();
+    document.getElementById('fixed-modal').style.display = 'flex';
+  }
+
+  function closeFixedModal() {
+    editingFixedId = null;
+    document.getElementById('fixed-modal').style.display = 'none';
+  }
+
+  function updateFixedPreview() {
+    const val = parseFloat(document.getElementById('fixed-val').value) || 0;
+    const sm = document.getElementById('fixed-start-month-only').value;
+    const sy = document.getElementById('fixed-start-year-only').value;
+    const startMonth = `${sy}-${sm}`;
+    document.getElementById('fixed-preview').textContent =
+      `Fixo mensal: R$ ${val.toFixed(2)} / mês • A partir de ${formatMonthKey(startMonth)} (todos os meses)`;
+  }
+
+  function saveFixedCost(e) {
+    e.preventDefault();
+    const desc = document.getElementById('fixed-desc').value.trim();
+    const topicId = document.getElementById('fixed-topic').value;
+    const val = parseFloat(document.getElementById('fixed-val').value);
+    const startMonth = `${document.getElementById('fixed-start-year-only').value}-${document.getElementById('fixed-start-month-only').value}`;
+    const fb = document.getElementById('fixed-feedback');
+
+    if (!desc || isNaN(val) || val <= 0) {
+      fb.textContent = 'Preencha descrição e valor mensal maior que zero.';
+      return;
+    }
+
+    const topicObj = currentTopics.find(t => t.id === topicId) || currentTopics[0];
+    const fixedList = getAccountFixedCosts();
+
+    if (editingFixedId) {
+      const idx = fixedList.findIndex(f => f.id === editingFixedId);
+      if (idx !== -1) {
+        const updatedFixed = {
+          ...fixedList[idx],
+          desc,
+          topicId: topicObj ? topicObj.id : topicId,
+          topicName: topicObj ? topicObj.name : '',
+          val,
+          startMonth
+        };
+        fixedList[idx] = updatedFixed;
+        applyFixedToMonths(updatedFixed);
+      }
+    } else {
+      const newFixed = {
+        id: 'fix_' + Date.now(),
+        desc,
+        topicId: topicObj ? topicObj.id : topicId,
+        topicName: topicObj ? topicObj.name : '',
+        val,
+        startMonth
+      };
+      fixedList.push(newFixed);
+      applyFixedToMonths(newFixed);
+    }
+
+    closeFixedModal();
+    renderTopics();
+    scheduleSave();
+  }
+
+  function openFixedManager() {
+    renderFixedManager();
+    document.getElementById('fixed-list-modal').style.display = 'flex';
+  }
+
+  function closeFixedManager() {
+    document.getElementById('fixed-list-modal').style.display = 'none';
+  }
+
+  function renderFixedManager() {
+    const container = document.getElementById('fixed-list-container');
+    const fixedList = getAccountFixedCosts();
+
+    if (fixedList.length === 0) {
+      container.innerHTML = `<div style="text-align:center; padding:18px; font-size:12.5px; color:var(--text-muted);">Nenhum custo fixo cadastrado nesta conta.</div>`;
+      return;
+    }
+
+    container.innerHTML = fixedList.map(f => {
+      const mLabel = formatMonthKey(f.startMonth);
+      return `
+        <div class="parcel-list-item">
+          <div>
+            <div class="parcel-list-title">${escapeHtml(f.desc)}</div>
+            <div class="parcel-list-meta num-tabular">R$ ${Number(f.val).toFixed(2)} / mês • ${escapeHtml(f.topicName || 'Tópico')} • Desde ${mLabel}</div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button type="button" class="btn" onclick="closeFixedManager(); openFixedModal('${f.id}')">✎ Editar</button>
+            <button type="button" class="btn btn-danger" onclick="deleteFixedCost('${f.id}')" title="Remover custo fixo">×</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function deleteFixedCost(fixedId) {
+    if (!confirm('Remover este custo fixo de todos os meses?')) return;
+    cloudRoot.fixedCosts[activeAccountId] = getAccountFixedCosts().filter(f => f.id !== fixedId);
+    removeFixedFromAllMonths(fixedId);
+    renderFixedManager();
+    renderTopics();
+    scheduleSave();
   }
 
   // --- IMPORTAÇÃO POR CÓDIGO & PROMPT ---
@@ -1630,7 +2005,7 @@
     try {
       const data = extractAndParseImport(raw);
       currentIncome = data.income;
-      currentTopics = data.topics;
+      currentTopics = syncRecurrencesForSingleMonth(getCurrentMonth(), data.topics);
       document.getElementById('income').value = currentIncome;
       renderTopics();
       scheduleSave();
@@ -1803,13 +2178,14 @@
   }
 
   function hydrateMonthData(raw) {
+    const monthKey = getCurrentMonth();
     if (!raw || !Array.isArray(raw.topics) || raw.topics.length === 0) {
       currentIncome = raw && raw.income !== undefined ? raw.income : 0;
-      currentTopics = getDefaultTopics();
+      currentTopics = syncRecurrencesForSingleMonth(monthKey, getDefaultTopics());
       return;
     }
     currentIncome = raw.income !== undefined ? raw.income : 0;
-    currentTopics = ensureCreditCardTopic(JSON.parse(JSON.stringify(raw.topics)));
+    currentTopics = syncRecurrencesForSingleMonth(monthKey, JSON.parse(JSON.stringify(raw.topics)));
   }
 
   // --- SISTEMA DE COMPRAS PARCELADAS ---
@@ -2069,6 +2445,7 @@
           </div>
           <div class="sec-controls">
             <span id="sub-topic-${tIdx}" class="num-tabular" style="color:${topic.color}; font-weight:700;">R$ ${totalTopic.toFixed(0)}</span>
+            <button class="btn" onclick="openFixedModal(null, '${topic.id}')" title="Fixar custo recorrente neste tópico">📌 Fixar</button>
             <button class="btn" onclick="openInstallmentModal(null, '${topic.id}')" title="Parcelar compra neste tópico">💳 Parcelar</button>
             <button class="btn" onclick="addItem(${tIdx})">+ Item</button>
             <button class="btn btn-danger" onclick="deleteTopic(${tIdx})" title="Excluir tópico">×</button>
@@ -2084,16 +2461,19 @@
         const row = document.createElement('div');
         row.className = 'row';
 
-        const editClickAttr = item.installmentId
-          ? `onclick="openInstallmentModal('${item.installmentId}')" title="Clique para editar esta compra parcelada"`
-          : `onclick="editItem(${tIdx}, ${iIdx})" title="Clique para editar nome"`;
+        let editClickAttr = `onclick="editItem(${tIdx}, ${iIdx})" title="Clique para editar nome"`;
+        let badgeHtml = '';
 
-        const parcelBadge = item.installmentId
-          ? `<span class="parcel-tag">PARCELA</span>`
-          : '';
+        if (item.installmentId) {
+          editClickAttr = `onclick="openInstallmentModal('${item.installmentId}')" title="Clique para editar esta compra parcelada"`;
+          badgeHtml = `<span class="parcel-tag">PARCELA</span>`;
+        } else if (item.fixedId) {
+          editClickAttr = `onclick="openFixedModal('${item.fixedId}')" title="Clique para editar este custo fixo"`;
+          badgeHtml = `<span class="fixed-tag">FIXO</span>`;
+        }
 
         row.innerHTML = `
-          <span class="item-label" ${editClickAttr}>${escapeHtml(item.label)}${parcelBadge}</span>
+          <span class="item-label" ${editClickAttr}>${escapeHtml(item.label)}${badgeHtml}</span>
           <input type="range" class="sb-slider" style="--topic-color:${topic.color}; --pct:${pct}%" min="0" max="${maxVal}" step="${item.step || 5}" value="${val}" oninput="onSliderChange(${tIdx}, ${iIdx}, this)">
           <input type="number" class="num-input num-tabular" value="${val}" oninput="onNumberChange(${tIdx}, ${iIdx}, this)">
           <button class="btn btn-danger" onclick="deleteItem(${tIdx}, ${iIdx})" title="Excluir item">×</button>
@@ -2271,6 +2651,22 @@
 
   function deleteItem(tIdx, iIdx) {
     const item = currentTopics[tIdx].items[iIdx];
+    if (item.fixedId) {
+      if (!confirm(`"${item.label}" é um custo fixo recorrente. Deseja remover ele de TODOS os meses?`)) return;
+      cloudRoot.fixedCosts[activeAccountId] = getAccountFixedCosts().filter(f => f.id !== item.fixedId);
+      removeFixedFromAllMonths(item.fixedId);
+      renderTopics();
+      scheduleSave();
+      return;
+    }
+    if (item.installmentId) {
+      if (!confirm(`"${item.label}" faz parte de uma compra parcelada. Deseja remover TODAS as parcelas desta compra?`)) return;
+      cloudRoot.installments[activeAccountId] = getAccountInstallments().filter(p => p.id !== item.installmentId);
+      removePlanFromAllMonths(item.installmentId);
+      renderTopics();
+      scheduleSave();
+      return;
+    }
     if (!confirm(`Excluir "${item.label}"?`)) return;
     currentTopics[tIdx].items.splice(iIdx, 1);
     renderTopics();
@@ -2285,9 +2681,9 @@
   }
 
   function resetToDefaultStructure() {
-    if (!confirm('Restaurar todas as 6 repartições padrão (incluindo Cartão de Crédito) zeradas neste mês para esta conta?')) return;
+    if (!confirm('Restaurar todas as 6 repartições padrão zeradas neste mês (mantendo suas parcelas e custos fixos ativos)?')) return;
     currentIncome = 0;
-    currentTopics = getDefaultTopics();
+    currentTopics = syncRecurrencesForSingleMonth(getCurrentMonth(), getDefaultTopics());
     document.getElementById('income').value = 0;
     renderTopics();
     scheduleSave();
@@ -2301,10 +2697,9 @@
       const key = `${selectedYear}-${m}`;
       userMonths[key] = {
         income: currentIncome,
-        topics: ensureCreditCardTopic(JSON.parse(JSON.stringify(currentTopics)))
+        topics: syncRecurrencesForSingleMonth(key, JSON.parse(JSON.stringify(currentTopics)))
       };
     });
-    getAccountInstallments().forEach(plan => applyPlanToMonths(plan));
     scheduleSave();
   }
 
