@@ -1410,7 +1410,7 @@
 
     <button type="button" class="btn btn-accent btn-add-bottom" onclick="addTopic()">+ Criar Novo Tópico / Categoria</button>
 
-    <div class="note">💡 <strong>Prioridade & Flexibilidade Mensal (2026–2035):</strong> Clique e segure <strong>⋮⋮</strong> para arrastar e reordenar tópicos ou itens por prioridade. Alterar um item <strong>FIXO</strong> em um mês específico salva a alteração apenas naquele mês sem voltar atrás ao recarregar.</div>
+    <div class="note">💡 <strong>Prioridade & Flexibilidade Mensal (2026–2035):</strong> Itens <strong>FIXO</strong> aparecem no topo de cada tópico e você pode clicar e segurar <strong>⋮⋮</strong> para reordenar tópicos ou itens livremente. Excluir um item propaga a remoção para os próximos meses.</div>
   </div>
 </div>
 
@@ -1919,7 +1919,6 @@
   let hasPendingSave = false;
   let lastLocalEditAt = 0;
 
-  // Estado de arrastar e soltar (mouse e touch)
   let dragState = null;
 
   function normalizeCloudRoot(raw) {
@@ -2017,10 +2016,47 @@
         monthsMap[k] = {
           initialized: existing ? Boolean(existing.initialized) : false,
           topics: existing ? existing.topics : null,
+          deletedKeys: existing && Array.isArray(existing.deletedKeys) ? existing.deletedKeys : [],
           income: roundMoney(newIncome),
           incomeCustom: false
         };
       }
+    }
+  }
+
+  function propagateItemDeletionForward(fromMonthKey, item) {
+    const monthsMap = getAccountMonthsMap();
+    const startIdx = ALL_MONTHS.indexOf(fromMonthKey);
+    if (startIdx === -1) return;
+
+    const itemSig = item.id ? `id:${item.id}` : `lbl:${normalizeTopicKey(item.label)}`;
+
+    for (let i = startIdx + 1; i < ALL_MONTHS.length; i++) {
+      const k = ALL_MONTHS[i];
+      const existing = monthsMap[k];
+      const prevDeleted = (existing && Array.isArray(existing.deletedKeys)) ? existing.deletedKeys : [];
+      const nextDeleted = prevDeleted.includes(itemSig) ? prevDeleted : [...prevDeleted, itemSig];
+
+      let nextTopics = existing && Array.isArray(existing.topics)
+        ? existing.topics.map(t => ({
+            ...t,
+            items: Array.isArray(t.items)
+              ? t.items.filter(it => {
+                  if (!it) return false;
+                  const sig = it.id ? `id:${it.id}` : `lbl:${normalizeTopicKey(it.label)}`;
+                  return sig !== itemSig && normalizeTopicKey(it.label) !== normalizeTopicKey(item.label);
+                })
+              : []
+          }))
+        : null;
+
+      monthsMap[k] = {
+        initialized: existing ? Boolean(existing.initialized) : false,
+        topics: nextTopics,
+        deletedKeys: nextDeleted,
+        income: existing ? existing.income : undefined,
+        incomeCustom: existing ? Boolean(existing.incomeCustom) : false
+      };
     }
   }
 
@@ -2109,14 +2145,24 @@
       ? (Array.isArray(rawMonthObj.topics) ? rawMonthObj.topics : getInheritedBaseTopics(monthKey))
       : getInheritedBaseTopics(monthKey);
 
-    const list = source.map(t => ({
-      ...t,
-      items: Array.isArray(t.items)
+    const deletedSet = new Set(Array.isArray(rawMonthObj && rawMonthObj.deletedKeys) ? rawMonthObj.deletedKeys : []);
+
+    const list = source.map(t => {
+      const normalItems = Array.isArray(t.items)
         ? t.items
-            .filter(it => it && !it.installmentId && !it.fixedId)
+            .filter(it => {
+              if (!it || it.installmentId || it.fixedId) return false;
+              const sig = it.id ? `id:${it.id}` : `lbl:${normalizeTopicKey(it.label)}`;
+              if (deletedSet.has(sig) || deletedSet.has(`lbl:${normalizeTopicKey(it.label)}`)) return false;
+              return true;
+            })
             .map(it => ({ ...it, val: roundMoney(it.val || 0), step: it.step || 0.01 }))
-        : []
-    }));
+        : [];
+      return {
+        ...t,
+        items: normalItems
+      };
+    });
 
     const mIdx = ALL_MONTHS.indexOf(monthKey);
     if (mIdx === -1) return applyTopicColors(list);
@@ -2143,6 +2189,7 @@
       }
     });
 
+    const fixedByTopic = new Map();
     getAccountFixedCosts().forEach(fixed => {
       const startIdx = ALL_MONTHS.indexOf(fixed.startMonth || '2026-01');
       const endIdx = fixed.endMonth ? ALL_MONTHS.indexOf(fixed.endMonth) : (ALL_MONTHS.length - 1);
@@ -2153,7 +2200,7 @@
         const hasOverride = Object.prototype.hasOwnProperty.call(overrides, monthKey);
         const val = hasOverride ? roundMoney(overrides[monthKey]) : roundMoney(fixed.val);
         const topicObj = resolveTargetTopic(list, fixed.topicId, fixed.topicName);
-        topicObj.items.push({
+        const fixedItem = {
           id: `it_${fixed.id}_${monthKey}`,
           fixedId: fixed.id,
           isMonthOverride: hasOverride,
@@ -2161,7 +2208,16 @@
           val: val,
           max: Math.max(1000, roundMoney(val * 2)),
           step: 0.01
-        });
+        };
+        if (!fixedByTopic.has(topicObj.id)) fixedByTopic.set(topicObj.id, []);
+        fixedByTopic.get(topicObj.id).push(fixedItem);
+      }
+    });
+
+    list.forEach(topicObj => {
+      const topFixed = fixedByTopic.get(topicObj.id) || [];
+      if (topFixed.length > 0) {
+        topicObj.items = [...topFixed, ...topicObj.items];
       }
     });
 
@@ -2192,6 +2248,7 @@
       initialized: true,
       income: incVal,
       incomeCustom: isCustom,
+      deletedKeys: Array.isArray(prev.deletedKeys) ? prev.deletedKeys : [],
       topics: currentTopics
     };
 
@@ -3148,14 +3205,11 @@
         itemHandle.addEventListener('dragend', () => { clearDragClasses(); dragState = null; });
         itemHandle.addEventListener('touchstart', e => handleTouchDragStart(e, 'item', tIdx, iIdx), { passive: false });
 
-        let editClickAttr = `onclick="editItem(${tIdx}, ${iIdx})" title="Clique para editar nome"`;
         let badgeHtml = '';
 
         if (item.installmentId) {
-          editClickAttr = `onclick="openInstallmentModal('${item.installmentId}')" title="Clique para editar esta compra parcelada"`;
           badgeHtml = `<span class="parcel-tag">PARCELA</span>`;
         } else if (item.fixedId) {
-          editClickAttr = `onclick="openFixedModal('${item.fixedId}')" title="Clique para editar valor base/período do fixo"`;
           badgeHtml = `<span class="fixed-tag">FIXO</span>`;
           if (item.isMonthOverride) {
             badgeHtml += `<span class="custom-month-tag">MÊS</span> <button type="button" class="btn-reset-override" onclick="event.stopPropagation(); resetFixedOverrideForCurrentMonth(${tIdx}, ${iIdx})" title="Voltar ao valor base do custo fixo neste mês">↺</button>`;
@@ -3409,7 +3463,10 @@
     }
 
     if (!confirm(`Excluir "${item.label}"?`)) return;
+    const removedSnapshot = { ...item };
     currentTopics[tIdx].items.splice(iIdx, 1);
+    commitCurrentMonthToMemory(true, false);
+    propagateItemDeletionForward(getCurrentMonth(), removedSnapshot);
     renderTopics();
     scheduleBackgroundSave(250);
   }
