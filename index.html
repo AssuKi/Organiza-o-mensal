@@ -1444,7 +1444,7 @@
     </div>
 
     <div class="global-sort-bar">
-      <span class="global-sort-title">↕ Ordenar tópicos deste mês (propaga para os meses seguintes):</span>
+      <span class="global-sort-title">↕ Ordenar tópicos deste mês (numeração e meses seguintes atualizam automaticamente):</span>
       <select class="sort-select" id="global-topic-sort" onchange="sortAllTopics(this.value); this.value='';">
         <option value="">Escolher ordenação dos tópicos...</option>
         <option value="val_desc">Maior valor (R$)</option>
@@ -1458,7 +1458,7 @@
 
     <button type="button" class="btn btn-accent btn-add-bottom" onclick="addTopic()">+ Criar Novo Tópico / Categoria</button>
 
-    <div class="note">💡 <strong>Prioridade & Flexibilidade Mensal (2026–2035):</strong> Itens <strong>FIXO</strong> ficam no topo de cada tópico, mas você pode arrastar <strong>⋮⋮</strong> ou usar o seletor de ordenação dentro/fora dos tópicos a qualquer hora. Alterações de ordem e exclusões propagam para os meses seguintes.</div>
+    <div class="note">💡 <strong>Numeração & Prioridade Automática (2026–2035):</strong> A numeração (1., 2., 3....) é atualizada automaticamente conforme a ordem dos tópicos, e qualquer mudança de ordem propaga automaticamente para todos os meses seguintes.</div>
   </div>
 </div>
 
@@ -1566,7 +1566,7 @@
 
     <div id="import-tab-paste">
       <label class="modal-label">Cole aqui o código JSON do cálculo</label>
-      <textarea id="import-code-input" class="modal-textarea" placeholder='{"income":1650.00,"topics":[{"name":"1. Cartão de Crédito","items":[{"label":"Seguro iPhone","val":34.90}]}]}' oninput="previewImportCode()"></textarea>
+      <textarea id="import-code-input" class="modal-textarea" placeholder='{"income":1650.00,"topics":[{"name":"Cartão de Crédito","items":[{"label":"Seguro iPhone","val":34.90}]}]}' oninput="previewImportCode()"></textarea>
 
       <div class="import-preview-box num-tabular" id="import-preview">Aguardando código para validar...</div>
       <div id="import-feedback" style="font-size:12px; color:var(--c-neg); min-height:16px;"></div>
@@ -1581,7 +1581,7 @@
       <label class="modal-label">Copie este prompt e cole aqui no chat junto com seus valores</label>
       <textarea id="import-prompt-text" class="modal-textarea" readonly>Converta o resumo financeiro a seguir em um código JSON válido para importação no StonksBank, sem explicações extras, apenas o bloco JSON:
 - Formato esperado: {"income": numero_com_centavos, "topics": [{"name": "Nome do Tópico", "items": [{"label": "Nome do Item", "val": numero_com_centavos}]}]}
-- Mantenha "1. Cartão de Crédito" para gastos de cartão e "2. Contas Fixas & Assinaturas" para contas fixas.
+- Mantenha "Cartão de Crédito" para gastos de cartão e "Contas Fixas & Assinaturas" para contas fixas.
 - Meus dados do mês: [ESCREVA AQUI SEU SALÁRIO E SEUS GASTOS/TÓPICOS]</textarea>
 
       <div id="prompt-copy-feedback" style="font-size:12px; color:var(--c-guardado); min-height:16px;"></div>
@@ -1761,6 +1761,10 @@
     return `${SHORT_MONTH_NAMES[m] || m}/${y.slice(-2)}`;
   }
 
+  function stripNumericPrefix(name) {
+    return String(name || '').replace(/^\d+\.\s*/, '').trim();
+  }
+
   function getInitialMonthKey() {
     const saved = localStorage.getItem(LAST_DATE_KEY);
     if (saved && ALL_MONTHS.includes(saved)) return saved;
@@ -1875,10 +1879,10 @@
   };
 
   function getDefaultTopics() {
-    return [
+    return renumberTopicsAutomatically([
       {
         id: 'top_cartao',
-        name: '1. Cartão de Crédito',
+        name: 'Cartão de Crédito',
         shortName: 'Cartão Crédito',
         color: '#FF9F0A',
         items: [
@@ -1888,7 +1892,7 @@
       },
       {
         id: 'top_fixas',
-        name: '2. Contas Fixas & Assinaturas',
+        name: 'Contas Fixas & Assinaturas',
         shortName: 'Contas Fixas',
         color: '#0A84FF',
         items: [
@@ -1900,7 +1904,7 @@
       },
       {
         id: 'top_cabelo',
-        name: '3. Cabelo & Cuidados Pessoais',
+        name: 'Cabelo & Cuidados Pessoais',
         shortName: 'Cabelo',
         color: '#FF375F',
         items: [
@@ -1910,7 +1914,7 @@
       },
       {
         id: 'top_lazer',
-        name: '4. Lazer, Delivery & Rolês',
+        name: 'Lazer, Delivery & Rolês',
         shortName: 'Lazer',
         color: '#FFD60A',
         items: [
@@ -1920,7 +1924,7 @@
       },
       {
         id: 'top_reserva',
-        name: '5. Fundo de Reserva (Emergência)',
+        name: 'Fundo de Reserva (Emergência)',
         shortName: 'Fundo Reserva',
         color: '#BF5AF2',
         items: [
@@ -1930,7 +1934,7 @@
       },
       {
         id: 'top_guardado',
-        name: '6. Dinheiro Guardado & Metas',
+        name: 'Dinheiro Guardado & Metas',
         shortName: 'Guardado',
         color: '#30D158',
         items: [
@@ -1938,7 +1942,7 @@
           { id: 'it_meta', label: 'Meta Específica / Viagem / Upgrade', val: 0, max: 2000, step: 0.01 }
         ]
       }
-    ];
+    ]);
   }
 
   function getDefaultTopicColor(topic, fallbackIdx) {
@@ -1951,6 +1955,21 @@
     if (id === 'top_reserva' || norm.includes('reserva')) return '#BF5AF2';
     if (id === 'top_guardado' || norm.includes('guardado')) return '#30D158';
     return topic.color || PALETTE[fallbackIdx % PALETTE.length];
+  }
+
+  function renumberTopicsAutomatically(list) {
+    if (!Array.isArray(list)) return [];
+    return list.map((t, idx) => {
+      const baseTitle = stripNumericPrefix(t.name) || `Tópico ${idx + 1}`;
+      const shortName = baseTitle.split('(')[0].trim().slice(0, 14) || baseTitle;
+      return {
+        ...t,
+        baseName: baseTitle,
+        name: `${idx + 1}. ${baseTitle}`,
+        shortName,
+        color: getDefaultTopicColor({ ...t, name: baseTitle }, idx)
+      };
+    });
   }
 
   let cloudRoot = { accounts: {}, data: {}, installments: {}, fixedCosts: {}, updatedAt: 0 };
@@ -2073,7 +2092,7 @@
 
   function applyOrderSnapshotToTopicList(targetTopics, orderedSnapshotTopics) {
     if (!Array.isArray(orderedSnapshotTopics) || orderedSnapshotTopics.length === 0) {
-      return targetTopics;
+      return renumberTopicsAutomatically(targetTopics);
     }
 
     const topicRankMap = new Map();
@@ -2082,6 +2101,7 @@
     orderedSnapshotTopics.forEach((snapT, tPos) => {
       const tKey = snapT.id || normalizeTopicKey(snapT.name);
       topicRankMap.set(tKey, tPos);
+      topicRankMap.set(`norm:${normalizeTopicKey(snapT.name)}`, tPos);
 
       const iMap = new Map();
       if (Array.isArray(snapT.items)) {
@@ -2093,19 +2113,21 @@
         });
       }
       itemRankByTopic.set(tKey, iMap);
+      itemRankByTopic.set(`norm:${normalizeTopicKey(snapT.name)}`, iMap);
     });
 
     const sortedTopics = [...targetTopics].sort((a, b) => {
-      const ka = a.id || normalizeTopicKey(a.name);
-      const kb = b.id || normalizeTopicKey(b.name);
-      const ra = topicRankMap.has(ka) ? topicRankMap.get(ka) : 9999;
-      const rb = topicRankMap.has(kb) ? topicRankMap.get(kb) : 9999;
+      const ra = topicRankMap.has(a.id)
+        ? topicRankMap.get(a.id)
+        : (topicRankMap.has(`norm:${normalizeTopicKey(a.name)}`) ? topicRankMap.get(`norm:${normalizeTopicKey(a.name)}`) : 9999);
+      const rb = topicRankMap.has(b.id)
+        ? topicRankMap.get(b.id)
+        : (topicRankMap.has(`norm:${normalizeTopicKey(b.name)}`) ? topicRankMap.get(`norm:${normalizeTopicKey(b.name)}`) : 9999);
       return ra - rb;
     });
 
-    return sortedTopics.map(t => {
-      const tKey = t.id || normalizeTopicKey(t.name);
-      const iMap = itemRankByTopic.get(tKey);
+    const withSortedItems = sortedTopics.map(t => {
+      const iMap = itemRankByTopic.get(t.id) || itemRankByTopic.get(`norm:${normalizeTopicKey(t.name)}`);
       if (!iMap || !Array.isArray(t.items)) return t;
 
       const sortedItems = [...t.items].sort((x, y) => {
@@ -2122,6 +2144,8 @@
 
       return { ...t, items: sortedItems };
     });
+
+    return renumberTopicsAutomatically(withSortedItems);
   }
 
   function propagateOrderForward(fromMonthKey, orderedTopicsSnapshot) {
@@ -2174,7 +2198,7 @@
 
       monthsMap[k] = {
         initialized: existing ? Boolean(existing.initialized) : false,
-        topics: nextTopics,
+        topics: nextTopics ? renumberTopicsAutomatically(nextTopics) : null,
         deletedKeys: nextDeleted,
         income: existing ? existing.income : undefined,
         incomeCustom: existing ? Boolean(existing.incomeCustom) : false
@@ -2223,8 +2247,8 @@
     const norm = normalizeTopicKey(topicName);
     const isCard = topicId === 'top_cartao' || norm.includes('cartao');
     const isFixed = topicId === 'top_fixas' || norm.includes('contas fixas');
-    const cleanName = topicName || (isCard ? '1. Cartão de Crédito' : '2. Contas Fixas & Assinaturas');
-    const shortName = cleanName.replace(/^\d+\.\s*/, '').split('(')[0].trim().slice(0, 14) || cleanName;
+    const cleanName = stripNumericPrefix(topicName) || (isCard ? 'Cartão de Crédito' : 'Contas Fixas & Assinaturas');
+    const shortName = cleanName.split('(')[0].trim().slice(0, 14) || cleanName;
     const color = fallbackColor || (isCard ? '#FF9F0A' : (isFixed ? '#0A84FF' : '#64D2FF'));
     return {
       id: isCard ? 'top_cartao' : (topicId || 'top_' + norm.replace(/[^a-z0-9]+/g, '_')),
@@ -2254,13 +2278,6 @@
     return topicObj;
   }
 
-  function applyTopicColors(list) {
-    return list.map((t, idx) => ({
-      ...t,
-      color: getDefaultTopicColor(t, idx)
-    }));
-  }
-
   function buildTopicsForMonth(monthKey, rawMonthObj) {
     const isInitialized = Boolean(rawMonthObj && (rawMonthObj.initialized === true || Array.isArray(rawMonthObj.topics)));
     const source = isInitialized
@@ -2287,7 +2304,7 @@
     });
 
     const mIdx = ALL_MONTHS.indexOf(monthKey);
-    if (mIdx === -1) return applyTopicColors(list);
+    if (mIdx === -1) return renumberTopicsAutomatically(list);
 
     getAccountInstallments().forEach(plan => {
       const startIdx = ALL_MONTHS.indexOf(plan.startMonth);
@@ -2343,7 +2360,12 @@
       }
     });
 
-    return applyTopicColors(list);
+    const inheritedOrder = getInheritedBaseTopics(monthKey);
+    const orderedList = (!isInitialized && inheritedOrder.length > 0)
+      ? applyOrderSnapshotToTopicList(list, inheritedOrder)
+      : renumberTopicsAutomatically(list);
+
+    return orderedList;
   }
 
   function loadMonthIntoView(monthKey) {
@@ -2353,13 +2375,14 @@
       ? roundMoney(raw.income)
       : getInheritedIncome(monthKey);
     currentIncome = inc;
-    currentTopics = buildTopicsForMonth(monthKey, raw);
+    currentTopics = renumberTopicsAutomatically(buildTopicsForMonth(monthKey, raw));
     document.getElementById('income').value = currentIncome.toFixed(2);
     renderTopics();
   }
 
   function commitCurrentMonthToMemory(markTimestamp = true, markIncomeCustom = false) {
     if (!activeAccountId) return;
+    currentTopics = renumberTopicsAutomatically(currentTopics);
     const monthsMap = getAccountMonthsMap();
     const monthKey = getCurrentMonth();
     const prev = monthsMap[monthKey] || {};
@@ -2454,10 +2477,11 @@
     currentTopics.sort((a, b) => {
       if (mode === 'val_desc') return getTopicTotal(b) - getTopicTotal(a);
       if (mode === 'val_asc') return getTopicTotal(a) - getTopicTotal(b);
-      if (mode === 'alpha_asc') return String(a.name || '').localeCompare(String(b.name || ''), 'pt-BR', { sensitivity: 'base' });
-      if (mode === 'alpha_desc') return String(b.name || '').localeCompare(String(a.name || ''), 'pt-BR', { sensitivity: 'base' });
+      if (mode === 'alpha_asc') return stripNumericPrefix(a.name).localeCompare(stripNumericPrefix(b.name), 'pt-BR', { sensitivity: 'base' });
+      if (mode === 'alpha_desc') return stripNumericPrefix(b.name).localeCompare(stripNumericPrefix(a.name), 'pt-BR', { sensitivity: 'base' });
       return 0;
     });
+    currentTopics = renumberTopicsAutomatically(currentTopics);
     renderTopics();
     scheduleBackgroundSave(250, false, true);
   }
@@ -2508,6 +2532,7 @@
 
     const [moved] = currentTopics.splice(from, 1);
     currentTopics.splice(to, 0, moved);
+    currentTopics = renumberTopicsAutomatically(currentTopics);
     renderTopics();
     scheduleBackgroundSave(250, false, true);
   }
@@ -2616,6 +2641,7 @@
       if (st.type === 'topic' && st.fromT !== st.toT) {
         const [moved] = currentTopics.splice(st.fromT, 1);
         currentTopics.splice(st.toT, 0, moved);
+        currentTopics = renumberTopicsAutomatically(currentTopics);
         renderTopics();
         scheduleBackgroundSave(250, false, true);
       } else if (st.type === 'item' && (st.fromT !== st.toT || st.fromI !== st.toI)) {
@@ -2646,15 +2672,17 @@
     selectEl.innerHTML = '';
     const mapById = new Map();
 
-    applyTopicColors([...getDefaultTopics(), ...currentTopics]).forEach(t => {
-      mapById.set(t.id, t);
+    renumberTopicsAutomatically([...currentTopics, ...getDefaultTopics()]).forEach(t => {
+      if (!mapById.has(t.id)) mapById.set(t.id, t);
     });
 
+    let idx = 1;
     mapById.forEach(t => {
       const opt = document.createElement('option');
       opt.value = t.id;
-      opt.textContent = t.name;
+      opt.textContent = `${idx}. ${stripNumericPrefix(t.name)}`;
       selectEl.appendChild(opt);
+      idx++;
     });
 
     if (preselectedId && mapById.has(preselectedId)) {
@@ -2735,7 +2763,7 @@
     const desc = document.getElementById('fixed-desc').value.trim();
     const topicSelect = document.getElementById('fixed-topic');
     const topicId = topicSelect.value;
-    const selectedOptionText = topicSelect.options[topicSelect.selectedIndex]?.textContent || '';
+    const selectedOptionText = stripNumericPrefix(topicSelect.options[topicSelect.selectedIndex]?.textContent || '');
     const val = roundMoney(parseFloat(document.getElementById('fixed-val').value));
     const startMonth = `${document.getElementById('fixed-start-year-only').value}-${document.getElementById('fixed-start-month-only').value}`;
     const endMonth = getFixedEndMonthFromInputs();
@@ -2752,6 +2780,7 @@
     }
 
     const topicObj = currentTopics.find(t => t.id === topicId) || getDefaultTopics().find(t => t.id === topicId);
+    const cleanTopicName = topicObj ? stripNumericPrefix(topicObj.name) : selectedOptionText;
     const fixedList = getAccountFixedCosts();
 
     if (editingFixedId) {
@@ -2761,7 +2790,7 @@
           ...fixedList[idx],
           desc,
           topicId: topicObj ? topicObj.id : topicId,
-          topicName: topicObj ? topicObj.name : selectedOptionText,
+          topicName: cleanTopicName,
           val,
           startMonth,
           endMonth
@@ -2772,7 +2801,7 @@
         id: 'fix_' + Date.now(),
         desc,
         topicId: topicObj ? topicObj.id : topicId,
-        topicName: topicObj ? topicObj.name : selectedOptionText,
+        topicName: cleanTopicName,
         val,
         startMonth,
         endMonth,
@@ -2814,7 +2843,7 @@
         <div class="parcel-list-item">
           <div>
             <div class="parcel-list-title">${escapeHtml(f.desc)}</div>
-            <div class="parcel-list-meta num-tabular">Base ${formatBRL(f.val)} / mês • ${escapeHtml(f.topicName || 'Tópico')} • ${rangeText}${extraInfo}</div>
+            <div class="parcel-list-meta num-tabular">Base ${formatBRL(f.val)} / mês • ${escapeHtml(stripNumericPrefix(f.topicName) || 'Tópico')} • ${rangeText}${extraInfo}</div>
           </div>
           <div style="display:flex; gap:6px;">
             <button type="button" class="btn" onclick="closeFixedManager(); openFixedModal('${f.id}')">✎ Editar</button>
@@ -2913,7 +2942,7 @@
     const desc = document.getElementById('inst-desc').value.trim();
     const topicSelect = document.getElementById('inst-topic');
     const topicId = topicSelect.value;
-    const selectedOptionText = topicSelect.options[topicSelect.selectedIndex]?.textContent || '';
+    const selectedOptionText = stripNumericPrefix(topicSelect.options[topicSelect.selectedIndex]?.textContent || '');
     const total = roundMoney(parseFloat(document.getElementById('inst-total').value));
     const count = parseInt(document.getElementById('inst-count').value, 10);
     const startMonth = `${document.getElementById('inst-start-year-only').value}-${document.getElementById('inst-start-month-only').value}`;
@@ -2927,6 +2956,7 @@
     }
 
     const topicObj = currentTopics.find(t => t.id === topicId) || getDefaultTopics().find(t => t.id === topicId);
+    const cleanTopicName = topicObj ? stripNumericPrefix(topicObj.name) : selectedOptionText;
     const plans = getAccountInstallments();
 
     if (editingInstallmentId) {
@@ -2936,7 +2966,7 @@
           ...plans[idx],
           desc,
           topicId: topicObj ? topicObj.id : topicId,
-          topicName: topicObj ? topicObj.name : selectedOptionText,
+          topicName: cleanTopicName,
           total,
           count,
           startMonth,
@@ -2948,7 +2978,7 @@
         id: 'inst_' + Date.now(),
         desc,
         topicId: topicObj ? topicObj.id : topicId,
-        topicName: topicObj ? topicObj.name : selectedOptionText,
+        topicName: cleanTopicName,
         total,
         count,
         startMonth,
@@ -3047,9 +3077,9 @@
     }
 
     const normalizedTopics = parsed.topics.map((t, idx) => {
-      const name = String(t.name || `Tópico ${idx + 1}`).trim();
-      const shortName = String(t.shortName || name.replace(/^\d+\.\s*/, '').split('(')[0].trim().slice(0, 14) || name);
-      const isCard = normalizeTopicKey(name).includes('cartao');
+      const cleanName = stripNumericPrefix(t.name || `Tópico ${idx + 1}`);
+      const shortName = String(t.shortName || cleanName.split('(')[0].trim().slice(0, 14) || cleanName);
+      const isCard = normalizeTopicKey(cleanName).includes('cartao');
       const color = t.color || (isCard ? '#FF9F0A' : PALETTE[idx % PALETTE.length]);
       const rawItems = Array.isArray(t.items) ? t.items : [];
 
@@ -3068,14 +3098,14 @@
 
       return {
         id: isCard ? 'top_cartao' : (t.id || `top_imp_${Date.now()}_${idx}`),
-        name,
+        name: cleanName,
         shortName,
         color,
         items
       };
     });
 
-    return { income, topics: normalizedTopics };
+    return { income, topics: renumberTopicsAutomatically(normalizedTopics) };
   }
 
   function previewImportCode() {
@@ -3115,7 +3145,7 @@
       document.getElementById('income').value = currentIncome.toFixed(2);
       renderTopics();
       closeImportModal();
-      scheduleBackgroundSave(200, true);
+      scheduleBackgroundSave(200, true, true);
     } catch (err) {
       fbEl.textContent = err.message;
     }
@@ -3276,6 +3306,7 @@
   }
 
   function renderTopics() {
+    currentTopics = renumberTopicsAutomatically(currentTopics);
     const container = document.getElementById('topics-container');
     const frag = document.createDocumentFragment();
 
@@ -3290,6 +3321,8 @@
     }
 
     currentTopics.forEach((topic, tIdx) => {
+      const displayTitle = `${tIdx + 1}. ${stripNumericPrefix(topic.name)}`;
+
       const sec = document.createElement('div');
       sec.className = 'section';
       sec.dataset.tidx = String(tIdx);
@@ -3321,7 +3354,7 @@
       titleArea.style.color = topic.color;
       titleArea.title = 'Clique para renomear tópico';
       titleArea.onclick = () => editTopic(tIdx);
-      titleArea.innerHTML = `<span>${escapeHtml(topic.name)}</span><span style="font-size:11px; opacity:0.75;">✎</span>`;
+      titleArea.innerHTML = `<span>${escapeHtml(displayTitle)}</span><span style="font-size:11px; opacity:0.75;">✎</span>`;
 
       leftGroup.appendChild(topicHandle);
       leftGroup.appendChild(titleArea);
@@ -3457,7 +3490,7 @@
       const kpi = document.createElement('div');
       kpi.className = 'kpi';
       kpi.innerHTML = `
-        <div class="kpi-label">${escapeHtml(topic.shortName || topic.name)}</div>
+        <div class="kpi-label">${escapeHtml(topic.shortName || stripNumericPrefix(topic.name))}</div>
         <div class="kpi-val" style="color:${topic.color}">${formatBRL(sum)}</div>
         <div class="kpi-pct" style="color:${topic.color}">${pct}%</div>
       `;
@@ -3526,11 +3559,10 @@
   }
 
   function addTopic() {
-    const nextNum = currentTopics.length + 1;
-    const name = prompt(`Nome do novo tópico (ex: ${nextNum}. Transporte, Faculdade, Moto):`);
+    const name = prompt('Nome do novo tópico (a numeração será automática):');
     if (!name || !name.trim()) return;
-    const cleanName = name.trim();
-    const shortName = cleanName.replace(/^\d+\.\s*/, '').split('(')[0].trim().slice(0, 14);
+    const cleanName = stripNumericPrefix(name.trim());
+    const shortName = cleanName.split('(')[0].trim().slice(0, 14);
     const color = PALETTE[currentTopics.length % PALETTE.length];
 
     const newTopic = {
@@ -3555,19 +3587,19 @@
     }
 
     currentTopics.push(newTopic);
-    currentTopics = applyTopicColors(currentTopics);
+    currentTopics = renumberTopicsAutomatically(currentTopics);
     renderTopics();
     scheduleBackgroundSave(250, false, true);
   }
 
   function editTopic(tIdx) {
-    const current = currentTopics[tIdx].name;
-    const updated = prompt('Editar nome do tópico:', current);
+    const current = stripNumericPrefix(currentTopics[tIdx].name);
+    const updated = prompt('Editar nome do tópico (a numeração é automática):', current);
     if (!updated || !updated.trim()) return;
-    const cleanName = updated.trim();
+    const cleanName = stripNumericPrefix(updated.trim());
     currentTopics[tIdx].name = cleanName;
-    currentTopics[tIdx].shortName = cleanName.replace(/^\d+\.\s*/, '').split('(')[0].trim().slice(0, 14);
-    currentTopics = applyTopicColors(currentTopics);
+    currentTopics[tIdx].shortName = cleanName.split('(')[0].trim().slice(0, 14);
+    currentTopics = renumberTopicsAutomatically(currentTopics);
     renderTopics();
     scheduleBackgroundSave(250, false, true);
   }
@@ -3575,6 +3607,7 @@
   function deleteTopic(tIdx) {
     if (!confirm(`Excluir o tópico "${currentTopics[tIdx].name}"?`)) return;
     currentTopics.splice(tIdx, 1);
+    currentTopics = renumberTopicsAutomatically(currentTopics);
     renderTopics();
     scheduleBackgroundSave(250, false, true);
   }
@@ -3641,7 +3674,7 @@
     if (!confirm('Restaurar todas as 6 repartições padrão zeradas nesta página mensal (mantendo suas parcelas e custos fixos ativos)?')) return;
     currentTopics = buildTopicsForMonth(getCurrentMonth(), { initialized: true, topics: getDefaultTopics() });
     renderTopics();
-    scheduleBackgroundSave(250);
+    scheduleBackgroundSave(250, false, true);
   }
 
   function copyToAllMonths() {
@@ -3656,7 +3689,7 @@
         initialized: true,
         income: currentIncome,
         incomeCustom: true,
-        topics: buildTopicsForMonth(key, { initialized: true, topics: snapshotTopics })
+        topics: renumberTopicsAutomatically(buildTopicsForMonth(key, { initialized: true, topics: snapshotTopics }))
       };
     });
     cloudRoot.updatedAt = Date.now();
