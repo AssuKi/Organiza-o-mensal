@@ -74,27 +74,28 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* ==================== TELA DE LOGIN LIQUID GLASS ==================== */
+  /* ==================== TELA DE LOGIN LIQUID GLASS ENXUTA ==================== */
   .sb-login-page {
     position: relative;
     min-height: 100vh;
     width: 100%;
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    overflow-x: hidden;
-    background: #05070c;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow: hidden;
+    background: #000000;
     color: #F5F5F7;
   }
 
   .sb-bg-image {
     position: fixed;
-    inset: -28px;
+    inset: -32px;
     background-image: url('icon.png');
     background-size: cover;
     background-position: center;
-    filter: blur(22px) brightness(0.72) saturate(1.25);
-    transform: scale(1.06);
+    filter: blur(26px) brightness(0.62) saturate(1.25);
+    transform: scale(1.08);
     z-index: 0;
     pointer-events: none;
   }
@@ -102,107 +103,33 @@
   .sb-bg-overlay {
     position: fixed;
     inset: 0;
-    background: radial-gradient(circle at 50% 40%, rgba(10, 14, 24, 0.25) 0%, rgba(0, 0, 0, 0.65) 100%);
+    background: radial-gradient(circle at 50% 45%, rgba(12, 16, 28, 0.28) 0%, rgba(0, 0, 0, 0.72) 100%);
     z-index: 1;
     pointer-events: none;
   }
 
-  .sb-topbar {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px 28px;
-    gap: 12px;
-  }
-
-  .sb-logo-top {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 19px;
-    font-weight: 700;
-    color: #F5F5F7;
-    letter-spacing: -0.02em;
-  }
-
-  .sb-chart-icon {
-    width: 30px;
-    height: 30px;
-    background: rgba(255, 255, 255, 0.14);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    border-radius: 9px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: #30D158;
-  }
-
-  .sb-nav-links {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    font-size: 13px;
-    font-weight: 500;
-  }
-
-  .sb-nav-links a {
-    color: rgba(245, 245, 247, 0.85);
-    text-decoration: none;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-
-  .sb-nav-links a:hover {
-    opacity: 1;
-    color: #FFFFFF;
-  }
-
-  .sb-btn-open-top {
-    background: rgba(255, 255, 255, 0.14) !important;
-    border: 1px solid rgba(255, 255, 255, 0.24);
-    color: #FFFFFF !important;
-    padding: 8px 14px;
-    border-radius: 999px;
-    font-weight: 600;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-  }
-
-  .sb-center-wrap {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-    flex: 1;
-  }
-
   .sb-glass-card {
+    position: relative;
+    z-index: 2;
     width: 100%;
-    max-width: 350px;
+    max-width: 360px;
     background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(25px) saturate(180%);
-    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    backdrop-filter: blur(26px) saturate(180%);
+    -webkit-backdrop-filter: blur(26px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 24px;
-    padding: 28px 24px 24px;
+    border-radius: 26px;
+    padding: 32px 24px 26px;
     text-align: center;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.22);
   }
 
   .sb-card-logo {
-    width: 44px;
-    height: 44px;
-    margin: 0 auto 12px;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 14px;
     background: rgba(48, 209, 88, 0.16);
     border: 1px solid rgba(48, 209, 88, 0.35);
-    border-radius: 14px;
+    border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -211,7 +138,7 @@
 
   .sb-card-title {
     margin: 0;
-    font-size: 22px;
+    font-size: 23px;
     font-weight: 700;
     color: #F5F5F7;
     letter-spacing: -0.02em;
@@ -220,7 +147,7 @@
   .sb-card-sub {
     font-size: 12.5px;
     color: rgba(245, 245, 247, 0.72);
-    margin: 5px 0 20px;
+    margin: 5px 0 22px;
   }
 
   .sb-field-group {
@@ -242,7 +169,7 @@
   .sb-input {
     width: 100%;
     min-height: 46px;
-    background: rgba(0, 0, 0, 0.42);
+    background: rgba(0, 0, 0, 0.44);
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 14px;
     padding: 12px 42px 12px 42px;
@@ -258,7 +185,7 @@
 
   .sb-input:focus {
     border-color: #30D158;
-    background: rgba(0, 0, 0, 0.62);
+    background: rgba(0, 0, 0, 0.65);
   }
 
   .sb-eye-btn {
@@ -275,28 +202,10 @@
     justify-content: center;
   }
 
-  .sb-help-links {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-    margin: 10px 2px 18px;
-  }
-
-  .sb-help-links a {
-    font-size: 12px;
-    color: rgba(245, 245, 247, 0.78);
-    text-decoration: none;
-    cursor: pointer;
-  }
-
-  .sb-help-links a:hover {
-    color: #FFFFFF;
-    text-decoration: underline;
-  }
-
   .sb-btn-enter {
     width: 100%;
     min-height: 46px;
+    margin-top: 8px;
     background: #30D158;
     color: #041408;
     border: none;
@@ -316,107 +225,11 @@
     transform: scale(0.985);
   }
 
-  .sb-btn-secondary {
-    width: 100%;
-    min-height: 44px;
-    margin-top: 10px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 14px;
-    padding: 8px 14px;
-    color: #F5F5F7;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    line-height: 1.25;
-  }
-
-  .sb-btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.14);
-  }
-
-  .sb-btn-secondary strong {
-    font-size: 12.5px;
-    font-weight: 600;
-  }
-
-  .sb-btn-secondary span {
-    font-size: 10.5px;
-    color: rgba(245, 245, 247, 0.68);
-  }
-
-  .sb-qr-link {
-    margin-top: 16px;
-    min-height: 40px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12.5px;
-    color: rgba(245, 245, 247, 0.85);
-    cursor: pointer;
-    background: none;
-    border: none;
-  }
-
-  .sb-qr-link:hover {
-    color: #FFFFFF;
-    text-decoration: underline;
-  }
-
   .sb-login-msg {
-    margin-top: 10px;
+    margin-top: 12px;
     font-size: 12px;
     min-height: 16px;
     color: #FFD60A;
-  }
-
-  .sb-footer {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 28px;
-    font-size: 12px;
-    color: rgba(245, 245, 247, 0.72);
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .sb-footer-links {
-    display: flex;
-    gap: 18px;
-  }
-
-  .sb-footer-links a {
-    color: rgba(245, 245, 247, 0.72);
-    text-decoration: none;
-    cursor: pointer;
-  }
-
-  .sb-footer-badge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 500;
-  }
-
-  @media (max-width: 720px) {
-    .sb-topbar { padding: 14px 16px; }
-    .sb-nav-links a:not(.sb-btn-open-top) { display: none; }
-    .sb-glass-card {
-      max-width: 100%;
-      border-radius: 22px;
-      padding: 24px 18px 20px;
-    }
-    .sb-footer {
-      flex-direction: column;
-      text-align: center;
-      padding: 14px 16px;
-      gap: 8px;
-    }
   }
 
   /* ==================== PAINEL APPLE GOURMET ==================== */
@@ -1310,87 +1123,41 @@
 </head>
 <body>
 
-<!-- ==================== TELA DE LOGIN LIQUID GLASS ==================== -->
+<!-- ==================== TELA DE LOGIN LIQUID GLASS ENXUTA ==================== -->
 <div id="login-screen" class="sb-login-page">
   <div class="sb-bg-image"></div>
   <div class="sb-bg-overlay"></div>
 
-  <header class="sb-topbar">
-    <div class="sb-logo-top">
-      <span class="sb-chart-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
-      </span>
-      <span>StonksBank</span>
+  <main class="sb-glass-card">
+    <div class="sb-card-logo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
     </div>
-    <nav class="sb-nav-links">
-      <a onclick="demoToast('Menu decorativo')">Para Você</a>
-      <a onclick="demoToast('Menu decorativo')">Para Empresas</a>
-      <a onclick="demoToast('Menu decorativo')">Ajuda</a>
-      <a onclick="demoToast('Menu decorativo')">Segurança</a>
-      <a class="sb-btn-open-top" onclick="demoToast('Contas ativas: kirito, asuna, nossa conta, beta tester')">Abra sua conta</a>
-    </nav>
-  </header>
+    <h1 class="sb-card-title">StonksBank</h1>
+    <div class="sb-card-sub">Entre na sua conta</div>
 
-  <main class="sb-center-wrap">
-    <div class="sb-glass-card">
-      <div class="sb-card-logo">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+    <form onsubmit="handleLogin(event)">
+      <div class="sb-field-group">
+        <span class="sb-field-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+        </span>
+        <input type="text" id="login-user" class="sb-input" placeholder="Usuário" autocomplete="username" required>
       </div>
-      <h1 class="sb-card-title">StonksBank</h1>
-      <div class="sb-card-sub">Acesso restrito ao controle financeiro</div>
 
-      <form onsubmit="handleLogin(event)">
-        <div class="sb-field-group">
-          <span class="sb-field-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-          </span>
-          <input type="text" id="login-user" class="sb-input" placeholder="Usuário" autocomplete="username" required>
-        </div>
-
-        <div class="sb-field-group">
-          <span class="sb-field-icon">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
-          </span>
-          <input type="password" id="login-pass" class="sb-input" placeholder="Senha" autocomplete="current-password" required>
-          <button type="button" class="sb-eye-btn" onclick="togglePassVisibility()" title="Mostrar/ocultar senha">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
-          </button>
-        </div>
-
-        <div class="sb-help-links">
-          <a onclick="demoToast('Senha inicial padrão: 2027')">Esqueci minha senha</a>
-          <a onclick="demoToast('Logins: kirito | asuna | nossa conta | beta tester')">Esqueci meu usuário</a>
-        </div>
-
-        <button type="submit" class="sb-btn-enter">Entrar</button>
-
-        <button type="button" class="sb-btn-secondary" onclick="demoToast('4 contas individuais já configuradas')">
-          <strong>Abrir minha conta</strong>
-          <span>Primeiro acesso</span>
+      <div class="sb-field-group">
+        <span class="sb-field-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+        </span>
+        <input type="password" id="login-pass" class="sb-input" placeholder="Senha" autocomplete="current-password" required>
+        <button type="button" class="sb-eye-btn" onclick="togglePassVisibility()" title="Mostrar/ocultar senha">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
         </button>
-      </form>
+      </div>
 
-      <div id="login-error" class="sb-login-msg"></div>
-    </div>
+      <button type="submit" class="sb-btn-enter">Entrar</button>
+    </form>
 
-    <button type="button" class="sb-qr-link" onclick="demoToast('Login via QR Code apenas ilustrativo')">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><path d="M14 14h3v3h-3zM18 18h3v3h-3zM14 19h2v2h-2zM19 14h2v2h-2z"/></svg>
-      <span>Acessar com QR Code</span>
-    </button>
+    <div id="login-error" class="sb-login-msg"></div>
   </main>
-
-  <footer class="sb-footer">
-    <div class="sb-footer-links">
-      <a onclick="demoToast('Termos de Uso StonksBank')">Termos de Uso</a>
-      <a onclick="demoToast('Privacidade StonksBank')">Privacidade</a>
-      <a onclick="demoToast('Atendimento 24h')">Atendimento</a>
-    </div>
-    <div class="sb-footer-badge">
-      <span>Acesso seguro • Banco Central</span>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2z"/></svg>
-    </div>
-    <div>StonksBank S.A. © Todos os direitos reservados</div>
-  </footer>
 </div>
 
 <!-- ==================== PAINEL APPLE GOURMET ==================== -->
@@ -1480,20 +1247,7 @@
       <div class="modal-grid-2">
         <div>
           <label class="modal-label">A partir de (Mês)</label>
-          <select id="fixed-start-month-only" class="modal-select" onchange="updateFixedPreview()">
-            <option value="01">Janeiro</option>
-            <option value="02">Fevereiro</option>
-            <option value="03">Março</option>
-            <option value="04">Abril</option>
-            <option value="05">Maio</option>
-            <option value="06">Junho</option>
-            <option value="07">Julho</option>
-            <option value="08">Agosto</option>
-            <option value="09">Setembro</option>
-            <option value="10">Outubro</option>
-            <option value="11">Novembro</option>
-            <option value="12">Dezembro</option>
-          </select>
+          <select id="fixed-start-month-only" class="modal-select" onchange="updateFixedPreview()"></select>
         </div>
         <div>
           <label class="modal-label">A partir de (Ano)</label>
@@ -1504,27 +1258,11 @@
       <div class="modal-grid-2">
         <div>
           <label class="modal-label">Até (Mês)</label>
-          <select id="fixed-end-month-only" class="modal-select" onchange="updateFixedPreview()">
-            <option value="NONE">Sem limite (até 2035)</option>
-            <option value="01">Janeiro</option>
-            <option value="02">Fevereiro</option>
-            <option value="03">Março</option>
-            <option value="04">Abril</option>
-            <option value="05">Maio</option>
-            <option value="06">Junho</option>
-            <option value="07">Julho</option>
-            <option value="08">Agosto</option>
-            <option value="09">Setembro</option>
-            <option value="10">Outubro</option>
-            <option value="11">Novembro</option>
-            <option value="12">Dezembro</option>
-          </select>
+          <select id="fixed-end-month-only" class="modal-select" onchange="updateFixedPreview()"></select>
         </div>
         <div>
           <label class="modal-label">Até (Ano)</label>
-          <select id="fixed-end-year-only" class="modal-select" onchange="updateFixedPreview()">
-            <option value="NONE">Sem limite</option>
-          </select>
+          <select id="fixed-end-year-only" class="modal-select" onchange="updateFixedPreview()"></select>
         </div>
       </div>
 
@@ -1642,20 +1380,7 @@
       <div class="modal-grid-2">
         <div>
           <label class="modal-label">A partir de (Mês)</label>
-          <select id="inst-start-month-only" class="modal-select" onchange="syncCountFromEndDate(); updateInstallmentPreview()">
-            <option value="01">Janeiro</option>
-            <option value="02">Fevereiro</option>
-            <option value="03">Março</option>
-            <option value="04">Abril</option>
-            <option value="05">Maio</option>
-            <option value="06">Junho</option>
-            <option value="07">Julho</option>
-            <option value="08">Agosto</option>
-            <option value="09">Setembro</option>
-            <option value="10">Outubro</option>
-            <option value="11">Novembro</option>
-            <option value="12">Dezembro</option>
-          </select>
+          <select id="inst-start-month-only" class="modal-select" onchange="syncCountFromEndDate(); updateInstallmentPreview()"></select>
         </div>
         <div>
           <label class="modal-label">A partir de (Ano)</label>
@@ -1666,27 +1391,11 @@
       <div class="modal-grid-2">
         <div>
           <label class="modal-label">Até (Mês opcional)</label>
-          <select id="inst-end-month-only" class="modal-select" onchange="syncCountFromEndDate(); updateInstallmentPreview()">
-            <option value="AUTO">Automático pela qtd.</option>
-            <option value="01">Janeiro</option>
-            <option value="02">Fevereiro</option>
-            <option value="03">Março</option>
-            <option value="04">Abril</option>
-            <option value="05">Maio</option>
-            <option value="06">Junho</option>
-            <option value="07">Julho</option>
-            <option value="08">Agosto</option>
-            <option value="09">Setembro</option>
-            <option value="10">Outubro</option>
-            <option value="11">Novembro</option>
-            <option value="12">Dezembro</option>
-          </select>
+          <select id="inst-end-month-only" class="modal-select" onchange="syncCountFromEndDate(); updateInstallmentPreview()"></select>
         </div>
         <div>
           <label class="modal-label">Até (Ano opcional)</label>
-          <select id="inst-end-year-only" class="modal-select" onchange="syncCountFromEndDate(); updateInstallmentPreview()">
-            <option value="AUTO">Automático</option>
-          </select>
+          <select id="inst-end-year-only" class="modal-select" onchange="syncCountFromEndDate(); updateInstallmentPreview()"></select>
         </div>
       </div>
 
@@ -1779,33 +1488,41 @@
     return activeMonthKey;
   }
 
-  (function initModalYearSelectors() {
-    const initialYear = activeMonthKey.split('-')[0];
-    ['inst-start-year-only', 'fixed-start-year-only'].forEach(id => {
-      const sel = document.getElementById(id);
-      if (!sel) return;
-      YEARS_LIST.forEach(y => {
-        const opt = document.createElement('option');
-        opt.value = y;
-        opt.textContent = y;
-        if (y === initialYear) opt.selected = true;
-        sel.appendChild(opt);
-      });
+  function fillSelectOptions(selectEl, optionsList, selectedValue) {
+    if (!selectEl) return;
+    const frag = document.createDocumentFragment();
+    optionsList.forEach(({ value, label }) => {
+      const opt = document.createElement('option');
+      opt.value = value;
+      opt.textContent = label;
+      if (value === selectedValue) opt.selected = true;
+      frag.appendChild(opt);
     });
+    selectEl.replaceChildren(frag);
+  }
 
-    ['inst-end-year-only', 'fixed-end-year-only'].forEach(id => {
-      const sel = document.getElementById(id);
-      if (!sel) return;
-      YEARS_LIST.forEach(y => {
-        const opt = document.createElement('option');
-        opt.value = y;
-        opt.textContent = y;
-        sel.appendChild(opt);
-      });
-    });
+  function populateMonthAndYearSelects() {
+    const [initialYear, initialMonth] = activeMonthKey.split('-');
+    const monthOpts = MONTH_NUMS.map(m => ({ value: m, label: FULL_MONTH_NAMES[m] }));
+    const yearOpts = YEARS_LIST.map(y => ({ value: y, label: y }));
+    const endMonthOpts = [{ value: 'NONE', label: 'Sem limite (até 2035)' }, ...monthOpts];
+    const endYearOpts = [{ value: 'NONE', label: 'Sem limite' }, ...yearOpts];
+    const instEndMonthOpts = [{ value: 'AUTO', label: 'Automático pela qtd.' }, ...monthOpts];
+    const instEndYearOpts = [{ value: 'AUTO', label: 'Automático' }, ...yearOpts];
 
-    localStorage.setItem(LAST_DATE_KEY, activeMonthKey);
-  })();
+    fillSelectOptions(document.getElementById('fixed-start-month-only'), monthOpts, initialMonth);
+    fillSelectOptions(document.getElementById('fixed-start-year-only'), yearOpts, initialYear);
+    fillSelectOptions(document.getElementById('fixed-end-month-only'), endMonthOpts, 'NONE');
+    fillSelectOptions(document.getElementById('fixed-end-year-only'), endYearOpts, 'NONE');
+
+    fillSelectOptions(document.getElementById('inst-start-month-only'), monthOpts, initialMonth);
+    fillSelectOptions(document.getElementById('inst-start-year-only'), yearOpts, initialYear);
+    fillSelectOptions(document.getElementById('inst-end-month-only'), instEndMonthOpts, 'AUTO');
+    fillSelectOptions(document.getElementById('inst-end-year-only'), instEndYearOpts, 'AUTO');
+  }
+
+  populateMonthAndYearSelects();
+  localStorage.setItem(LAST_DATE_KEY, activeMonthKey);
 
   function renderBinderBar() {
     const [curYear, curMonth] = activeMonthKey.split('-');
@@ -2017,7 +1734,6 @@
     })));
   }
 
-  // Compacta meses idênticos em sequência para evitar JSON gigante (>100KB) no JSONBin e localStorage
   function compactAccountMonths(accId) {
     const monthsMap = cloudRoot.data[accId];
     if (!monthsMap || typeof monthsMap !== 'object') return;
@@ -2451,7 +2167,6 @@
 
   function commitCurrentMonthToMemory(markTimestamp = true, markIncomeCustom = false) {
     if (!activeAccountId) return;
-    currentTopics = renumberTopicsAutomatically(currentTopics);
     const monthsMap = getAccountMonthsMap();
     const monthKey = getCurrentMonth();
     const prev = monthsMap[monthKey] || {};
@@ -2764,6 +2479,7 @@
     editingFixedId = existingId;
     const topicSelect = document.getElementById('fixed-topic');
     populateTopicSelectWithKnownTopics(topicSelect, preselectedTopicId);
+    populateMonthAndYearSelects();
 
     document.getElementById('fixed-feedback').textContent = '';
 
@@ -2936,6 +2652,7 @@
     editingInstallmentId = existingId;
     const topicSelect = document.getElementById('inst-topic');
     populateTopicSelectWithKnownTopics(topicSelect, preselectedTopicId);
+    populateMonthAndYearSelects();
 
     document.getElementById('inst-feedback').textContent = '';
 
@@ -3311,12 +3028,6 @@
     inp.type = inp.type === 'password' ? 'text' : 'password';
   }
 
-  function demoToast(msg) {
-    const el = document.getElementById('login-error');
-    el.textContent = msg;
-    setTimeout(() => { if (el.textContent === msg) el.textContent = ''; }, 3500);
-  }
-
   // --- MODAL ALTERAR NOME E SENHA ---
   function openAccountModal() {
     if (!activeAccountId || !cloudRoot.accounts[activeAccountId]) return;
@@ -3375,7 +3086,6 @@
   }
 
   function renderTopics() {
-    currentTopics = renumberTopicsAutomatically(currentTopics);
     const container = document.getElementById('topics-container');
     const frag = document.createDocumentFragment();
 
