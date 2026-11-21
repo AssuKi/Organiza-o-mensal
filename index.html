@@ -1444,7 +1444,7 @@
     </div>
 
     <div class="global-sort-bar">
-      <span class="global-sort-title">↕ Ordenar tópicos deste mês (numeração e meses seguintes atualizam automaticamente):</span>
+      <span class="global-sort-title">↕ Ordenar tópicos (numeração 1., 2., 3.... e todos os meses atualizam automaticamente):</span>
       <select class="sort-select" id="global-topic-sort" onchange="sortAllTopics(this.value); this.value='';">
         <option value="">Escolher ordenação dos tópicos...</option>
         <option value="val_desc">Maior valor (R$)</option>
@@ -1458,7 +1458,7 @@
 
     <button type="button" class="btn btn-accent btn-add-bottom" onclick="addTopic()">+ Criar Novo Tópico / Categoria</button>
 
-    <div class="note">💡 <strong>Numeração & Prioridade Automática (2026–2035):</strong> A numeração (1., 2., 3....) é atualizada automaticamente conforme a ordem dos tópicos, e qualquer mudança de ordem propaga automaticamente para todos os meses seguintes.</div>
+    <div class="note">💡 <strong>Sincronização Leve & Instantânea (2026–2035):</strong> A ordem de prioridade e a numeração automática são aplicadas globalmente em todas as páginas sem duplicar dados pesados na nuvem.</div>
   </div>
 </div>
 
@@ -1972,7 +1972,7 @@
     });
   }
 
-  let cloudRoot = { accounts: {}, data: {}, installments: {}, fixedCosts: {}, updatedAt: 0 };
+  let cloudRoot = { accounts: {}, data: {}, installments: {}, fixedCosts: {}, orders: {}, updatedAt: 0 };
   let activeAccountId = localStorage.getItem(SESSION_KEY) || null;
   let currentIncome = 0;
   let currentTopics = [];
@@ -1980,12 +1980,79 @@
   let editingFixedId = null;
 
   let saveTimer = null;
+  let localCacheTimer = null;
   let isSaving = false;
   let isFetching = false;
   let hasPendingSave = false;
   let lastLocalEditAt = 0;
 
   let dragState = null;
+
+  function stripDerivedItemsForStorage(topicsList) {
+    if (!Array.isArray(topicsList)) return [];
+    return topicsList.map(t => ({
+      id: t.id,
+      name: stripNumericPrefix(t.name),
+      shortName: t.shortName,
+      color: t.color,
+      items: Array.isArray(t.items)
+        ? t.items
+            .filter(it => it && !it.installmentId && !it.fixedId)
+            .map(it => ({
+              id: it.id,
+              label: it.label,
+              val: roundMoney(it.val || 0),
+              max: it.max || 1000
+            }))
+        : []
+    }));
+  }
+
+  function getTopicSignature(topicsList) {
+    const clean = stripDerivedItemsForStorage(topicsList);
+    return JSON.stringify(clean.map(t => ({
+      id: t.id,
+      name: t.name,
+      items: t.items.map(i => ({ id: i.id, label: i.label, val: roundMoney(i.val || 0) }))
+    })));
+  }
+
+  // Compacta meses idênticos em sequência para evitar JSON gigante (>100KB) no JSONBin e localStorage
+  function compactAccountMonths(accId) {
+    const monthsMap = cloudRoot.data[accId];
+    if (!monthsMap || typeof monthsMap !== 'object') return;
+
+    let lastInheritedTopicsSig = getTopicSignature(getDefaultTopics());
+    let lastInheritedIncome = 0;
+
+    for (let i = 0; i < ALL_MONTHS.length; i++) {
+      const k = ALL_MONTHS[i];
+      const entry = monthsMap[k];
+      if (!entry) continue;
+
+      const hasDeleted = Array.isArray(entry.deletedKeys) && entry.deletedKeys.length > 0;
+      const entryIncome = roundMoney(entry.income || 0);
+      const isIncomeDifferent = entry.incomeCustom && entryIncome !== lastInheritedIncome;
+
+      if (entry.initialized && Array.isArray(entry.topics)) {
+        const cleanTopics = stripDerivedItemsForStorage(entry.topics);
+        const sig = getTopicSignature(cleanTopics);
+        if (sig === lastInheritedTopicsSig && !hasDeleted && !isIncomeDifferent) {
+          delete monthsMap[k];
+          continue;
+        }
+        entry.topics = cleanTopics;
+        lastInheritedTopicsSig = sig;
+      } else if (!hasDeleted && !isIncomeDifferent) {
+        delete monthsMap[k];
+        continue;
+      }
+
+      if (entryIncome > 0) {
+        lastInheritedIncome = entryIncome;
+      }
+    }
+  }
 
   function normalizeCloudRoot(raw) {
     const root = (raw && typeof raw === 'object') ? { ...raw } : {};
@@ -2001,12 +2068,16 @@
     if (!root.data || typeof root.data !== 'object') root.data = {};
     if (!root.installments || typeof root.installments !== 'object') root.installments = {};
     if (!root.fixedCosts || typeof root.fixedCosts !== 'object') root.fixedCosts = {};
+    if (!root.orders || typeof root.orders !== 'object') root.orders = {};
     if (typeof root.updatedAt !== 'number') root.updatedAt = 0;
 
     for (const accId of Object.keys(root.accounts)) {
       if (!root.data[accId] || typeof root.data[accId] !== 'object') root.data[accId] = {};
       if (!Array.isArray(root.installments[accId])) root.installments[accId] = [];
       if (!Array.isArray(root.fixedCosts[accId])) root.fixedCosts[accId] = [];
+      if (!root.orders[accId] || typeof root.orders[accId] !== 'object') {
+        root.orders[accId] = { topicOrder: [], itemOrder: {} };
+      }
       root.fixedCosts[accId] = root.fixedCosts[accId].map(f => ({
         ...f,
         monthOverrides: (f.monthOverrides && typeof f.monthOverrides === 'object') ? f.monthOverrides : {}
@@ -2015,10 +2086,29 @@
     return root;
   }
 
-  function saveLocalCache() {
+  function saveLocalCacheImmediate() {
     try {
       localStorage.setItem(CACHE_KEY, JSON.stringify(cloudRoot));
-    } catch (e) {}
+      return true;
+    } catch (e) {
+      if (activeAccountId) {
+        compactAccountMonths(activeAccountId);
+        try {
+          localStorage.setItem(CACHE_KEY, JSON.stringify(cloudRoot));
+          return true;
+        } catch (e2) {
+          return false;
+        }
+      }
+      return false;
+    }
+  }
+
+  function scheduleLocalCacheSave() {
+    clearTimeout(localCacheTimer);
+    localCacheTimer = setTimeout(() => {
+      saveLocalCacheImmediate();
+    }, 300);
   }
 
   function loadLocalCache() {
@@ -2037,22 +2127,28 @@
     const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
       headers: { 'X-Master-Key': API_KEY }
     });
-    if (!res.ok) throw new Error('Falha ao ler JSONBin');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
     return normalizeCloudRoot(json.record);
   }
 
   async function pushCloudRootNow() {
+    if (activeAccountId) {
+      compactAccountMonths(activeAccountId);
+    }
+    const payload = JSON.stringify(cloudRoot);
     const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'X-Master-Key': API_KEY
       },
-      body: JSON.stringify(cloudRoot)
+      body: payload
     });
-    if (!res.ok) throw new Error('Falha ao salvar JSONBin');
-    saveLocalCache();
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+    saveLocalCacheImmediate();
   }
 
   function getAccountMonthsMap() {
@@ -2070,65 +2166,58 @@
     return cloudRoot.fixedCosts[activeAccountId];
   }
 
-  function propagateIncomeForward(fromMonthKey, newIncome) {
-    const monthsMap = getAccountMonthsMap();
-    const startIdx = ALL_MONTHS.indexOf(fromMonthKey);
-    if (startIdx === -1) return;
-
-    for (let i = startIdx + 1; i < ALL_MONTHS.length; i++) {
-      const k = ALL_MONTHS[i];
-      const existing = monthsMap[k];
-      if (!existing || !existing.incomeCustom) {
-        monthsMap[k] = {
-          initialized: existing ? Boolean(existing.initialized) : false,
-          topics: existing ? existing.topics : null,
-          deletedKeys: existing && Array.isArray(existing.deletedKeys) ? existing.deletedKeys : [],
-          income: roundMoney(newIncome),
-          incomeCustom: false
-        };
-      }
+  function getAccountOrderPrefs() {
+    if (!cloudRoot.orders) cloudRoot.orders = {};
+    if (!cloudRoot.orders[activeAccountId]) {
+      cloudRoot.orders[activeAccountId] = { topicOrder: [], itemOrder: {} };
     }
+    if (!Array.isArray(cloudRoot.orders[activeAccountId].topicOrder)) {
+      cloudRoot.orders[activeAccountId].topicOrder = [];
+    }
+    if (!cloudRoot.orders[activeAccountId].itemOrder || typeof cloudRoot.orders[activeAccountId].itemOrder !== 'object') {
+      cloudRoot.orders[activeAccountId].itemOrder = {};
+    }
+    return cloudRoot.orders[activeAccountId];
   }
 
-  function applyOrderSnapshotToTopicList(targetTopics, orderedSnapshotTopics) {
-    if (!Array.isArray(orderedSnapshotTopics) || orderedSnapshotTopics.length === 0) {
-      return renumberTopicsAutomatically(targetTopics);
-    }
-
-    const topicRankMap = new Map();
-    const itemRankByTopic = new Map();
-
-    orderedSnapshotTopics.forEach((snapT, tPos) => {
-      const tKey = snapT.id || normalizeTopicKey(snapT.name);
-      topicRankMap.set(tKey, tPos);
-      topicRankMap.set(`norm:${normalizeTopicKey(snapT.name)}`, tPos);
-
-      const iMap = new Map();
-      if (Array.isArray(snapT.items)) {
-        snapT.items.forEach((snapIt, iPos) => {
-          const iKey = snapIt.fixedId
-            ? `fixed:${snapIt.fixedId}`
-            : (snapIt.installmentId ? `inst:${snapIt.installmentId}` : `lbl:${normalizeTopicKey(snapIt.label)}`);
-          iMap.set(iKey, iPos);
-        });
-      }
-      itemRankByTopic.set(tKey, iMap);
-      itemRankByTopic.set(`norm:${normalizeTopicKey(snapT.name)}`, iMap);
+  function updateAccountOrderFromCurrentTopics() {
+    if (!activeAccountId || !Array.isArray(currentTopics)) return;
+    const prefs = getAccountOrderPrefs();
+    prefs.topicOrder = currentTopics.map(t => t.id || `norm:${normalizeTopicKey(t.name)}`);
+    prefs.itemOrder = {};
+    currentTopics.forEach(t => {
+      const tKey = t.id || `norm:${normalizeTopicKey(t.name)}`;
+      prefs.itemOrder[tKey] = Array.isArray(t.items)
+        ? t.items.map(it => it.fixedId
+            ? `fixed:${it.fixedId}`
+            : (it.installmentId ? `inst:${it.installmentId}` : `lbl:${normalizeTopicKey(it.label)}`))
+        : [];
     });
+  }
+
+  function applyAccountOrderPrefs(targetTopics) {
+    const prefs = getAccountOrderPrefs();
+    const tOrder = prefs.topicOrder || [];
+    if (tOrder.length === 0) return renumberTopicsAutomatically(targetTopics);
+
+    const tRank = new Map();
+    tOrder.forEach((key, idx) => tRank.set(key, idx));
 
     const sortedTopics = [...targetTopics].sort((a, b) => {
-      const ra = topicRankMap.has(a.id)
-        ? topicRankMap.get(a.id)
-        : (topicRankMap.has(`norm:${normalizeTopicKey(a.name)}`) ? topicRankMap.get(`norm:${normalizeTopicKey(a.name)}`) : 9999);
-      const rb = topicRankMap.has(b.id)
-        ? topicRankMap.get(b.id)
-        : (topicRankMap.has(`norm:${normalizeTopicKey(b.name)}`) ? topicRankMap.get(`norm:${normalizeTopicKey(b.name)}`) : 9999);
+      const ka = tRank.has(a.id) ? a.id : `norm:${normalizeTopicKey(a.name)}`;
+      const kb = tRank.has(b.id) ? b.id : `norm:${normalizeTopicKey(b.name)}`;
+      const ra = tRank.has(ka) ? tRank.get(ka) : 9999;
+      const rb = tRank.has(kb) ? tRank.get(kb) : 9999;
       return ra - rb;
     });
 
     const withSortedItems = sortedTopics.map(t => {
-      const iMap = itemRankByTopic.get(t.id) || itemRankByTopic.get(`norm:${normalizeTopicKey(t.name)}`);
-      if (!iMap || !Array.isArray(t.items)) return t;
+      const tKey = t.id || `norm:${normalizeTopicKey(t.name)}`;
+      const iOrder = prefs.itemOrder[tKey] || prefs.itemOrder[`norm:${normalizeTopicKey(t.name)}`];
+      if (!Array.isArray(iOrder) || iOrder.length === 0 || !Array.isArray(t.items)) return t;
+
+      const iRank = new Map();
+      iOrder.forEach((k, idx) => iRank.set(k, idx));
 
       const sortedItems = [...t.items].sort((x, y) => {
         const kx = x.fixedId
@@ -2137,8 +2226,8 @@
         const ky = y.fixedId
           ? `fixed:${y.fixedId}`
           : (y.installmentId ? `inst:${y.installmentId}` : `lbl:${normalizeTopicKey(y.label)}`);
-        const rx = iMap.has(kx) ? iMap.get(kx) : 9999;
-        const ry = iMap.has(ky) ? iMap.get(ky) : 9999;
+        const rx = iRank.has(kx) ? iRank.get(kx) : 9999;
+        const ry = iRank.has(ky) ? iRank.get(ky) : 9999;
         return rx - ry;
       });
 
@@ -2148,7 +2237,7 @@
     return renumberTopicsAutomatically(withSortedItems);
   }
 
-  function propagateOrderForward(fromMonthKey, orderedTopicsSnapshot) {
+  function propagateIncomeForward(fromMonthKey, newIncome) {
     const monthsMap = getAccountMonthsMap();
     const startIdx = ALL_MONTHS.indexOf(fromMonthKey);
     if (startIdx === -1) return;
@@ -2156,16 +2245,9 @@
     for (let i = startIdx + 1; i < ALL_MONTHS.length; i++) {
       const k = ALL_MONTHS[i];
       const existing = monthsMap[k];
-      const baseForMonth = buildTopicsForMonth(k, existing);
-      const reordered = applyOrderSnapshotToTopicList(baseForMonth, orderedTopicsSnapshot);
-
-      monthsMap[k] = {
-        initialized: true,
-        topics: reordered,
-        deletedKeys: existing && Array.isArray(existing.deletedKeys) ? existing.deletedKeys : [],
-        income: existing ? existing.income : undefined,
-        incomeCustom: existing ? Boolean(existing.incomeCustom) : false
-      };
+      if (existing && !existing.incomeCustom) {
+        existing.income = roundMoney(newIncome);
+      }
     }
   }
 
@@ -2180,29 +2262,24 @@
     for (let i = startIdx + 1; i < ALL_MONTHS.length; i++) {
       const k = ALL_MONTHS[i];
       const existing = monthsMap[k];
-      const prevDeleted = (existing && Array.isArray(existing.deletedKeys)) ? existing.deletedKeys : [];
-      const nextDeleted = prevDeleted.includes(itemSig) ? prevDeleted : [...prevDeleted, itemSig];
+      if (!existing) continue;
 
-      let nextTopics = existing && Array.isArray(existing.topics)
-        ? existing.topics.map(t => ({
-            ...t,
-            items: Array.isArray(t.items)
-              ? t.items.filter(it => {
-                  if (!it) return false;
-                  const sig = it.id ? `id:${it.id}` : `lbl:${normalizeTopicKey(it.label)}`;
-                  return sig !== itemSig && normalizeTopicKey(it.label) !== itemLabelNorm;
-                })
-              : []
-          }))
-        : null;
+      const prevDeleted = Array.isArray(existing.deletedKeys) ? existing.deletedKeys : [];
+      if (!prevDeleted.includes(itemSig)) prevDeleted.push(itemSig);
+      existing.deletedKeys = prevDeleted;
 
-      monthsMap[k] = {
-        initialized: existing ? Boolean(existing.initialized) : false,
-        topics: nextTopics ? renumberTopicsAutomatically(nextTopics) : null,
-        deletedKeys: nextDeleted,
-        income: existing ? existing.income : undefined,
-        incomeCustom: existing ? Boolean(existing.incomeCustom) : false
-      };
+      if (Array.isArray(existing.topics)) {
+        existing.topics = existing.topics.map(t => ({
+          ...t,
+          items: Array.isArray(t.items)
+            ? t.items.filter(it => {
+                if (!it) return false;
+                const sig = it.id ? `id:${it.id}` : `lbl:${normalizeTopicKey(it.label)}`;
+                return sig !== itemSig && normalizeTopicKey(it.label) !== itemLabelNorm;
+              })
+            : []
+        }));
+      }
     }
   }
 
@@ -2212,8 +2289,8 @@
     if (targetIdx > 0) {
       for (let i = targetIdx - 1; i >= 0; i--) {
         const prev = monthsMap[ALL_MONTHS[i]];
-        if (prev && (prev.initialized === true || Array.isArray(prev.topics))) {
-          return Array.isArray(prev.topics) ? prev.topics : [];
+        if (prev && prev.initialized === true && Array.isArray(prev.topics)) {
+          return prev.topics;
         }
       }
     }
@@ -2279,11 +2356,8 @@
   }
 
   function buildTopicsForMonth(monthKey, rawMonthObj) {
-    const isInitialized = Boolean(rawMonthObj && (rawMonthObj.initialized === true || Array.isArray(rawMonthObj.topics)));
-    const source = isInitialized
-      ? (Array.isArray(rawMonthObj.topics) ? rawMonthObj.topics : getInheritedBaseTopics(monthKey))
-      : getInheritedBaseTopics(monthKey);
-
+    const isInitialized = Boolean(rawMonthObj && rawMonthObj.initialized === true && Array.isArray(rawMonthObj.topics));
+    const source = isInitialized ? rawMonthObj.topics : getInheritedBaseTopics(monthKey);
     const deletedSet = new Set(Array.isArray(rawMonthObj && rawMonthObj.deletedKeys) ? rawMonthObj.deletedKeys : []);
 
     const list = source.map(t => {
@@ -2304,7 +2378,7 @@
     });
 
     const mIdx = ALL_MONTHS.indexOf(monthKey);
-    if (mIdx === -1) return renumberTopicsAutomatically(list);
+    if (mIdx === -1) return applyAccountOrderPrefs(list);
 
     getAccountInstallments().forEach(plan => {
       const startIdx = ALL_MONTHS.indexOf(plan.startMonth);
@@ -2360,12 +2434,7 @@
       }
     });
 
-    const inheritedOrder = getInheritedBaseTopics(monthKey);
-    const orderedList = (!isInitialized && inheritedOrder.length > 0)
-      ? applyOrderSnapshotToTopicList(list, inheritedOrder)
-      : renumberTopicsAutomatically(list);
-
-    return orderedList;
+    return applyAccountOrderPrefs(list);
   }
 
   function loadMonthIntoView(monthKey) {
@@ -2394,7 +2463,7 @@
       income: incVal,
       incomeCustom: isCustom,
       deletedKeys: Array.isArray(prev.deletedKeys) ? prev.deletedKeys : [],
-      topics: currentTopics
+      topics: stripDerivedItemsForStorage(currentTopics)
     };
 
     if (markIncomeCustom) {
@@ -2404,18 +2473,17 @@
     if (markTimestamp) {
       cloudRoot.updatedAt = Date.now();
     }
-    saveLocalCache();
+    scheduleLocalCacheSave();
   }
 
-  function scheduleBackgroundSave(delayMs = 350, markIncomeCustom = false, propagateOrder = false) {
+  function scheduleBackgroundSave(delayMs = 450, markIncomeCustom = false, saveOrder = false) {
     if (!activeAccountId) return;
     lastLocalEditAt = Date.now();
     hasPendingSave = true;
-    commitCurrentMonthToMemory(true, markIncomeCustom);
-    if (propagateOrder) {
-      propagateOrderForward(getCurrentMonth(), JSON.parse(JSON.stringify(currentTopics)));
-      saveLocalCache();
+    if (saveOrder) {
+      updateAccountOrderFromCurrentTopics();
     }
+    commitCurrentMonthToMemory(true, markIncomeCustom);
     setStatus('● Salvando...');
 
     clearTimeout(saveTimer);
@@ -2430,7 +2498,7 @@
         } while (hasPendingSave);
         setStatus('● Sincronizado');
       } catch (e) {
-        setStatus('● Salvo local (sem rede)');
+        setStatus(`● Erro ao salvar (${e.message || 'rede'})`);
       } finally {
         isSaving = false;
       }
@@ -2463,7 +2531,7 @@
     delete fixedObj.monthOverrides[getCurrentMonth()];
     currentTopics = buildTopicsForMonth(getCurrentMonth(), { initialized: true, topics: currentTopics });
     renderTopics();
-    scheduleBackgroundSave(250);
+    scheduleBackgroundSave(300);
   }
 
   // --- ORDENAÇÃO POR VALOR OU ORDEM ALFABÉTICA (TÓPICOS E ITENS) ---
@@ -2483,7 +2551,7 @@
     });
     currentTopics = renumberTopicsAutomatically(currentTopics);
     renderTopics();
-    scheduleBackgroundSave(250, false, true);
+    scheduleBackgroundSave(300, false, true);
   }
 
   function sortItemsInTopic(tIdx, mode) {
@@ -2497,7 +2565,7 @@
       return 0;
     });
     renderTopics();
-    scheduleBackgroundSave(250, false, true);
+    scheduleBackgroundSave(300, false, true);
   }
 
   // --- ARRASTAR E SOLTAR POR PRIORIDADE (TÓPICOS E ITENS) ---
@@ -2534,7 +2602,7 @@
     currentTopics.splice(to, 0, moved);
     currentTopics = renumberTopicsAutomatically(currentTopics);
     renderTopics();
-    scheduleBackgroundSave(250, false, true);
+    scheduleBackgroundSave(300, false, true);
   }
 
   function handleItemDragStart(e, tIdx, iIdx) {
@@ -2575,7 +2643,7 @@
     const [movedItem] = sourceItems.splice(fromI, 1);
     targetItems.splice(iIdx, 0, movedItem);
     renderTopics();
-    scheduleBackgroundSave(250, false, true);
+    scheduleBackgroundSave(300, false, true);
   }
 
   function handleTouchDragStart(e, mode, tIdx, iIdx = null) {
@@ -2643,7 +2711,7 @@
         currentTopics.splice(st.toT, 0, moved);
         currentTopics = renumberTopicsAutomatically(currentTopics);
         renderTopics();
-        scheduleBackgroundSave(250, false, true);
+        scheduleBackgroundSave(300, false, true);
       } else if (st.type === 'item' && (st.fromT !== st.toT || st.fromI !== st.toI)) {
         const sourceItems = currentTopics[st.fromT]?.items;
         const targetItems = currentTopics[st.toT]?.items;
@@ -2652,7 +2720,7 @@
           const insertAt = Math.min(targetItems.length, st.toI);
           targetItems.splice(insertAt, 0, movedItem);
           renderTopics();
-          scheduleBackgroundSave(250, false, true);
+          scheduleBackgroundSave(300, false, true);
         }
       }
     };
@@ -2812,7 +2880,7 @@
     currentTopics = buildTopicsForMonth(getCurrentMonth(), { initialized: true, topics: currentTopics });
     closeFixedModal();
     renderTopics();
-    scheduleBackgroundSave(250);
+    scheduleBackgroundSave(300);
   }
 
   function openFixedManager() {
@@ -2860,7 +2928,7 @@
     currentTopics = buildTopicsForMonth(getCurrentMonth(), { initialized: true, topics: currentTopics });
     renderFixedManager();
     renderTopics();
-    scheduleBackgroundSave(250);
+    scheduleBackgroundSave(300);
   }
 
   // --- PARCELAS ---
@@ -2989,7 +3057,7 @@
     currentTopics = buildTopicsForMonth(getCurrentMonth(), { initialized: true, topics: currentTopics });
     closeInstallmentModal();
     renderTopics();
-    scheduleBackgroundSave(250);
+    scheduleBackgroundSave(300);
   }
 
   function openInstallmentsManager() {
@@ -3035,7 +3103,7 @@
     currentTopics = buildTopicsForMonth(getCurrentMonth(), { initialized: true, topics: currentTopics });
     renderInstallmentsManager();
     renderTopics();
-    scheduleBackgroundSave(250);
+    scheduleBackgroundSave(300);
   }
 
   // --- IMPORTAÇÃO POR CÓDIGO & PROMPT ---
@@ -3145,7 +3213,7 @@
       document.getElementById('income').value = currentIncome.toFixed(2);
       renderTopics();
       closeImportModal();
-      scheduleBackgroundSave(200, true, true);
+      scheduleBackgroundSave(250, true, true);
     } catch (err) {
       fbEl.textContent = err.message;
     }
@@ -3209,7 +3277,7 @@
       errEl.textContent = 'Verificando na nuvem...';
       try {
         cloudRoot = await fetchCloudRoot();
-        saveLocalCache();
+        saveLocalCacheImmediate();
         for (const [accId, creds] of Object.entries(cloudRoot.accounts)) {
           if (creds.username.trim().toLowerCase() === u && creds.password === p) {
             matchedId = accId;
@@ -3232,6 +3300,7 @@
 
   function logout() {
     clearTimeout(saveTimer);
+    clearTimeout(localCacheTimer);
     activeAccountId = null;
     localStorage.removeItem(SESSION_KEY);
     checkAuth();
@@ -3283,7 +3352,7 @@
     cloudRoot.accounts[activeAccountId] = { username: newUser, password: newPass };
     document.getElementById('active-user-badge').textContent = '👤 ' + newUser;
     closeAccountModal();
-    scheduleBackgroundSave(150);
+    scheduleBackgroundSave(200);
   }
 
   // --- TEMA DUAL ---
@@ -3530,7 +3599,7 @@
   // --- INTERAÇÕES E CRUD INSTANTÂNEOS ---
   function onIncomeChange() {
     updateSummary();
-    scheduleBackgroundSave(450, true);
+    scheduleBackgroundSave(550, true);
   }
 
   function onSliderChange(tIdx, iIdx, sliderEl, numInputEl) {
@@ -3539,7 +3608,7 @@
     if (numInputEl) numInputEl.value = val;
     syncSliderVisual(sliderEl, val, sliderEl.max);
     updateSummary();
-    scheduleBackgroundSave(400);
+    scheduleBackgroundSave(500);
   }
 
   function onNumberChange(tIdx, iIdx, numInputEl, sliderEl) {
@@ -3555,7 +3624,7 @@
       syncSliderVisual(sliderEl, val, sliderEl.max);
     }
     updateSummary();
-    scheduleBackgroundSave(400);
+    scheduleBackgroundSave(500);
   }
 
   function addTopic() {
@@ -3589,7 +3658,7 @@
     currentTopics.push(newTopic);
     currentTopics = renumberTopicsAutomatically(currentTopics);
     renderTopics();
-    scheduleBackgroundSave(250, false, true);
+    scheduleBackgroundSave(300, false, true);
   }
 
   function editTopic(tIdx) {
@@ -3601,7 +3670,7 @@
     currentTopics[tIdx].shortName = cleanName.split('(')[0].trim().slice(0, 14);
     currentTopics = renumberTopicsAutomatically(currentTopics);
     renderTopics();
-    scheduleBackgroundSave(250, false, true);
+    scheduleBackgroundSave(300, false, true);
   }
 
   function deleteTopic(tIdx) {
@@ -3609,7 +3678,7 @@
     currentTopics.splice(tIdx, 1);
     currentTopics = renumberTopicsAutomatically(currentTopics);
     renderTopics();
-    scheduleBackgroundSave(250, false, true);
+    scheduleBackgroundSave(300, false, true);
   }
 
   function addItem(tIdx) {
@@ -3627,7 +3696,7 @@
       step: 0.01
     });
     renderTopics();
-    scheduleBackgroundSave(250);
+    scheduleBackgroundSave(300);
   }
 
   function editItem(tIdx, iIdx) {
@@ -3636,7 +3705,7 @@
     if (!updated || !updated.trim()) return;
     currentTopics[tIdx].items[iIdx].label = updated.trim();
     renderTopics();
-    scheduleBackgroundSave(250);
+    scheduleBackgroundSave(300);
   }
 
   function deleteItem(tIdx, iIdx) {
@@ -3648,7 +3717,7 @@
       cloudRoot.fixedCosts[activeAccountId] = getAccountFixedCosts().filter(f => f.id !== item.fixedId);
       currentTopics = buildTopicsForMonth(getCurrentMonth(), { initialized: true, topics: currentTopics });
       renderTopics();
-      scheduleBackgroundSave(250);
+      scheduleBackgroundSave(300);
       return;
     }
 
@@ -3657,7 +3726,7 @@
       cloudRoot.installments[activeAccountId] = getAccountInstallments().filter(p => p.id !== item.installmentId);
       currentTopics = buildTopicsForMonth(getCurrentMonth(), { initialized: true, topics: currentTopics });
       renderTopics();
-      scheduleBackgroundSave(250);
+      scheduleBackgroundSave(300);
       return;
     }
 
@@ -3667,14 +3736,14 @@
     commitCurrentMonthToMemory(true, false);
     propagateItemDeletionForward(getCurrentMonth(), removedSnapshot);
     renderTopics();
-    scheduleBackgroundSave(250);
+    scheduleBackgroundSave(300);
   }
 
   function resetToDefaultStructure() {
     if (!confirm('Restaurar todas as 6 repartições padrão zeradas nesta página mensal (mantendo suas parcelas e custos fixos ativos)?')) return;
     currentTopics = buildTopicsForMonth(getCurrentMonth(), { initialized: true, topics: getDefaultTopics() });
     renderTopics();
-    scheduleBackgroundSave(250, false, true);
+    scheduleBackgroundSave(300, false, true);
   }
 
   function copyToAllMonths() {
@@ -3682,19 +3751,19 @@
     const selectedYear = activeMonthKey.split('-')[0];
     if (!confirm(`Copiar o salário e todas as repartições desta página para os 12 meses de ${selectedYear} (somente nesta conta)?`)) return;
     const userMonths = getAccountMonthsMap();
-    const snapshotTopics = JSON.parse(JSON.stringify(currentTopics));
+    const snapshotTopics = stripDerivedItemsForStorage(currentTopics);
     MONTH_NUMS.forEach(m => {
       const key = `${selectedYear}-${m}`;
       userMonths[key] = {
         initialized: true,
         income: currentIncome,
         incomeCustom: true,
-        topics: renumberTopicsAutomatically(buildTopicsForMonth(key, { initialized: true, topics: snapshotTopics }))
+        deletedKeys: [],
+        topics: JSON.parse(JSON.stringify(snapshotTopics))
       };
     });
     cloudRoot.updatedAt = Date.now();
-    saveLocalCache();
-    scheduleBackgroundSave(250);
+    scheduleBackgroundSave(300);
   }
 
   // --- SINCRONIZAÇÃO NUVEM ---
@@ -3711,7 +3780,10 @@
         setStatus('● Salvando...');
         await pushCloudRootNow();
         hasPendingSave = false;
-      } catch (e) {}
+      } catch (e) {
+        setStatus(`● Erro ao salvar (${e.message || 'rede'})`);
+        return;
+      }
     }
     await syncFromCloud(false, true);
   }
@@ -3741,7 +3813,7 @@
 
       if (forcePull || (fresh.updatedAt || 0) > (cloudRoot.updatedAt || 0)) {
         cloudRoot = fresh;
-        saveLocalCache();
+        saveLocalCacheImmediate();
 
         const creds = cloudRoot.accounts[activeAccountId] || DEFAULT_ACCOUNTS[activeAccountId];
         document.getElementById('active-user-badge').textContent = '👤 ' + creds.username;
